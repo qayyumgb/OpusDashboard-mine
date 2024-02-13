@@ -1,0 +1,60 @@
+<div style="min-width: 500px;">
+    <h2 mat-dialog-title style="text-align: center; text-decoration: underline;font-size:1.2rem;" *ngIf="this.location">Edit Location: {{this.location.name}}</h2>
+
+    <mat-dialog-content [formGroup]="editLocationForm" style="text-align: center;">
+        <table style="width: 95%; border-collapse: separate;border-spacing: 1rem 1.2rem; text-align: center;">
+            <tr colspan="6" style="width:95%; margin-top: 0.5rem;">
+                <td colspan="6">
+                    <mat-form-field style="max-width: 9rem;">
+                      <mat-label>Name</mat-label>
+                        <input matInput required formControlName="name"/>
+                    </mat-form-field>
+                </td>
+            </tr>
+            <tr colspan="6" style="margin-top: 2rem;">
+              <td colspan="2" style="padding-bottom: 1rem;">
+                    <mat-label>Entrance Point</mat-label>
+                </td>
+                <td colspan="2">
+                    <mat-form-field style="max-width: 9rem;">
+                        <mat-label>Latitude</mat-label>
+                        <input type="number" matInput formControlName="entrancePointLatitude">
+                    </mat-form-field>
+                </td>
+                <td colspan="2">
+                    <mat-form-field style="max-width: 9rem;">
+                        <mat-label>Longitude</mat-label>
+                        <input type="number" matInput formControlName="entrancePointLongitude">
+                    </mat-form-field>
+                </td>
+            </tr>
+            <tr colspan="6" style="margin-top: 2rem;">
+                <td colspan="2" style="padding-bottom: 1rem;">
+                    <mat-label>Trolleys</mat-label>
+                </td>
+                <td colspan="2">
+                    <mat-form-field style="max-width: 9rem;">
+                        <mat-label>Start</mat-label>
+                        <input type="number" matInput formControlName="trolleysStart">
+                    </mat-form-field>
+                </td>
+                <td colspan="2">
+                    <mat-form-field style="max-width: 9rem;">
+                        <mat-label>End</mat-label>
+                        <input type="number" matInput formControlName="trolleysEnd">
+                    </mat-form-field>
+                </td>
+            </tr>
+        </table>
+
+    </mat-dialog-content>
+    <br/>
+    <div style="text-align: center; margin-bottom: 0.8rem;">
+        <mat-dialog-actions>
+            <button mat-raised-button color="primary" (click)="close()">Close</button>
+            <button mat-raised-button color="primary" (click)="updateLocation()" style="margin-left: 20px;">Update
+                Location
+            </button>
+        </mat-dialog-actions>
+    </div>
+</div>

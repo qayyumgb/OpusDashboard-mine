@@ -1,0 +1,88 @@
+<div style="min-width: 400px;">
+  <mat-dialog-content [formGroup]="editRegnForm" style="text-align: center;max-height: 100%;">
+
+    <mat-form-field style="width: 18rem;margin-bottom: 0.5rem;">
+      <mat-label>Start Time</mat-label>
+      <div class="date-picker-container">
+          <input matInput  formControlName="startTimestamp" [ngxTimepicker]="startTimepicker"   name="startTimestamp"   [format]="24" [disableClick]="true" readonly>
+          <ngx-material-timepicker-toggle matSuffix [for]="startTimepicker">
+            <mat-icon style="transform: scale(1.45);cursor: pointer;color: whitesmoke;margin-top: -1rem;" ngxMaterialTimepickerToggleIcon>access_time</mat-icon>
+          </ngx-material-timepicker-toggle>
+          <ngx-material-timepicker (timeChanged)="timeChanged($event)" [enableKeyboardInput]="true" [theme]="oktTheme" #startTimepicker></ngx-material-timepicker>
+      </div>
+    </mat-form-field>
+    <br/>
+    <mat-form-field style="width: 18rem;margin-bottom: 0.5rem;">
+      <mat-label>End Time</mat-label>
+      <div class="date-picker-container">
+        <input matInput  formControlName="endTimestamp" [ngxTimepicker]="endTimepicker"   name="endTimestamp"   [format]="24" [disableClick]="true" readonly>
+        <ngx-material-timepicker-toggle matSuffix [for]="endTimepicker">
+          <mat-icon style="transform: scale(1.45);cursor: pointer;color: whitesmoke;margin-top: -1rem;" ngxMaterialTimepickerToggleIcon>access_time</mat-icon>
+        </ngx-material-timepicker-toggle>
+        <ngx-material-timepicker (timeChanged)="timeChanged($event)" [enableKeyboardInput]="true" [theme]="oktTheme" #endTimepicker></ngx-material-timepicker>
+      </div>
+    </mat-form-field>
+    <br/>
+    <mat-form-field appearance="fill" style="width: 18rem;margin-bottom: 0.5rem;">
+      <mat-label>Worker</mat-label>
+      <mat-select formControlName="workerId">
+        <mat-option [value]="null">Select Worker</mat-option>
+        <mat-option *ngFor="let worker of allWorkersList" [value]="worker.id">
+          {{ worker.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <br/>
+    <mat-form-field appearance="fill" style="width: 18rem;margin-bottom: 0.5rem;">
+      <mat-label>Task</mat-label>
+      <mat-select formControlName="taskId">
+        <mat-option [value]="null">Select Task</mat-option>
+        <mat-option *ngFor="let task of allTasksList" [value]="task.id">
+          {{ task.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <br/>
+    <mat-form-field appearance="fill" style="width: 18rem;margin-bottom: 0.5rem;">
+      <mat-label>Location</mat-label>
+      <mat-select formControlName="locationId">
+        <mat-option [value]="null">Select Location</mat-option>
+        <mat-option *ngFor="let location of allLocationsList" [value]="location.id">
+          {{ location.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <br/>
+  </mat-dialog-content>
+  <div style="text-align: center;margin-bottom: 0.4rem;">
+    <mat-dialog-actions>
+      <button
+        mat-stroked-button
+        color="accent"
+        (click)="revertChanges()"
+        class="listing-table-tools tdhover"
+        style="margin-left: 2px;"
+        matTooltip="Revert to original"
+        matTooltipClass="tooltip-class"
+        matTooltipHideDelay="100"
+        matTooltipPosition="below"
+        [disabled]="beingSaved || regnRecordBeingEdited.isOriginal"
+      >
+        <mat-icon>settings_backup_restore</mat-icon>
+      </button>
+      <button mat-stroked-button (click)="close()"
+              matTooltip="Close without saving"
+              matTooltipClass="tooltip-class"
+              matTooltipHideDelay="100"
+              matTooltipPosition="below"
+      >Close</button>
+      <button mat-raised-button color="primary" (click)="updateRegistration()" [disabled]="beingSaved" style="margin-left: 20px;"
+              matTooltip="Save edited changes"
+              matTooltipClass="tooltip-class"
+              matTooltipHideDelay="100"
+              matTooltipPosition="below"
+      >Save Changes
+      </button>
+    </mat-dialog-actions>
+  </div>
+</div>

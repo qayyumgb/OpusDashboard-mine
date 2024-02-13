@@ -1,0 +1,17 @@
+.mat-mdc-dialog-actions {
+  display: inline-flex !important;
+}
+
+.keyInput {
+  font-size: 3rem;
+  text-align: center;
+}
+
+.flex-container {
+  display: flex;
+  align-items: center;
+}
+
+::ng-deep .mat-vertical-stepper-header {
+  pointer-events: none !important;
+}

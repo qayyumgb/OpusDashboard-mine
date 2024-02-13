@@ -1,0 +1,59 @@
+<div style="min-width: 600px;">
+    <h2 mat-dialog-title style="text-align: center; text-decoration: underline; font-size: 1.2rem; margin-bottom: 1rem;">Edit Layout</h2>
+
+    <mat-dialog-content [formGroup]="editLayoutForm" style="text-align: center;">
+        <table style="width: 95%; border-collapse: separate;border-spacing: 1rem 1.2rem; text-align: center;">
+            <tr colspan="6" style="width:95%; margin-top: 0.5rem;">
+                <td colspan="3">
+                    Location: &nbsp;{{this.locationName}}
+                </td>
+                <td colspan="3">
+                    <mat-form-field style="max-width: 9rem;">
+                        <mat-label>Name</mat-label><input matInput required formControlName="name">
+                    </mat-form-field>
+                </td>
+            </tr>
+            <tr colspan="6" style="margin-top: 2rem;">
+                <td colspan="2">
+                    <mat-form-field style="max-width: 8rem;">
+                        <mat-label>First Row</mat-label> <input matInput formControlName="firstRowNumber">
+                    </mat-form-field>
+                </td>
+                <td colspan="2">
+                    <mat-form-field style="max-width: 9rem;">
+                        <mat-label>Latitude</mat-label><input type="number" matInput  formControlName="firstRowLatitude">
+                    </mat-form-field>
+                </td>
+                <td colspan="2">
+                    <mat-form-field style="max-width: 9rem;">
+                        <mat-label>Longitude</mat-label><input type="number" matInput  formControlName="firstRowLongitude">
+                    </mat-form-field>
+                </td>
+            </tr>
+            <tr colspan="6" style="margin-top: 2rem;">
+                <td colspan="2">
+                    <mat-form-field style="max-width: 8rem;">
+                        <mat-label>Second Row</mat-label> <input matInput formControlName="secondRowNumber">
+                    </mat-form-field>
+                </td>
+                <td colspan="2">
+                    <mat-form-field style="max-width: 9rem;">
+                        <mat-label>Latitude</mat-label><input type="number" matInput  formControlName="secondRowLatitude">
+                    </mat-form-field>
+                </td>
+                <td colspan="2">
+                    <mat-form-field style="max-width: 9rem;">
+                        <mat-label>Longitude</mat-label><input type="number" matInput  formControlName="secondRowLongitude">
+                    </mat-form-field>
+                </td>
+            </tr>
+        </table>
+    </mat-dialog-content>
+    <br><br>
+    <div style="text-align: center;">
+        <mat-dialog-actions>
+            <button mat-raised-button color="primary" (click)="close()">Close</button>
+            <button mat-raised-button color="primary" (click)="updateLayout()" style="margin-left: 20px;">Update Layout</button>
+        </mat-dialog-actions>
+    </div>
+</div>

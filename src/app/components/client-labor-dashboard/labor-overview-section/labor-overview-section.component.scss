@@ -1,0 +1,44 @@
+.example-element-descriptions {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.example-element-description {
+  padding: 16px;
+  width: 100%;
+}
+
+.example-element-description__cell {
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.example-element-description__header {
+  color:#777;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  padding-top: 8px;
+  padding-bottom: 4px;
+}
+
+.example-element-description__content {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.example-element-description__content div,
+.example-element-description__header div {
+  width: 10%;
+}
+
+div.row-detail-expanded {
+  overflow: hidden;
+  width: 112% !important;
+}

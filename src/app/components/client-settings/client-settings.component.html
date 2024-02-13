@@ -1,0 +1,14 @@
+<div style="margin-top: 1.5rem;margin-bottom: 12px;margin-left:5rem;width: 90%;float: left;">
+  <span style="font-size: 2rem;">Settings</span>
+  <nav mat-tab-nav-bar mat-align-tabs="left" [tabPanel]="tabPanel">
+    <a mat-tab-link
+       *ngFor="let l of navigation"
+       [routerLink]="rootUrl + l.link"
+       [active]="this.router.url === rootUrl + l.link">
+      {{l.name | uppercase}}
+    </a>
+  </nav>
+  <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
+  <router-outlet></router-outlet>
+</div>
+

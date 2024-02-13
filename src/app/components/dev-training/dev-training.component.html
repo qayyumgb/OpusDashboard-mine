@@ -1,0 +1,182 @@
+<div class="listing-container">
+  <mat-form-field appearance="outline" class="listing-filter-with-archival">
+    <mat-icon matPrefix>search</mat-icon>
+    <mat-label style="color: gray">Type Filter String Here...</mat-label>
+    <input matInput (keyup)="applyFilter($event)" #input/>
+  </mat-form-field>
+  <div
+    style="margin-left: 1rem;
+    float: left;
+    vertical-align: bottom;
+    margin-top: 0.8rem;
+    border: 1px #ffffff4d solid;
+    border-radius: 5px;
+    display: inline-block;">
+    <mat-button-toggle-group #group="matButtonToggleGroup" [(ngModel)]="unArchivedVsArchived"
+                             style="height: 2.15rem;padding-top: 0;" (change)="toggleArchived()">
+      <mat-button-toggle value="unarchived" aria-label="Text align left">
+        <mat-icon
+          style="transform: scale(1);cursor: pointer;color: whitesmoke;margin-top: -1rem;"
+          matTooltip="Show trainings"
+          matTooltipClass="tooltip-class"
+          matTooltipHideDelay="100"
+          matTooltipPosition="below"
+        >list
+        </mat-icon>
+      </mat-button-toggle>
+      <mat-button-toggle value="archived" aria-label="Text align center">
+        <mat-icon
+          style="transform: scale(1);cursor: pointer;color: whitesmoke;margin-top: -1rem;"
+          matTooltip="Show archived trainings"
+          matTooltipClass="tooltip-class"
+          matTooltipHideDelay="100"
+          matTooltipPosition="below"
+        >archive
+        </mat-icon>
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+  <div style="float:left; margin-left: 2rem; margin-top:1.3rem;">
+    <mat-icon
+      style="transform: scale(1.2);cursor: pointer;color: whitesmoke;"
+      matTooltip="Download as CSV"
+      matTooltipClass="tooltip-class"
+      matTooltipHideDelay="100"
+      matTooltipPosition="below"
+      (click)="downloadAsCSV('TrainingList')"
+      *ngIf="trainingsList?.length > 0">download
+    </mat-icon>
+  </div>
+
+  <div style="clear: both; font-size: 1.1rem;padding-left: 0.2rem;margin-bottom: 0.25rem;" *ngIf="areArchivedTrainingsShown()">Archived Trainings</div>
+  <div class="mat-elevation-z8" style="clear: both;">
+    <ngx-simplebar>
+      <table
+        mat-table
+        [dataSource]="dataSource"
+        multiTemplateDataRows
+        matSort
+        class="listing-table"
+      >
+        <ng-container
+          matColumnDef="{{ column }}"
+          *ngFor="let column of columnsToDisplay"
+        >
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            {{ trainingsAttributesReadableMap.get(column) }}
+          </th>
+          <td mat-cell *matCellDef="let element">{{ element[column] }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="expandedDetail">
+          <td
+            mat-cell
+            *matCellDef="let element"
+            [attr.colspan]="columnsToDisplay.length"
+          >
+            <div
+              class="row-detail"
+              [@detailExpand]="
+                element.trainingId == expandedElement?.trainingId ? 'expanded' : 'collapsed'
+              "
+            >
+              <div class="row-detail-description">
+                <table>
+                  <tr *ngFor="let column of element.remainingAttributesList">
+                    <td class="details key">
+                      {{ column[0] }}
+                    </td>
+                    <td class="details value">
+                      <ng-container
+                        *ngIf="
+                          column[0] === 'YouTube';
+                          then linkTemplate;
+                          else textTemplate
+                        "
+                      ></ng-container>
+                      <ng-template #linkTemplate>
+                        <a
+                          *ngIf="column[1]"
+                          href="{{ column[1] }}"
+                          target="_blank"
+                        >click here to open</a
+                        >
+                      </ng-template>
+                      <ng-template #textTemplate>
+                        {{ column[1] }}
+                      </ng-template>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="edit">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let element" class="listing-table-tools">
+            <a
+              mat-icon-button
+              color="accent"
+              [routerLink]="editAnnotationLink(element)"
+              role="link"
+              class="listing-table-tools"
+            >
+              <mat-icon>movie</mat-icon>
+            </a>
+            <button
+              mat-icon-button
+              color="accent"
+              (click)="archiveTraining(element)"
+              class="listing-table-tools"
+              *ngIf="!element.isArchived">
+              <mat-icon matTooltip="Archive this training"
+                        matTooltipClass="tooltip-class"
+                        matTooltipHideDelay="100"
+                        matTooltipPosition="below"
+                        style="width: 44px; height: 24px">archive
+              </mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              color="accent"
+              (click)="unarchiveTraining(element)"
+              class="listing-table-tools"
+              *ngIf="element.isArchived">
+              <mat-icon matTooltip="Unarchive this training"
+                        matTooltipClass="tooltip-class"
+                        matTooltipHideDelay="100"
+                        matTooltipPosition="below"
+                        style="width: 44px; height: 24px">unarchive
+              </mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr
+          mat-header-row
+          *matHeaderRowDef="columnsHeadersToDisplay; sticky: true"
+        ></tr>
+        <tr
+          mat-row
+          *matRowDef="let element; columns: columnsHeadersToDisplay"
+          class="row"
+          [class.expanded-row]="applyExpandedClass(element)"
+          (click)="expandRow(element)"
+        ></tr>
+        <tr
+          mat-row
+          *matRowDef="let row; columns: ['expandedDetail']"
+          class="row-detail"
+        ></tr>
+      </table>
+    </ngx-simplebar>
+
+    <mat-paginator
+      [pageSizeOptions]="[5, 10, 25, 100]"
+      [pageSize]="25"
+      [showFirstLastButtons]="true"
+    ></mat-paginator>
+  </div>
+</div>

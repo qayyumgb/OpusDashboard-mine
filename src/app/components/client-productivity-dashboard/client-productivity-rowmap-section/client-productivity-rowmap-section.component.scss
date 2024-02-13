@@ -1,0 +1,147 @@
+p,
+li {
+  color: lightgray;
+  font-size: smaller;
+  font-weight: 200;
+}
+
+.pending {
+  background-color: #d81159;
+}
+
+.skip {
+  background-color: #e45932;
+  cursor: pointer;
+}
+
+.done {
+  background-color: #13a384;
+}
+
+.done-below {
+  background-color: #EFA00B;
+}
+.progress {
+  background-color: #265c60;
+}
+
+.add {
+  background-color: #4c2660;
+}
+
+/* TODO(mdc-migration): The following rule targets internal classes of card that may no longer apply for the MDC version.*/
+/* TODO(mdc-migration): The following rule targets internal classes of card that may no longer apply for the MDC version.*/
+/* TODO(mdc-migration): The following rule targets internal classes of card that may no longer apply for the MDC version.*/
+mat-card {
+  color: white;
+  margin-bottom: 3px;
+  padding: 1px;
+  min-width: 240px;
+}
+
+/* TODO(mdc-migration): The following rule targets internal classes of card that may no longer apply for the MDC version.*/
+/* TODO(mdc-migration): The following rule targets internal classes of card that may no longer apply for the MDC version.*/
+/* TODO(mdc-migration): The following rule targets internal classes of card that may no longer apply for the MDC version.*/
+mat-card-content {
+  display: flex;
+  padding: 0.3rem !important;
+}
+
+.row-content {
+  flex-grow: 0;
+  flex-shrink: 0;
+  align-self: center;
+  // background-color: green;
+}
+
+.row-spacer-wide {
+  flex-grow: 10;
+  // background-color: red;
+}
+
+.row-spacer-small {
+  flex-basis: 1rem;
+  // background-color: blue;
+}
+
+.row-number {
+  flex-basis: 4rem;
+  text-align: right;
+  font-size: 1rem;
+}
+
+.row-varierty {
+  flex-basis: 6rem;
+  font-size: 0.85rem;
+  font-weight: 200;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  height: 1.2em;
+  white-space: nowrap;
+}
+
+.row-state {
+  flex-basis: 25.5rem;
+  flex-shrink: 4;
+  align-self: center;
+  text-align: right;
+}
+
+.row-state-info {
+  flex-basis: 25.5rem;
+  flex-shrink: 1;
+  align-self: center;
+  text-align: right;
+}
+
+.row-state-info > span {
+  font-size: 0.75rem;
+  font-weight: 300;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  height: 1.2em;
+  white-space: nowrap;
+  align-self: center;
+}
+
+.row-state-icon {
+  margin-left: 0.2rem;
+  font-size: 1rem;
+  height: 1rem;
+  width: 1rem;
+  font-weight: 100;
+}
+
+.bar {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 1.5rem;
+}
+
+.bar-card {
+  flex-grow: 1;
+  font-size: 0.85rem;
+  font-weight: 200;
+  min-width: 1%;
+  display: flex;
+  flex-direction: column;
+}
+
+.bar-card-left {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.bar-card-middle {
+  border-radius: 0;
+}
+
+.bar-card-right {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.bar-card-content {
+  align-self: center;
+}

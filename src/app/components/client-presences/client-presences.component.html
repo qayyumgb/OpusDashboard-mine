@@ -1,0 +1,20 @@
+<div style="margin-left: 0;margin-bottom: 1rem;width: 100%;max-width: 1200px;">
+  <mat-card appearance="outlined" style="display: flex; flex-direction: column;margin-top: 4rem;max-width: 1200px;">
+    <mat-card-header style="display: flex; flex-direction: column;">
+      <mat-card-title style="font-size: 1.2rem;margin-bottom: 0.4rem;">Sessions auto archive</mat-card-title>
+      <mat-card-subtitle style="font-weight: 200;">Automatically archive previous sessions that are shorter then 4 minutes and at least have one of the following matching fields: row number, trolley number or variety.</mat-card-subtitle>
+    </mat-card-header>
+    <br/>
+    <mat-card-content>
+      <div style="margin-left: 16px; display:flex; flex-direction: column;">
+        <mat-slide-toggle [(ngModel)]="autoArchiveShortSessions" style="margin-top: 0.6rem;">
+          <mat-label style="font-size: 1rem;font-weight: 300;">Archive previous short sessions automatically</mat-label>
+        </mat-slide-toggle>
+      </div>
+    </mat-card-content>
+    <mat-card-actions align="end" style="margin-right: 1rem;">
+      <button mat-flat-button (click)="saveAutoArchiveSessionFlag()" color="primary">SAVE</button>
+    </mat-card-actions>
+  </mat-card>
+
+</div>

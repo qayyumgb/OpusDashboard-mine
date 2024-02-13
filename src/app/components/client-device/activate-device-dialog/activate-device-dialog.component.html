@@ -1,0 +1,63 @@
+<div style="min-width: 400px">
+  <mat-dialog-content style="text-align: center">
+    <div class="flex-container">
+      <div style="flex-grow: 1; margin: 20px">
+        <img width="300px" src="assets/activate_device.svg" />
+      </div>
+      <div style="flex-grow: 8">
+        <!-- <h2 mat-dialog-title style="text-align: center">Activate Device</h2> -->
+        <mat-vertical-stepper [linear]="true" #stepper>
+          <mat-step>
+            <ng-template matStepLabel
+              >Open the Opus application on the watch</ng-template
+            >
+            <div style="margin-top: 0.4rem;">
+              <button mat-raised-button matStepperNext color="primary">
+                Yes, I see the key
+              </button>
+            </div>
+          </mat-step>
+
+          <mat-step>
+            <ng-template matStepLabel>Fill in the activation key</ng-template>
+
+            <mat-form-field style="margin-top: 0.4rem;">
+              <mat-label>Activation Key</mat-label>
+              <input
+                matInput
+                required
+                [(ngModel)]="activationKey"
+                (input)="autocapitalize($event)"
+                class="keyInput"
+                maxlength="4"
+              />
+            </mat-form-field>
+            <div style="margin-bottom: 20px; text-align: center">
+              <div style="color: #0085fc" *ngIf="progressMessage">
+                {{ progressMessage }}
+              </div>
+            </div>
+          </mat-step>
+          <mat-step>
+            <ng-template matStepLabel>Edit/Confirm Device Number</ng-template>
+            <mat-form-field style="width:5.3rem;margin-top: 0.4rem;" appearance="fill">
+              <input matInput [(ngModel)]="deviceNumber" maxlength="4"/>
+            </mat-form-field>
+            <br/>
+            <button style="width: 5rem;" mat-raised-button color="primary" (click)="deviceNumberConfirmed($event)">
+              Confirm
+            </button>
+            <br/>
+          </mat-step>
+          <mat-step>
+            <ng-template matStepLabel>Done</ng-template>
+            <br/>
+            <div>
+              <button mat-raised-button color="primary" (click)="close()">Close</button>
+            </div>
+          </mat-step>
+        </mat-vertical-stepper>
+      </div>
+    </div>
+  </mat-dialog-content>
+</div>

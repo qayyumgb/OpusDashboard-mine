@@ -1,0 +1,6 @@
+<div class="listing-container" style="text-align: center; padding-top: 8rem;">
+  <mat-form-field style="width: 18rem;">
+    <mat-label>API Key:</mat-label><input readonly matInput required #inputTarget [value]="apiKey">
+  </mat-form-field>
+  <button style="margin-left: 1rem;" mat-raised-button color="primary" [ngxClipboard]="inputTarget">Copy</button>
+</div>

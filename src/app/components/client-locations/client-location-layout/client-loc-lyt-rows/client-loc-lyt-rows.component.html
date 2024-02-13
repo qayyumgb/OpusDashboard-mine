@@ -1,0 +1,93 @@
+<div class="listing-container">
+  <div class="mat-elevation-z8">
+    <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort (matSortChange)= "sortData()" class="listing-table">
+      <ng-container matColumnDef="{{ column }}" *ngFor="let column of columnsToDisplay">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header [disabled]="column === 'labelIds'">
+          {{ rowAttributesReadableMap.get(column) }}
+        </th>
+        <td mat-cell *matCellDef="let element" style="height: 3rem;">
+          <mat-form-field style="width: 7rem;height: 2.9rem;padding-top: 2px;" *ngIf="column === 'rowReference'" appearance="fill">
+            <input [type]="rowAttributesSchema[column]" style="height: 2rem;"
+                   matInput [(ngModel)]="element[column]" (focusout)="saveRowOnFocusOut(element, dataSource.data.indexOf(element))"
+                   [disabled]="!selectedClientDocData?.hasAdminRole" *ngIf="!['id', 'activityId', 'varietyId', 'labelIds', 'rowNumber', 'rowLength'].includes(column)"
+            >
+          </mat-form-field>
+          <mat-form-field style="width: 8rem;height: 2.9rem;padding-top: 2px;" *ngIf="column === 'rowNumber'" appearance="fill">
+            <input [type]="rowAttributesSchema[column]" style="height: 2rem;"
+                   matInput [(ngModel)]="element[column]" (focusout)="saveRowOnFocusOut(element, dataSource.data.indexOf(element))"
+                   [disabled]="!selectedClientDocData?.hasAdminRole" *ngIf="!['id', 'activityId', 'varietyId', 'labelIds', 'rowReference', 'rowLength'].includes(column)"
+            >
+          </mat-form-field>
+          <mat-form-field style="width: 9rem;height: 3rem;" *ngIf="column === 'rowLength'" appearance="fill">
+            <mat-label>Length (m)</mat-label>
+            <input [type]="rowAttributesSchema[column]"
+                   matInput [(ngModel)]="element[column]" (focusout)="saveRowOnFocusOut(element, dataSource.data.indexOf(element))"
+                   [disabled]="!selectedClientDocData?.hasAdminRole" *ngIf="!['id', 'activityId', 'varietyId', 'labelIds', 'rowReference', 'rowNumber'].includes(column)"
+            >
+            <button matSuffix mat-icon-button aria-label="Clear">
+              <mat-icon>content_paste_go</mat-icon>
+            </button>
+          </mat-form-field>
+          <mat-select [(ngModel)]="element[column]"
+                      placeholder="Select Activity" style="margin-left:-5px; margin-right: 5px; margin-top: 0.5rem; padding-left: 5px;height:2rem; width: 8rem;"
+                      [disabled]="!selectedClientDocData?.hasAdminRole"
+                      (selectionChange)="saveRowOnFocusOut(element, dataSource.data.indexOf(element))"
+                      *ngIf="column === 'activityId'">
+            <mat-option value="-1">Select Activity</mat-option>
+            <mat-option *ngFor="let activity of allActivitiesList" [value]="activity.id">
+              {{activity.name}}
+            </mat-option>
+          </mat-select>
+          <mat-select [(ngModel)]="element[column]"
+                      placeholder="Select Variety" style="margin-left:-5px; margin-right: 5px; margin-top: 0.5rem; padding-left: 5px;height:2rem; width: 8rem;"
+                      [disabled]="!selectedClientDocData?.hasAdminRole"
+                      (selectionChange)="saveRowOnFocusOut(element, dataSource.data.indexOf(element))"
+                      *ngIf="column === 'varietyId'">
+            <mat-option value="-1">Select Variety</mat-option>
+            <mat-option *ngFor="let variety of allVarietiesList" [value]="variety.id">
+              {{variety.name}}
+            </mat-option>
+          </mat-select>
+          <mat-select [(ngModel)]="element[column]" multiple
+                      placeholder="Select Labels" style="margin-left:-5px; margin-right: 5px; margin-top: 0.5rem; padding-left: 5px;height:2rem; width: 8rem;"
+                      [disabled]="!selectedClientDocData?.hasAdminRole"
+                      (selectionChange)="saveRowOnFocusOut(element, dataSource.data.indexOf(element))"
+                      *ngIf="column === 'labelIds'">
+            <mat-option *ngFor="let label of allLabelsList" [value]="label.id">
+              {{label.name}}
+            </mat-option>
+          </mat-select>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="edit">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let element" class="listing-table-tools">
+          <button matTooltip="Save row" mat-icon-button color="accent" (click)="saveRow(element)" [disabled]="!selectedClientDocData?.hasAdminRole">
+            <mat-icon>save</mat-icon>
+          </button>
+          <button matTooltip="Delete row"
+                  mat-icon-button color="accent" (click)="deleteCurrentRow(element, dataSource.data.indexOf(element))"
+                  [disabled]="!selectedClientDocData?.hasAdminRole">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columnsHeadersToDisplay"></tr>
+
+      <tr mat-row *matRowDef="let element; columns: columnsHeadersToDisplay" class="row"></tr>
+    </table>
+
+    <mat-paginator
+      [pageSizeOptions]="[5, 10, 25, 100]"
+      [pageSize]="25"
+      [showFirstLastButtons]="true"
+    ></mat-paginator>
+    <button matTooltip="Add new row" mat-icon-button color="accent"
+            (click)="addNewEmptyRow()" style="position: relative; top: -3.3rem; left:20px"
+            *ngIf="selectedClientDocData?.hasAdminRole">
+      <mat-icon>add_circle</mat-icon>
+    </button>
+  </div>
+</div>

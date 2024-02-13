@@ -1,0 +1,80 @@
+<div style="min-width: 400px;">
+  <mat-dialog-content [formGroup]="enrollmentSettingsForm" style="text-align: center;">
+    <mat-form-field appearance="fill"  style="width: 18rem;">
+      <mat-label>Select Location</mat-label>
+      <mat-select formControlName="locationId">
+        <mat-option [value]="null">Select Location</mat-option>
+        <mat-option *ngFor="let location of allLocationsList" [value]="location.id">
+          {{location.name}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <br/>
+    <mat-form-field appearance="fill" style="width: 18rem;margin-top: 0.4rem;">
+      <mat-label>App Modes</mat-label>
+      <mat-select formControlName="appModes" multiple>
+        <mat-option *ngFor="let appMode of allAppModesList" [value]="appMode.id">
+          {{appMode.name}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <br/>
+    <mat-form-field appearance="fill" style="width: 18rem;margin-top: 0.4rem;">
+      <mat-label>Next Device Number</mat-label>
+      <input matInput formControlName="nextDeviceNumber"/>
+    </mat-form-field>
+    <br/>
+    <span style="color: #EC4444; font-size: 0.7rem;font-style: italic;"
+          *ngIf="enrollmentSettingsForm.controls['nextDeviceNumber'].invalid">
+    (requires zero-padded 4-digit number, e.g. 0023)
+  </span>
+    <span style="color: #EC4444; font-size: 0.7rem;font-style: italic;"
+          *ngIf="enrollmentSettingsForm.controls['nextDeviceNumber'].valid">
+    &nbsp;
+  </span>
+    <br/>
+    <mat-slide-toggle
+      class="edit_device_toggles"
+      style="margin-top: 0.4rem !important;"
+      formControlName="enableAutoTouchLock"
+    >
+      <mat-label>Enable auto touch lock</mat-label>
+    </mat-slide-toggle>
+    <br/>
+    <mat-slide-toggle
+      class="edit_device_toggles"
+      formControlName="enableGPS"
+    >
+      <mat-label>Enable GPS</mat-label>
+    </mat-slide-toggle>
+    <br/>
+    <mat-slide-toggle
+      class="edit_device_toggles"
+      formControlName="enableOutOfRange"
+    >
+      <mat-label>Enable out of range</mat-label>
+    </mat-slide-toggle>
+    <br/>
+    <mat-slide-toggle
+      class="edit_device_toggles"
+      formControlName="enableTrainingMode"
+    >
+      <mat-label>Enable training mode</mat-label>
+    </mat-slide-toggle>
+    <br/>
+    <mat-slide-toggle
+      class="edit_device_toggles"
+      formControlName="enableVoiceAssistance"
+    >
+      <mat-label>Enable voice assistance</mat-label>
+    </mat-slide-toggle>
+    <br/>
+  </mat-dialog-content>
+  <div style="text-align: center;margin-bottom: 0.4rem;">
+    <mat-dialog-actions>
+      <button mat-raised-button color="primary" (click)="close()" [disabled]="beingSaved">Close</button>
+      <button mat-raised-button color="primary" (click)="updateEnrollmentSettings()"
+              [disabled]="beingSaved || enrollmentSettingsForm?.invalid" style="margin-left: 20px;">Save Changes</button>
+    </mat-dialog-actions>
+  </div>
+</div>

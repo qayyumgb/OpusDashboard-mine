@@ -1,0 +1,38 @@
+<div class="listing-container">
+  <mat-form-field appearance="outline" class="listing-filter">
+    <mat-icon matPrefix>search</mat-icon>
+    <mat-label style="color: gray">Filter</mat-label>
+    <input matInput (keyup)="applyFilter($event)" [(ngModel)]="filterValue" placeholder="Enter filter value..." #input />
+  </mat-form-field>
+  <div class="mat-elevation-z8" style="clear: both;">
+    <table
+      class="listing-table"
+      mat-table
+      [dataSource]="dataSource"
+      multiTemplateDataRows
+      matSort
+    >
+      <ng-container
+        matColumnDef="{{ column }}"
+        *ngFor="let column of columnsToDisplay"
+      >
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          {{ workerAttributesReadableMap.get(column) }}
+        </th>
+        <td mat-cell *matCellDef="let element">{{ element[column] }}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columnsHeadersToDisplay"></tr>
+      <tr
+        mat-row
+        *matRowDef="let element; columns: columnsHeadersToDisplay"
+      ></tr>
+    </table>
+
+    <mat-paginator
+      [pageSizeOptions]="[5, 10, 25, 100]"
+      [pageSize]="25"
+      [showFirstLastButtons]="true"
+    ></mat-paginator>
+  </div>
+</div>

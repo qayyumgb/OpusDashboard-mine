@@ -1,0 +1,54 @@
+<div style="margin-left: 25%; margin-top: 2rem; margin-bottom: 1rem;max-width:40%;">
+  <mat-card appearance="outlined" style="display: flex; flex-direction: column;">
+    <mat-card-header style="display: flex; flex-direction: column;">
+      <mat-card-title style="font-size: 1.2rem;margin-bottom: 0.4rem;">Security settings</mat-card-title>
+      <mat-card-subtitle>General security settings for all devices</mat-card-subtitle>
+    </mat-card-header>
+    <br/>
+    <mat-card-content>
+      <div style="margin-left: 16px; display:flex; flex-direction: column;">
+        <mat-form-field appearance="fill" style="width: 8.2rem !important;">
+          <mat-label>Security code</mat-label>
+          <input matInput required placeholder="0000"
+                 [(ngModel)]="deviceSecurityCode"
+                 style="width: 6rem !important; height: 1.1rem; margin-right: 3rem; margin-top: 0.5rem;"
+                 maxlength="4"
+                 minlength="4"/>
+        </mat-form-field>
+
+        <mat-slide-toggle [(ngModel)]="workerCodeWatchEnabled" style="margin-top: 0.8rem;">
+          <mat-label style="font-size: 1rem;">Watch user should enter a 2 digit code to switch from worker</mat-label>
+        </mat-slide-toggle>
+        <mat-slide-toggle [(ngModel)]="workerCodeClockEnabled" style="margin-top: 1rem;">
+          <mat-label style="font-size: 1rem;">Clock user should enter a 2 digit code to switch from worker</mat-label>
+        </mat-slide-toggle>
+      </div>
+    </mat-card-content>
+    <mat-card-actions align="end" style="margin-right: 1rem;">
+      <button mat-flat-button (click)="saveDeviceSecurityCode()" color="primary">SAVE</button>
+    </mat-card-actions>
+  </mat-card>
+
+  <mat-card appearance="outlined" style="display: flex; flex-direction: column;margin-top: 4.5rem;">
+    <mat-card-header style="display: flex; flex-direction: column;">
+      <mat-card-title style="font-size: 1.2rem;margin-bottom: 0.4rem;">Correction</mat-card-title>
+      <mat-card-subtitle>Overall correction factor for all countings</mat-card-subtitle>
+    </mat-card-header>
+    <br/>
+    <mat-card-content>
+      <div style="margin-left: 16px; display:flex; flex-direction: column;">
+        <mat-form-field appearance="fill" style="width: 10rem !important;">
+          <mat-label>Correction factor</mat-label>
+          <input matInput required placeholder="00.00"
+                 [(ngModel)]="correctionFactor"
+                 style="width: 6.4rem !important; height: 1.1rem; margin-right: 3rem; margin-top: 0.5rem;"
+                 />
+        </mat-form-field>
+      </div>
+    </mat-card-content>
+    <mat-card-actions align="end" style="margin-right: 1rem;">
+      <button mat-flat-button (click)="saveCorrectionFactor()" color="primary">SAVE</button>
+    </mat-card-actions>
+  </mat-card>
+
+</div>

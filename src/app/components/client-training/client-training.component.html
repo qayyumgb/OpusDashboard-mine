@@ -1,0 +1,133 @@
+<div class="listing-container">
+  <mat-form-field appearance="outline" class="listing-filter">
+    <mat-icon matPrefix>search</mat-icon>
+    <mat-label style="color: gray">Type Filter String Here...</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="client" #input />
+  </mat-form-field>
+
+  <div class="mat-elevation-z8">
+    <!-- <div class="table-container"> -->
+    <ngx-simplebar>
+      <table
+        mat-table
+        [dataSource]="dataSource"
+        multiTemplateDataRows
+        matSort
+        class="listing-table"
+      >
+        <ng-container
+          matColumnDef="{{ column }}"
+          *ngFor="let column of columnsToDisplay"
+        >
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            {{ trainingsAttributesReadableMap.get(column) }}
+          </th>
+          <td mat-cell *matCellDef="let element">{{ element[column] }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="expandedDetail">
+          <td
+            mat-cell
+            *matCellDef="let element"
+            [attr.colspan]="columnsToDisplay.length"
+          >
+            <div
+              class="row-detail"
+              [@detailExpand]="
+                element == expandedElement ? 'expanded' : 'collapsed'
+              "
+            >
+              <div class="row-detail-description">
+                <table>
+                  <tr *ngFor="let column of element.remainingAttributesList">
+                    <td class="details key">
+                      {{ column[0] }}
+                    </td>
+                    <td class="details value">
+                      <ng-container
+                        *ngIf="
+                          column[0] === 'YouTube';
+                          then linkTemplate;
+                          else textTemplate
+                        "
+                      ></ng-container>
+                      <ng-template #linkTemplate>
+                        <a
+                          *ngIf="column[1]"
+                          href="{{ column[1] }}"
+                          target="_blank"
+                          >click here to open</a
+                        >
+                      </ng-template>
+                      <ng-template #textTemplate>
+                        {{ column[1] }}
+                      </ng-template>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="details key">Training dashboard</td>
+                    <td class="details value">
+                      <a
+                        routerLink="{{ element.url }}"
+                        routerLinkActive="active-link"
+                        >Training data dashboard</a
+                      >
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="edit">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let element" class="listing-table-tools">
+            <button
+              mat-icon-button
+              color="accent"
+              (click)="openEditDialog(element)"
+              class="listing-table-tools"
+            >
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              color="accent"
+              (click)="openSnackBar('Contact us to remove a training')"
+              class="listing-table-tools"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr
+          mat-header-row
+          *matHeaderRowDef="columnsHeadersToDisplay; sticky: true"
+        ></tr>
+        <tr
+          mat-row
+          *matRowDef="let element; columns: columnsHeadersToDisplay"
+          class="row"
+          [class.expanded-row]="expandedElement === element"
+          (click)="
+            expandedElement = expandedElement === element ? null : element
+          "
+        ></tr>
+        <tr
+          mat-row
+          *matRowDef="let row; columns: ['expandedDetail']"
+          class="row-detail"
+        ></tr>
+      </table>
+    </ngx-simplebar>
+    <!-- </div> -->
+
+    <mat-paginator
+      [pageSizeOptions]="[5, 10, 25, 100]"
+      [pageSize]="25"
+      [showFirstLastButtons]="true"
+    ></mat-paginator>
+  </div>
+</div>

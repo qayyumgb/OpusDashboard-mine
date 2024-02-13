@@ -1,0 +1,16 @@
+<mat-accordion>
+  <mat-expansion-panel *ngFor="let layout of layoutList; let counter=index">
+    <mat-expansion-panel-header>
+      <mat-panel-title style="max-width: 10rem;">
+        <span style="font-size: 1.1rem;" (focusout)="saveNewLayoutName($event, layout)" [disabled]="!selectedClientDocData?.hasAdminRole" ngDefaultControl contenteditable (click)="preventPropagation($event)" [(ngModel)]="layoutList[counter].name"></span>
+      </mat-panel-title>
+      <mat-panel-description style="display: flex; justify-content: right; margin-right: 1rem;">
+        <button mat-raised-button color="primary" matTooltip='Edit {{layout.name}}'
+                (click)="openEditLayoutDialog($event, layout)"
+                style="margin-left: 20px;"
+        *ngIf="selectedClientDocData?.hasAdminRole">Edit</button>
+      </mat-panel-description>
+      </mat-expansion-panel-header>
+    <app-client-loc-lyt-rows [clientId]="clientId" [locationId]="locationId" [layoutId]="layout.id"></app-client-loc-lyt-rows>
+  </mat-expansion-panel>
+</mat-accordion>

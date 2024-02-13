@@ -1,0 +1,43 @@
+<div class="listing-container" *ngIf="locationList">
+  <mat-accordion>
+    <mat-expansion-panel [expanded]="counter === 0" *ngFor="let location of locationList; let counter = index">
+      <mat-expansion-panel-header>
+        <mat-panel-title style="max-width: 10rem;">
+        <span style="font-size: 1.1rem;margin-top: 0.5rem;" (focusout)="saveNewLocationName($event, location)" (click)="preventPropagation($event)"
+              contenteditable
+              ngDefaultControl
+              [disabled]="!selectedClientDocData?.hasAdminRole"
+              [(ngModel)]="locationList[counter].name"></span>
+      </mat-panel-title>
+        <mat-panel-description style="display: flex; justify-content: right; margin-right: 1rem;">
+          <button mat-raised-button color="primary"
+                  matTooltip='Edit Location "{{location.name}}"'
+                  (click)="openEditLocationDialog($event, location)"
+                  style="margin-left: 20px;"
+          *ngIf="selectedClientDocData?.hasAdminRole">Edit</button>
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <app-client-location-layout [locationId]="location.id" [locationName]="location.name" [clientId]="selectedClientDocData.id"></app-client-location-layout>
+      <div style="text-align: center;margin-top:0.5rem;">
+        <button mat-raised-button color="primary" matTooltip='Create New Layout for {{location.name}}'
+                (click)="openCreateLayoutDialog($event, location)" style="margin-left: 20px;"
+                *ngIf="selectedClientDocData?.hasAdminRole">Create Layout</button>
+      </div>
+    </mat-expansion-panel>
+  </mat-accordion>
+</div>
+<button
+  mat-fab
+  color="accent"
+  (click)="openDialog()"
+  *ngIf="selectedClientDocData?.hasAdminRole"
+  class="fab"
+>
+  <mat-icon
+    matTooltip="Create new Location"
+    matTooltipClass="tooltip-class"
+    matTooltipHideDelay="100000"
+    style="width: 44px; height: 24px"
+  >add</mat-icon
+  >
+</button>

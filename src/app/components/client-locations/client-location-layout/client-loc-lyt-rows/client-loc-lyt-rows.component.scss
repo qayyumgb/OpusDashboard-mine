@@ -1,0 +1,130 @@
+@import "@angular/material/theming";
+$primary: mat-palette($mat-blue-gray);
+
+.listing-container {
+  margin: auto;
+  padding: 10px 10px;
+  max-width: 100%;
+  min-width: 600px;
+}
+
+ngx-simplebar {
+  max-height: 60vh;
+  overflow: auto;
+}
+
+::ng-deep .simplebar-scrollbar::before {
+  background-color: #fff !important;
+  width: 4px;
+  margin: 60px 0px 0px 0px;
+}
+
+.listing-filter {
+  margin-bottom: 16px;
+  font-size: 14px;
+  padding-bottom: 0;
+  width: 100%;
+}
+
+.listing-table-main-heading {
+  text-align: center;
+  font-size: 32px;
+  font-weight: bold;
+  margin-top: 50px;
+  margin-bottom: 10px;
+  text-decoration: underline;
+}
+
+table.listing-table {
+  width: 100%;
+}
+
+button.listing-table-tools {
+  visibility: hidden;
+}
+
+td.listing-table-tools {
+  text-align: right;
+  width: 1%;
+  white-space: nowrap;
+}
+
+table.listing-table tr:hover .listing-table-tools {
+  visibility: visible;
+}
+
+tr.row-detail {
+  height: 0;
+}
+
+tr.row:not(.expanded-row):hover {
+  background-color: mat-color($primary, 700);
+  cursor: pointer;
+  height:3.5rem;
+}
+
+tr.row {
+  cursor: pointer;
+  border-bottom-width: 0;
+  height:3.5rem;
+}
+
+div.row-detail {
+  overflow: hidden;
+  display: flex;
+}
+
+div.row-detail-description {
+  padding: 16px;
+}
+
+div.row-detail-description > table {
+  border-collapse: collapse;
+}
+
+td.details {
+  border: 0px solid #545454;
+  color: #9c9c9c;
+  padding-right: 6px;
+  text-align: left;
+  font-weight: 500;
+}
+
+td.key {
+  font-weight: 400;
+}
+
+td.value {
+  font-weight: 100;
+}
+
+/* TODO(mdc-migration): The following rule targets internal classes of paginator that may no longer apply for the MDC version. */
+/* TODO(mdc-migration): The following rule targets internal classes of paginator that may no longer apply for the MDC version. */
+mat-paginator {
+  width: 100%;
+}
+
+.mat-column-id {
+  margin-left: 5px;
+  max-width: 5rem;
+}
+.mat-column-rowNumber {
+  max-width: 9rem;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.mat-column-rowReference {
+  max-width: 9rem;
+}
+
+.mat-column-rowLength {
+  max-width: 9rem;
+}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  margin: 0;
+}

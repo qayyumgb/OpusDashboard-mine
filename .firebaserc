@@ -1,0 +1,17 @@
+{
+  "projects": {
+    "default": "opustest-6d0c8"
+  },
+  "targets": {
+    "opustest-6d0c8": {
+      "hosting": {
+        "apis": [
+          "dev-api-opuswatch-nl"
+        ],
+        "dashboard": [
+          "opustest-6d0c8"
+        ]
+      }
+    }
+  }
+}

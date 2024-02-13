@@ -1,0 +1,42 @@
+<div style="min-width: 400px">
+  <h2 mat-dialog-title style="text-align: center">Edit Training</h2>
+
+  <mat-dialog-content [formGroup]="form" style="text-align: center">
+    <div style="margin-bottom: 20px; text-align: center">
+      <div style="color: lawngreen" *ngIf="successMessage">
+        {{ successMessage }}
+      </div>
+      <div style="color: orangered" *ngIf="failureMessage">
+        {{ failureMessage }}
+      </div>
+    </div>
+    <mat-form-field>
+      <textarea
+        matInput
+        placeholder="Enter Notes"
+        formControlName="notes"
+      ></textarea>
+    </mat-form-field>
+    <br/>
+    <mat-form-field>
+      <input
+        matInput
+        placeholder="Enter YouTube link"
+        formControlName="youtubeLink"
+      />
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <div style="text-align: center">
+    <mat-dialog-actions>
+      <button mat-raised-button color="primary" (click)="close()">Close</button>
+      <button
+        class="mat-raised-button mat-primary"
+        (click)="updateDevice()"
+        style="margin-left: 20px"
+      >
+        Save Changes
+      </button>
+    </mat-dialog-actions>
+  </div>
+</div>

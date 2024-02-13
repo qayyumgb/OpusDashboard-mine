@@ -1,0 +1,35 @@
+<div style="min-width: 400px;">
+    <mat-dialog-content [formGroup]="editUserForm" style="text-align: center;">
+        <mat-label style="font-size: 1rem;">{{userRecordBeingEdited?.email}}<em style="font-size: 0.8rem;"> (not editable)</em></mat-label>
+        <div style="height: 0.4rem;">&nbsp;</div>
+        <br/>
+        <mat-form-field appearance="fill">
+            <mat-label>Name</mat-label>
+            <input matInput required
+                   formControlName="name">
+        </mat-form-field>
+        <br/>
+        <mat-form-field style="margin-top: 0.4rem;">
+            <mat-label>Notes</mat-label>
+            <input matInput
+                   formControlName="notes">
+        </mat-form-field>
+        <br/>
+        <mat-form-field appearance="fill"  style="margin-top: 0.4rem">
+            <mat-label>Select role</mat-label>
+            <mat-select formControlName="role">
+                <mat-option value="regular">regular</mat-option>
+                <mat-option value="manager">manager</mat-option>
+                <mat-option value="admin">admin</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <br/>
+    </mat-dialog-content>
+    <br/>
+    <div style="text-align: center;margin-bottom: 0.8rem;">
+        <mat-dialog-actions>
+            <button mat-raised-button color="primary" (click)="close()">Close</button>
+            <button mat-raised-button color="primary" (click)="updateUser()" style="margin-left: 20px;">Save Changes</button>
+        </mat-dialog-actions>
+    </div>
+</div>

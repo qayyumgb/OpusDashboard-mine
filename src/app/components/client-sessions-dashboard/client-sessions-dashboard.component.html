@@ -1,0 +1,335 @@
+<mat-icon [matTooltip]="getTooltipForStreamingButton()" [inline]="true" (click)="toggleStreaming()"
+          style="cursor: pointer; position: fixed;right: 1.8rem; bottom: 8rem; font-size: 3rem;"
+          *ngIf="tableData?.length > 0">
+  {{displayedIcon}}
+</mat-icon>
+
+<button mat-fab color="accent" (click)="openCreateSessionDialog()"
+        *ngIf="selectedClientDocData?.hasAdminRole" class="fab">
+  <mat-icon
+    matTooltip="Create Session"
+    matTooltipClass="tooltip-class"
+    matTooltipHideDelay="100000"
+    style="width: 44px; height: 24px">
+    add
+  </mat-icon>
+</button>
+
+<section class="new-table-design-container mat-elevation-z8" tabindex="0" style="margin-top:2rem;">
+  <div class="controls-container">
+    <mat-button-toggle-group
+      class="table-chart-toggle"
+      #group="matButtonToggleGroup"
+    >
+      <mat-button-toggle
+        value="listView"
+        (click)="toggleTableChart = 'table';"
+        disabled="true"
+        checked
+      >
+        <mat-icon>table_chart</mat-icon>
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+    <div class="filter-container">
+      <button
+        mat-icon-button
+        [matMenuTriggerFor]="filterMenu"
+        aria-label="Example icon-button with a menu"
+      >
+        <mat-icon>filter_alt</mat-icon>
+      </button>
+
+      <mat-menu #filterMenu="matMenu" class="customize" >
+        <form
+          class="example-form"
+          (click)="$event.stopPropagation()"
+          *ngFor="let filter of displayedTopFilters"
+        >
+          <mat-form-field class="filter">
+            <mat-label>{{filter.displayName}}</mat-label>
+            <input
+              type="text"
+              placeholder=""
+              aria-label="Number"
+              matInput
+              [ngModelOptions]="{standalone: true}"
+              [(ngModel)]="filter.filterValue"
+              [matAutocomplete]="auto"
+              (keyup)="headerFilter($event, filter.name)"
+              (focus)="headerFilter($event, filter.name)"
+            />
+            <mat-icon matSuffix>search</mat-icon>
+            <mat-autocomplete #auto="matAutocomplete">
+              <mat-option
+                *ngFor="let option of filter.filterOptions"
+                [value]="option"
+              >
+                {{option}}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+        </form>
+        <button mat-menu-item (click)="removeFilters()">
+          <mat-icon>filter_list_off</mat-icon>
+          <span>Remove all filters</span>
+        </button>
+      </mat-menu>
+
+      <div class="date-container">
+        <button mat-icon-button aria-label="" matTooltip="Previous month" (click)="decrementMonth()">
+          <mat-icon>keyboard_double_arrow_left</mat-icon>
+        </button>
+        <button mat-icon-button aria-label="" matTooltip="Previous day" (click)="decrementDate()">
+          <mat-icon>navigate_before</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          [matMenuTriggerFor]="dateMenu"
+          aria-label="Example icon-button with a menu"
+        >
+          <mat-icon>event</mat-icon>
+        </button>
+        <mat-menu #dateMenu="matMenu" class="date-menu customize_date">
+          <mat-card appearance="outlined" class="demo-inline-calendar-card">
+            <mat-calendar [(selected)]="selectedDate" (selectedChange)="onDateChange()"></mat-calendar>
+          </mat-card>
+        </mat-menu>
+
+        <span>{{selectedDate | date: 'fullDate'}}</span>
+        <button mat-icon-button aria-label="" matTooltip="Next day" (click)="incrementDate()">
+          <mat-icon>navigate_next</mat-icon>
+        </button>
+        <button mat-icon-button aria-label="" matTooltip="Next month" (click)="incrementMonth()">
+          <mat-icon>keyboard_double_arrow_right</mat-icon>
+        </button>
+      </div>
+      <button mat-icon-button aria-label="" matTooltip="Download data">
+        <mat-icon
+          (click)="downloadAsCSV('Sessions')"
+        >download</mat-icon>
+      </button>
+      <mat-button-toggle-group
+        class="archive-toggle"
+        #group="matButtonToggleGroup"
+      >
+        <mat-button-toggle
+          value="listView"
+          (click)="toggleArchived(false)"
+          checked
+          matTooltip="All items"
+        >
+          <mat-icon>list</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle
+          value="archiveView"
+          (click)="toggleArchived(true);"
+          matTooltip="Archived items"
+        >
+          <mat-icon>archive</mat-icon>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+  </div>
+  <div class="filter-string" *ngIf="filterString">{{filterString}}</div>
+</section>
+
+<section class="new-table-design-container mat-elevation-z8" tabindex="0">
+  <table mat-table [dataSource]="dataSource" matSort multiTemplateDataRows class="mat-elevation-z8">
+    <ng-container [matColumnDef]="column.name" *ngFor="let column of columns">
+      <th mat-header-cell class="table-header" *matHeaderCellDef>
+        <div class="table-header-container">
+          <div class="table-header-content-text">{{column.displayName}}</div>
+          <!--<div class="table-header-content-spacer"></div>-->
+          <div class="table-header-content-menu">
+            <button
+              mat-icon-button
+              [matMenuTriggerFor]="menu"
+              aria-label="Example icon-button with a menu"
+              class="menu-button"
+              *ngIf="column.showHeaderFilter"
+              [class]="column.filtered ? 'filtered' : ''"
+            >
+              <mat-icon>filter_list</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu" class="menu customize" xPosition="before">
+              <button mat-menu-item (click)="sortList(column.name,'asc')">
+                <mat-icon></mat-icon>
+                <span>Sort A → Z</span>
+              </button>
+              <button mat-menu-item (click)="sortList(column.name,'desc')">
+                <mat-icon></mat-icon>
+                <span>Sort Z → A</span>
+              </button>
+              <form class="example-form" (click)="$event.stopPropagation()">
+                <mat-form-field class="filter">
+                  <mat-label>Filter Value</mat-label>
+                  <input
+                    type="text"
+                    placeholder=""
+                    aria-label="Filter Value"
+                    matInput
+                    [ngModelOptions]="{standalone: true}"
+                    [(ngModel)]="column.filterValue"
+                    [matAutocomplete]="auto"
+                    (keyup)="headerFilter($event, column.name)"
+                    (focus)="headerFilter($event, column.name)"
+                  />
+                  <mat-icon matSuffix>search</mat-icon>
+                  <mat-autocomplete #auto="matAutocomplete">
+                    <mat-option
+                      *ngFor="let option of column.filterOptions"
+                      [value]="option"
+                    >
+                      {{option}}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+              </form>
+              <button mat-menu-item (click)="removeFilters()">
+                <mat-icon>filter_list_off</mat-icon>
+                <span>Remove all filters</span>
+              </button>
+            </mat-menu>
+          </div>
+        </div>
+      </th>
+      <td mat-cell *matCellDef="let element">{{element[column.name]}}</td>
+      <td mat-footer-cell *matFooterCellDef> {{column.footerValue}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef='edit'>
+      <th mat-header-cell class="table-header" *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let element" class="listing-table-tools">
+        <button
+                mat-icon-button
+                color="accent"
+                [ngClass]="element.editButtonClass"
+                (click)="editSession($event, element)"
+        >
+          <mat-icon matTooltip="Edit this session"
+                    matTooltipClass="tooltip-class"
+                    matTooltipHideDelay="100"
+                    matTooltipPosition="below"
+                    >edit
+          </mat-icon>
+        </button>
+        <button
+                mat-icon-button
+                color="accent"
+                (click)="copyAsTraining($event, element)"
+                class="listing-table-tools tdhover"
+        *ngIf="selectedClientDocData.isDeveloper">
+
+          <mat-icon matTooltip="Copy as Training"
+                    matTooltipClass="tooltip-class"
+                    matTooltipHideDelay="100"
+                    matTooltipPosition="below"
+                    >movie_edit
+          </mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          color="accent"
+          (click)="archiveSession($event, element)"
+          class="listing-table-tools tdhover"
+          matTooltip="Archive session"
+          matTooltipClass="tooltip-class"
+          matTooltipHideDelay="100"
+          matTooltipPosition="below"
+          *ngIf="!element.isArchived">
+          <mat-icon>archive</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          color="accent"
+          (click)="unarchiveSession($event, element)"
+          matTooltip="Unarchive session"
+          matTooltipClass="tooltip-class"
+          matTooltipHideDelay="100"
+          matTooltipPosition="below"
+          class="listing-table-tools tdhover"
+          *ngIf="element.isArchived">
+          <mat-icon>unarchive</mat-icon>
+        </button>
+
+      </td>
+    </ng-container>
+    <ng-container matColumnDef='manual_indicator'>
+      <th mat-header-cell class="table-header" *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let element">
+        <mat-icon  matTooltip="Manually Created"
+          matTooltipHideDelay="100"
+          matTooltipPosition="below"
+          *ngIf="element.isManual">front_hand</mat-icon>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="expandedDetail">
+      <td
+              mat-cell
+              *matCellDef="let element"
+              [attr.colspan]="getDisplayedCols().length"
+      >
+        <div
+                class="row-detail"
+                [@detailExpand]="
+                element.sessionId == expandedElement?.sessionId ? 'expanded' : 'collapsed'"
+        >
+          <div class="row-detail-description">
+            <table>
+              <tr>
+                <td class="details key">Location</td>
+                <td class="details value">{{element['locationName']}}</td>
+              </tr>
+              <tr>
+                <td class="details key">Layout</td>
+                <td class="details value">{{element['layoutName']}}</td>
+              </tr>
+              <tr>
+                <td class="details key">Net</td>
+                <td class="details value preserve-whitespace">{{element['nettPerformance']}}</td>
+              </tr>
+              <tr>
+                <td class="details key">Gross</td>
+                <td class="details value preserve-whitespace">{{element['grossPerformance']}}</td>
+              </tr>
+              <tr>
+                <td class="details key">Device</td>
+                <td class="details value">{{element.deviceNumber}} ({{element['deviceId']}})</td>
+              </tr>
+              <tr>
+                <td class="details key">Session</td>
+                <td class="details value">{{element['sessionId']}}</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="getDisplayedCols(); sticky: true"></tr>
+    <tr
+            mat-row
+            [class.hidden]="toggleTableChart !== 'table'"
+            *matRowDef="let element; columns: getDisplayedCols();"
+
+            [class.expanded-row]="applyExpandedClass(element)"
+            (click)="expandRow(element)"
+    ></tr>
+
+    <tr
+            mat-row
+            *matRowDef="let row; columns: ['expandedDetail']"
+            class="row-detail"
+    ></tr>
+  </table>
+
+</section>
+<section class="new-table-design-container mat-elevation-z8" tabindex="0">
+  <mat-paginator
+    [pageSizeOptions]="[10, 20, 50, 100]"
+    showFirstLastButtons
+    aria-label="Select page"
+  >
+  </mat-paginator>
+</section>

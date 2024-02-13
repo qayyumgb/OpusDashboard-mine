@@ -1,0 +1,386 @@
+.spacer {
+  flex: 1 1 auto;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 90vh;
+}
+
+.toolbar {
+  flex: 0 0 auto;
+}
+
+.main_grid {
+  flex: 1 1 auto;
+}
+
+/* ANNOTATION */
+.annotation-container {
+  background-color: #303030;
+  min-width: 20rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 2px;
+  margin-left: 15%;
+}
+
+.annotation-controls-container {
+  flex: 0 0 auto;
+}
+
+.annotation-list-container {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  border-top: 2px solid mintcream;
+  margin-left: 3.5%;
+  padding-left: 0.1rem;
+  margin-top: 0;
+  width: 82%;
+  margin-bottom: 3.5rem;
+  margin-right: -2rem;
+
+  &::-webkit-scrollbar-corner {
+    border-radius: 5px;
+    width: 8px;
+  }
+}
+
+/* TODO(mdc-migration): The following rule targets internal classes of list that may no longer apply for the MDC version. */
+/* TODO(mdc-migration): The following rule targets internal classes of list that may no longer apply for the MDC version. */
+.mat-list-option-custom {
+  max-width: 16.8rem;
+  margin-left: -1rem;
+  overflow: hidden;
+  max-height: 2.2rem;
+}
+
+
+/* TRAINING INFO */
+
+.training_info_container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 2px 20px 10px 10px;
+  margin-top: 0.2rem;
+  width: 81%;
+}
+
+.training_info_card_form {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0.25rem 0.25rem 0.05rem 0.25rem !important;
+}
+
+.training_info_card_display {
+  margin-top: 0.2rem;
+  display: flex;
+  width: 76%;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 0.5rem 0.3rem 0.5rem 0.3rem !important;
+  margin-left: 1.4rem;
+}
+
+.card {
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  margin: 10px;
+}
+
+/* VIDEO */
+.video-container {
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 5px;
+}
+
+.video-center {
+  position: absolute;
+  margin: auto;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* ANNOTATION BUTTONS */
+.annotation_buttons_container {
+  min-width: 18rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 2px;
+  margin-left: 1%;
+  width: 82%;
+}
+
+.annotation_button {
+  height: 2rem;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.player_card {
+  background-color: black;
+}
+
+.list_item_time {
+  margin-right: 2em;
+  font-weight: 100 !important;
+}
+
+.list_item_label {
+  font-weight: 500 !important;
+}
+
+.time_input {
+  width: 2.5rem;
+  margin-right: 0.5em;
+}
+
+.time_input_container {
+  margin-right: 0.5em;
+  float: left;
+  margin-top: 1.2rem;
+}
+
+.relative_time_toggle {
+  margin-right: 2em;
+  float: left;
+}
+
+.grid-tile-content {
+  width: 80%;
+}
+
+.video_id_input {
+  height: 0.8rem;
+}
+
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
+::ng-deep .mat-form-field-wrapper {
+  margin-bottom: -0.45rem;
+  padding-bottom: 1rem;
+}
+
+::ng-deep .mat-mdc-card {
+  padding: 2px;
+}
+
+::ng-deep .mat-mdc-list-base {
+  padding: 0 !important;
+}
+
+
+@media only screen and (min-width: 1300px) and (max-width: 1599px) {
+  .annotation-list-container {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    border-top: 2px solid mintcream;
+    margin-left: 1rem;
+    padding-left: 0;
+    margin-top: 0;
+    width: 77%;
+    margin-bottom: 4.5rem;
+
+    &::-webkit-scrollbar-corner {
+      border-radius: 5px;
+      width: 8px;
+    }
+    /* TODO(mdc-migration): The following rule targets internal classes of list that may no longer apply for the MDC version. */
+    /* TODO(mdc-migration): The following rule targets internal classes of list that may no longer apply for the MDC version. */
+    .mat-list-option-custom {
+      max-width: 13rem;
+      margin-left: 0;
+      overflow: hidden;
+      max-height: 2rem;
+      font-size: 0.90rem;
+    }
+
+    /*.mat-list-item-content {
+      padding: 0 0 0 0.6rem !important;
+    }*/
+  }
+
+  .training_info_container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 2px 20px 6px 22px;
+    margin-top: 0.2rem;
+    width: 75%;
+    font-size: 0.8rem;
+  }
+
+  .training_info_card_form {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0.25rem 0.25rem 0.05rem 0.5rem !important;
+  }
+
+  .training_info_card_display {
+    margin-top: 0.2rem;
+    display: flex;
+    width: 68%;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 0.5rem 0 0.5rem 0.7rem !important;
+    margin-left: 1.4rem;
+    font-size: 0.75rem;
+    line-height: 0.85rem;
+    border-radius: 0;
+  }
+
+  .card {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    margin: 10px;
+  }
+}
+
+@media only screen and (min-width: 1200px) and (max-width: 1299px) {
+  .annotation-list-container {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    border-top: 2px solid mintcream;
+    margin-left: 2rem;
+    padding-left: 0;
+    margin-top: 0;
+    width: 67%;
+    margin-bottom: 4.8rem;
+
+    &::-webkit-scrollbar-corner {
+      border-radius: 5px;
+      width: 8px;
+    }
+    /* TODO(mdc-migration): The following rule targets internal classes of list that may no longer apply for the MDC version. */
+    /* TODO(mdc-migration): The following rule targets internal classes of list that may no longer apply for the MDC version. */
+    .mat-list-option-custom {
+      max-width: 12.5rem;
+      margin-left: 0;
+      overflow: hidden;
+      max-height: 2rem;
+      font-size: 0.87rem;
+    }
+  }
+
+  .training_info_container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2px 20px 6px 22px;
+    margin-top: 0.2rem;
+    width: 69%;
+    font-size: 0.78rem;
+  }
+
+  .training_info_container > input {
+    max-width: 70%;
+  }
+
+  .training_info_card_form {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0.25rem 0.25rem 0.05rem 0.6rem !important;
+    max-width: 80%;
+  }
+  /* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
+  /* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
+  /* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
+  .mat-form-field-wrapper {
+    /* margin-bottom: -0.45rem; */
+    max-width: 9rem;
+    max-height: 2.7rem !important;
+    font-size: 0.7rem;
+    line-height: 1.15;
+    padding: 0 0 0.5rem;
+  }
+
+  .training_info_card_display {
+    margin-top: 0.2rem;
+    display: flex;
+    width: 60%;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 0.5rem 0 0.5rem 0.7rem !important;
+    margin-left: 2.4rem;
+    font-size: 0.65rem;
+    line-height: 0.75rem;
+    border-radius: 0;
+    overflow: auto;
+  }
+
+  /*.annotation_button{
+    max-height: 1.8rem;
+    padding-bottom: 2rem;
+    margin-top: 0.2rem;
+    font-size: 0.85rem;
+  }
+*/
+  .card {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    margin: 10px;
+  }
+}
+
+@media only screen and (max-width: 1199px) {
+  .annotation-list-container {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    border-top: 2px solid mintcream;
+    margin-left: 0;
+    padding-left: 0;
+    margin-top: 0;
+    width: 76%;
+    margin-bottom: 4.8rem;
+
+    &::-webkit-scrollbar-corner {
+      border-radius: 5px;
+      width: 8px;
+    }
+    /* TODO(mdc-migration): The following rule targets internal classes of list that may no longer apply for the MDC version. */
+    /* TODO(mdc-migration): The following rule targets internal classes of list that may no longer apply for the MDC version. */
+    .mat-list-option-custom {
+      max-width: 12.5rem;
+      margin-left: 0;
+      overflow: hidden;
+      max-height: 2.2rem;
+      font-size: 0.88rem;
+    }
+  }
+
+  .video-container {
+    width: 90%;
+    height: 90%;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 5px;
+  }
+}

@@ -1,0 +1,316 @@
+// Custom Theming for Angular Material
+// For more information: https://material.angular.io/guide/theming
+@use '@angular/material' as mat;
+@import '@angular/material/theming';
+
+// Plus imports for other components in your app.
+
+// Include the common styles for Angular Material. We include this here so that you only
+// have to load a single css file for Angular Material in your app.
+// Be sure that you only ever include this mixin once!
+@include mat.core();
+
+// Define the palettes for your theme using the Material Design palettes available in palette.scss
+// (imported above). For each palette, you can optionally specify a default, lighter, and darker
+// hue. Available color palettes: https://material.io/design/color/
+
+$md-primary: (
+        50 : #e9ebef,
+        100 : #c7ced7,
+        200 : #a2adbd,
+        300 : #7c8ca2,
+        400 : #60748e,
+        500 : #445b7a,
+        600 : #3e5372,
+        700 : #354967,
+        800 : #2d405d,
+        900 : #1f2f4a,
+        A100 : #8db5ff,
+        A200 : #5a94ff,
+        A400 : #2773ff,
+        A700 : #0e62ff,
+        contrast: (
+                50 : #000000,
+                100 : #000000,
+                200 : #000000,
+                300 : #000000,
+                400 : #ffffff,
+                500 : #ffffff,
+                600 : #ffffff,
+                700 : #ffffff,
+                800 : #ffffff,
+                900 : #ffffff,
+                A100 : #000000,
+                A200 : #000000,
+                A400 : #ffffff,
+                A700 : #ffffff,
+        )
+);
+
+$md-primarydark: (
+        50 : #e3e4e5,
+        100 : #b9bbbd,
+        200 : #8a8d92,
+        300 : #5b5f66,
+        400 : #373d45,
+        500 : #141b24,
+        600 : #121820,
+        700 : #0e141b,
+        800 : #0b1016,
+        900 : #06080d,
+        A100 : #5277ff,
+        A200 : #1f4fff,
+        A400 : #0033eb,
+        A700 : #002dd1,
+        contrast: (
+                50 : #000000,
+                100 : #000000,
+                200 : #000000,
+                300 : #ffffff,
+                400 : #ffffff,
+                500 : #ffffff,
+                600 : #ffffff,
+                700 : #ffffff,
+                800 : #ffffff,
+                900 : #ffffff,
+                A100 : #ffffff,
+                A200 : #ffffff,
+                A400 : #ffffff,
+                A700 : #ffffff,
+        )
+);
+
+/* For use in src/lib/core/theming/_palette.scss */
+$md-accent: (
+        50 : #e0fef4,
+        100 : #b3fde3,
+        200 : #80fcd1,
+        300 : #4dfabe,
+        400 : #26f9b0,
+        500 : #00f8a2,
+        600 : #00f79a,
+        700 : #00f690,
+        800 : #00f586,
+        900 : #00f375,
+        A100 : #ffffff,
+        A200 : #e6fff1,
+        A400 : #b3ffd3,
+        A700 : #9affc5,
+        contrast: (
+                50 : #000000,
+                100 : #000000,
+                200 : #000000,
+                300 : #000000,
+                400 : #000000,
+                500 : #000000,
+                600 : #000000,
+                700 : #000000,
+                800 : #000000,
+                900 : #000000,
+                A100 : #000000,
+                A200 : #000000,
+                A400 : #000000,
+                A700 : #000000,
+        )
+);
+
+
+$background: mat.define-palette($md-primarydark);
+
+$primary: mat.define-palette($md-primary);
+
+$accent: mat.define-palette($md-accent, A200, A100, A400);
+
+$background-color: map_get($mat-blue-grey, 100);
+
+// The warn palette is optional (defaults to red).
+$warn: mat.define-palette($mat-deep-orange);
+
+// Create the theme object. A theme consists of configurations for individual
+// theming systems such as "color" or "typography".
+$theme: mat.define-dark-theme(
+  (
+    color: (
+      primary: $primary,
+      accent: $accent,
+      warn: $warn,
+    ),
+  )
+);
+
+@include mat.button-theme($theme);
+@include mat.fab-theme($theme);
+@include mat.icon-button-theme($theme);
+// Insert custom background color
+$background: map-get($theme, background);
+$background: map_merge(
+  $background,
+  (
+    background: $background-color,
+  )
+);
+$theme: map_merge(
+  $theme,
+  (
+    background: $background,
+  )
+);
+
+// Include theme styles for core and each component used in your app.
+// Alternatively, you can import and @include the theme mixins for each component
+// that you are using.
+@include mat.all-component-themes($theme);
+
+/* You can add global styles to this file, and also import other style files */
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.mat-mdc-raised-button.mat-primary{
+  background-color: #01aec0 !important;
+  font-weight: 200;
+  font-size: 0.88rem;
+  height: 1.92rem;
+}
+
+.mat-mdc-fab.mat-accent, .mat-mdc-mini-fab.mat-accent{
+  background-color: #00F8A2;
+}
+
+::ng-deep.mat-mdc-tab-group.mat-primary .mat-ink-bar, .mat-mdc-tab-nav-bar.mat-primary .mat-ink-bar{
+  background-color: #00F8A2;
+}
+
+/* TODO(mdc-migration): The following rule targets internal classes of select that may no longer apply for the MDC version.*/
+/* TODO(mdc-migration): The following rule targets internal classes of select that may no longer apply for the MDC version.*/
+/* TODO(mdc-migration): The following rule targets internal classes of select that may no longer apply for the MDC version.*/
+.mat-select-panel-client-list {
+  background-image: linear-gradient(
+                  to bottom right,
+                  #01A0C6,
+                  #01ADC1,
+                  #00D0B3,
+                  #00F8A2
+  );
+  border: 1px solid darkcyan;
+  border-radius: 2px;
+}
+
+.mat-mdc-snack-bar-container {
+  &.snackbar-success {
+    --mdc-snackbar-container-color: #00F8A2;
+    --mat-mdc-snack-bar-button-color: #000;
+    --mdc-snackbar-supporting-text-color: #000;
+  }
+}
+
+.mat-mdc-snack-bar-container {
+  &.snackbar-error {
+    --mdc-snackbar-container-color: #EC4444;
+    --mat-mdc-snack-bar-button-color: #000;
+    --mdc-snackbar-supporting-text-color: #000;
+  }
+}
+
+.mat-mdc-snack-bar-container {
+  &.snackbar-warning {
+    --mdc-snackbar-container-color: #e8e81e;
+    --mat-mdc-snack-bar-button-color: #000;
+    --mdc-snackbar-supporting-text-color: #000;
+  }
+}
+
+.mat-mdc-snack-bar-container {
+  &.snackbar-theme-black {
+    --mdc-snackbar-container-color: #303030;
+    --mat-mdc-snack-bar-button-color: #000;
+    --mdc-snackbar-supporting-text-color: #fff;
+  }
+}
+
+.matcolorprimary{
+  background-color: #303030;
+}
+
+@media only screen and (min-width: 1200px) and (max-width: 1599px) {
+  /* TODO(mdc-migration): The following rule targets internal classes of list that may no longer apply for the MDC version.*/
+  /* TODO(mdc-migration): The following rule targets internal classes of list that may no longer apply for the MDC version.*/
+  .mat-mdc-list-base .mat-mdc-list-item .mat-list-item-content {
+    padding: 0 0 0 0.7rem !important;
+  }
+}
+
+/*@media only screen and (min-width: 1200px) and (max-width: 1299px) {
+
+  .mat-list-base .mat-list-item .mat-list-item-content {
+    padding: 0 0 0 0.7rem !important;
+    max-height: 2rem;
+    margin-top: -0.2rem;
+    font-size: 0.7rem;
+    line-height: 0.8;
+  }
+
+  .mat-list-base .mat-list-item:first-child {
+    .mat-list-item-content {
+      padding: 0 0 0 0.7rem !important;
+      max-height: 2rem;
+      margin-top: 1rem;
+      font-size: 0.7rem;
+      line-height: 0.8;
+    }
+  }
+  .mat-list-base .mat-list-item:last-child {
+    .mat-list-item-content {
+      padding: 0 0 0 0.7rem !important;
+      max-height: 2rem;
+      font-size: 0.7rem;
+      line-height: 0.8;
+    }
+    margin-bottom: -0.8rem;
+  }
+}*/
+
+.mat-mdc-tab-link {
+  max-width: 135px !important;
+  min-width: 135px !important;
+}
+
+.mat-mdc-tab-nav-bar {
+  --mdc-tab-indicator-active-indicator-color: #00f8a2;;
+  --mat-tab-header-disabled-ripple-color: rgba(255, 255, 255, 0.5);
+  --mat-tab-header-pagination-icon-color: #fff;
+  --mat-tab-header-inactive-label-text-color: rgba(255, 255, 255, 0.6);
+  --mat-tab-header-active-label-text-color: #fff;
+  --mat-tab-header-active-ripple-color: #2e423b;
+  --mat-tab-header-inactive-ripple-color: #9ed3c1;
+  --mat-tab-header-inactive-focus-label-text-color: rgba(255, 255, 255, 0.6);
+  --mat-tab-header-inactive-hover-label-text-color: rgba(255, 255, 255, 0.6);
+  --mat-tab-header-active-focus-label-text-color: #fff;
+  --mat-tab-header-active-hover-label-text-color: #00f8a2;
+  --mat-tab-header-active-focus-indicator-color: #00f8a2;
+  --mat-tab-header-active-hover-indicator-color: #00f8a2;
+}
+
+
+.mat-mdc-select-panel {
+  --mat-option-selected-state-label-text-color: #80fcd1;
+}
+
+.mat-pseudo-checkbox-checked.mat-pseudo-checkbox-full, .mat-primary .mat-pseudo-checkbox-indeterminate.mat-pseudo-checkbox-full {
+  background: #80fcd1 !important;
+}
+
+.timepicker-overlay {
+  z-index: 1100 !important;
+}
+
+.timepicker-backdrop-overlay {
+  z-index: 1100 !important;
+}

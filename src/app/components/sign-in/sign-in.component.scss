@@ -1,0 +1,94 @@
+// ::ng-deep body {
+//   background-image: url(/assets/background.jpg);
+//   background-position: center;
+//   background-repeat: no-repeat;
+//   background-size: cover;
+
+//   filter: blur(8px);
+//   -webkit-filter: blur(8px);
+// }
+
+.image-overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+
+  //height: 100%;
+  //width: 100%;
+  //background: #002749e3;
+}
+
+.bg-image {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  /* The image used */
+  background-image: url(/assets/opus_watch_hero_bg.jpg);
+
+  /* Add the blur effect */
+  //filter: blur(6px);
+  //-webkit-filter: blur(6px);
+
+  /* Full height */
+  //height: 100%;
+  //width: 100%;
+
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+:host {
+  display: flex;
+  justify-content: center;
+  padding: 100px 0px;
+}
+
+.logo {
+  position: fixed;
+  top: 25px;
+  left: 25px;
+  justify-content: center;
+}
+
+.mat-mdc-form-field {
+  min-width: 100% !important;
+  font-size: inherit !important;
+  font-weight: 400 !important;
+  line-height: 1.125 !important;
+  font-family: Roboto,Helvetica Neue,sans-serif !important;
+  letter-spacing: normal !important;
+}
+
+.mat-mdc-card {
+  width: 24rem !important;
+}
+
+.mat-mdc-card-content {
+  display: flex !important;
+  justify-content: center !important;
+}
+
+.mat-mdc-card-title {
+  padding-top: 12px;
+  font-size: 24px !important;
+  font-weight: 500 !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+
+
+.error {
+  padding: 16px;
+  width: 300px;
+  color: white;
+  background-color: red;
+}
+.button {
+  display: flex !important;
+}

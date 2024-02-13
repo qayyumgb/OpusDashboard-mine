@@ -1,0 +1,37 @@
+<div class="bg-image"></div>
+<div class="image-overlay"></div>
+<img class="logo" width='170' height='50' src="assets/Opus%20Watch_Logo_Wit_L.svg" alt="Opus Logo" />
+
+<mat-card appearance="outlined" style="width: 20rem;">
+  <mat-card-title>Login</mat-card-title>
+  <mat-card-content>
+    <form [formGroup]="form" (ngSubmit)="submit()" style="max-width: 100%;">
+      <p>
+        <mat-form-field>
+          <mat-label>Email</mat-label>
+          <input
+            type="text"
+            matInput
+            required
+            formControlName="email"
+          />
+        </mat-form-field>
+      </p>
+      <p>
+        <mat-form-field>
+          <mat-label>Password</mat-label>
+          <input
+            type="password"
+            matInput
+            required
+            formControlName="password"
+          />
+        </mat-form-field>
+      </p>
+      <div style="float: left;margin-left:-1rem;">
+        <div style="float: right!important; margin-left:5rem;"><button type="submit" mat-raised-button color="primary">Login</button></div>
+        <div style="float: left;"><button  (click)="initiatePasswordRecovery($event)" mat-button style="color:#01aec0;font-weight: 600;">Forgot password?</button></div>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>

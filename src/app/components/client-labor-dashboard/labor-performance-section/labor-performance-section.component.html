@@ -1,0 +1,201 @@
+<div
+  style="margin-left: 8rem;float: left;margin-top:1rem;margin-bottom: 2rem;border: 2px #ffffff4d solid;border-radius: 5px;padding: 0.2rem 0.2rem;display: inline-block;">
+  <mat-button-toggle-group #group="matButtonToggleGroup" [(ngModel)]="performanceChartVsTable"
+                           style="height: 2rem;padding-top: 0;">
+    <mat-button-toggle value="chart" aria-label="Text align left">
+      <mat-icon
+        style="transform: scale(1);cursor: pointer;color: whitesmoke;margin-top: -1rem;"
+        matTooltip="See Chart"
+        matTooltipClass="tooltip-class"
+        matTooltipHideDelay="100"
+        matTooltipPosition="below"
+      >bar_chart
+      </mat-icon>
+    </mat-button-toggle>
+    <mat-button-toggle value="table" aria-label="Text align center">
+      <mat-icon
+        style="transform: scale(1);cursor: pointer;color: whitesmoke;margin-top: -1rem;"
+        matTooltip="See Table"
+        matTooltipClass="tooltip-class"
+        matTooltipHideDelay="100"
+        matTooltipPosition="below"
+      >table_chart
+      </mat-icon>
+    </mat-button-toggle>
+  </mat-button-toggle-group>
+</div>
+<div class="sort-dropdown-wrapper"
+     [style.display]="isChartSectionDisplayed()">
+  <mat-icon style="margin-top: 0.2rem;float: left;">sort</mat-icon>
+  <mat-form-field style="float: left;
+    height: 31px;
+    width: 11.5rem;
+    margin-top: 0.1rem;">
+    <mat-select [(ngModel)]="performanceSortOption"
+                (selectionChange)="performanceSortOptionChanged()"
+                style="margin-left: 0.4rem;"
+                [disabled]="(!allAvgsPerformanceData || (allAvgsPerformanceData.length === 0))">
+      <mat-option value="-1">All averages</mat-option>
+      <mat-option *ngFor="let worker of allWorkersList" [value]="worker.workerId">
+        {{worker.workerName}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+<div class="sort-dropdown-wrapper"
+     [style.display]="isAvgPerformanceChartDisplayed()">
+  <mat-icon style="margin-top: 0.2rem;float: left;">sort</mat-icon>
+  <mat-form-field class="sort-dropdown-formfield">
+    <mat-select [(value)]="dataSortOption"
+                (selectionChange)="dataSortOptionChanged()"
+                style="margin-left: 0.4rem;"
+                [disabled]="(!allAvgsPerformanceData || (allAvgsPerformanceData.length === 0))">
+      <mat-option value="AZ">Sort A &rarr; Z</mat-option>
+      <mat-option value="ZA">Sort Z &rarr; A</mat-option>
+      <mat-option value="PerfH2L">Sort Perf. Ratio High &rarr; Low</mat-option>
+      <mat-option value="PerfL2H">Sort Perf. Ratio Low &rarr; High</mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+<div style="float: left;margin-left: 1rem;margin-top:1.5rem;
+      border: 2px #ffffff4d solid;border-radius: 5px;padding: 0 0.4rem 0 0.2rem;display: inline-block;"
+     [style.display]="isWorkerSpecificPerfChartDisplayed()">
+  <mat-icon style="margin-top: 0.2rem;float: left;">sort</mat-icon>
+  <mat-form-field class="sort-dropdown-formfield">
+    <mat-select [(value)]="dataWorkerSpecificSortOption"
+                (selectionChange)="dataWorkerSpecificSortOptionChanged()"
+                style="margin-left: 0.4rem;"
+                [disabled]="(!allAvgsPerformanceData || (allAvgsPerformanceData.length === 0))">
+      <mat-option value="AZ">Sort A &rarr; Z</mat-option>
+      <mat-option value="ZA">Sort Z &rarr; A</mat-option>
+      <mat-option value="NetPerfH2L">Sort Net Perf. High &rarr; Low</mat-option>
+      <mat-option value="NetPerfL2H">Sort Net Perf. Low &rarr; High</mat-option>
+      <mat-option value="RowL2H">Sort Row Low &rarr; High</mat-option>
+      <mat-option value="RowH2L">Sort Row High &rarr; Low</mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+<div style="float:left; margin-top:1.3rem;text-align: center; width: 25%;"
+     [ngStyle]="((isAvgPerformanceChartDisplayed() === 'block') || (isWorkerSpecificPerfChartDisplayed() === 'block')) ? {'margin-left': '0.1rem'} : {'margin-left': '21.5rem'}"
+     *ngIf="allAvgsPerformanceData?.length > 0">
+  <span style="font-size: 1.1rem;">TOTAL FINISHED: {{finishedData.actual.count}} picked, {{finishedData.actual.rows}} rows</span> <br/>
+  <span style="margin-top:0.2rem;color:lightgray;">TOTAL ACTUAL: {{finishedData.total.count}} picked, {{finishedData.total.rows}} rows</span> <br/>
+</div>
+<div style="float:right; margin-right: 8rem; margin-top:1.3rem;">
+  <mat-icon
+    style="transform: scale(1.2);cursor: pointer;color: whitesmoke;"
+    matTooltip="Download as CSV"
+    matTooltipClass="tooltip-class"
+    matTooltipHideDelay="100"
+    matTooltipPosition="below"
+    (click)="downloadAsCSV('Performance')"
+    *ngIf="allAvgsPerformanceData.length > 0">download
+  </mat-icon>
+</div>
+
+<div style="margin-top: 5rem; margin-left: 10rem; clear: both; overflow: hidden;"
+     [style.height.px]="graphHeight"
+     [style.display]="isAvgPerformanceChartDisplayed()"
+     *ngIf="allAvgsPerformanceData?.length > 0">
+  <ngx-charts-bar-horizontal-2d
+    [view]=""
+    [scheme]="colorScheme"
+    [results]="allAvgsPerformanceData"
+    [gradient]="gradient"
+    [xAxis]="showXAxis"
+    [yAxis]="showYAxis"
+    [legend]="showLegend"
+    [showXAxisLabel]="showXAxisLabel"
+    [showYAxisLabel]="showYAxisLabel"
+    [xAxisLabel]="xAxisLabel"
+    [yAxisLabel]="yAxisLabel"
+    [barPadding]="barPadding"
+    [noBarWhenZero]="true"
+    [showGridLines]="false"
+    [showDataLabel]="showDataLabel"
+    [animations]="chartAnimation"
+    (select)="onSelect($event)"
+    style="fill: #F3F3F3;"
+  >
+    <ng-template #tooltipTemplate let-model="model">
+      <div class="tooltip" style='text-align: left;' [innerHTML]="getToolTipForAvgsChart(model) | safeHtml">
+      </div>
+    </ng-template>
+  </ngx-charts-bar-horizontal-2d>
+</div>
+<div style="margin-top: 6rem; padding-top: 2rem; text-align: center; clear: both;font-size: 1.2rem;overflow: hidden;"
+     [style.height.px]="graphHeight"
+     *ngIf="sessionsData?.length === 0">
+  There is no data available for the selected date
+</div>
+<div style="margin-top: 5rem; margin-left: 10rem; clear: both; overflow: hidden;"
+     [style.height.px]="graphHeightWorkerSpecific"
+     [style.display]="isWorkerSpecificPerfChartDisplayed()"
+     *ngIf="workerSpecificPerformanceData?.length > 0 && !allValuesZero">
+  <ngx-charts-bar-horizontal-2d
+    [view]=""
+    [scheme]="colorScheme"
+    [results]="workerSpecificPerformanceData"
+    [gradient]="gradient"
+    [xAxis]="showXAxis"
+    [yAxis]="showYAxis"
+    [legend]="showLegend"
+    [showXAxisLabel]="showXAxisLabel"
+    [showYAxisLabel]="showYAxisLabel"
+    [xAxisLabel]="xAxisLabel"
+    [yAxisLabel]="yAxisLabelWorkerSpecific"
+    [barPadding]="barPaddingWorkerSpecific"
+    [noBarWhenZero]="true"
+    [showGridLines]="false"
+    [showDataLabel]="showDataLabel"
+    [animations]="chartAnimation"
+    (select)="onSelect($event)"
+    style="fill: #F3F3F3;"
+  >
+    <ng-template #tooltipTemplate let-model="model">
+      <div class="tooltip" style='text-align: left;' [innerHTML]="getToolTipForWorkerSpecificChart(model) | safeHtml">
+      </div>
+    </ng-template>
+  </ngx-charts-bar-horizontal-2d>
+</div>
+
+<div style="margin-top: 6rem; padding-top: 2rem; text-align: center; clear: both;font-size: 1.2rem;overflow: hidden;"
+     *ngIf="(isWorkerSpecificPerfChartDisplayed() === 'none') && this.performanceSortOption !== '-1'
+     && (workerSpecificPerformanceData?.length === 0) && (isPerformanceTableDisplayed() === 'none')">
+  There is no worker specific data available for the selected date
+</div>
+
+<div style="margin-top: 6rem; padding-top: 2rem; text-align: center; clear: both;font-size: 1.2rem;overflow: hidden;"
+     *ngIf="(isWorkerSpecificPerfChartDisplayed() === 'block') && (isPerformanceTableDisplayed() === 'none') && allValuesZero">
+  Worker specific chart cannot be displayed due to missing data
+</div>
+
+<section class="listing-container-laborPerf" style="clear: both;" [style.display]="isPerformanceTableDisplayed()">
+  <table
+    mat-table
+    [dataSource]="laborPerfDataSource"
+    multiTemplateDataRows
+    matSort
+    class="listing-table"
+  >
+    <ng-container
+      matColumnDef="{{ column }}"
+      *ngFor="let column of laborPerfColumnsToDisplay"
+    >
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>
+        <span [innerHTML]="laborPerfAttributesReadableMap.get(column) | safeHtml"></span>
+      </th>
+      <td mat-cell *matCellDef="let element">{{ element[column] }}</td>
+    </ng-container>
+
+
+    <tr mat-header-row *matHeaderRowDef="columnsHeadersToDisplay; sticky: true"></tr>
+    <tr mat-row *matRowDef="let element; columns: columnsHeadersToDisplay" class="row"></tr>
+  </table>
+  <mat-paginator
+    [style.display]="isPerformanceTableDisplayed()"
+    [pageSizeOptions]="[5, 10, 25, 100]"
+    [pageSize]="25"
+    [showFirstLastButtons]="true"
+  ></mat-paginator>
+</section>

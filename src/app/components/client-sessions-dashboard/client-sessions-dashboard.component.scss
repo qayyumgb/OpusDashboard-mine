@@ -1,0 +1,124 @@
+.controls-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.filter-container {
+  flex-grow: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.date-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.date-container > span {
+  /* flex-grow: 1; */
+  /* background-color: aqua; */
+  font-size: 0.8em;
+  color: gray;
+}
+
+/* not working */
+.date-menu {
+  width: 20em;
+}
+
+.new-table-design-container {
+  margin-left: 10%;
+  max-width: 80%;
+  min-width: 20%;
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+}
+
+.table-header-container {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+}
+
+.table-header-content-text {
+}
+
+.table-header-content-spacer {
+  flex-grow: 1;
+}
+
+.table-header-content-menu {
+}
+
+.footer-row{
+  font-weight:500;
+}
+
+.menu-button {
+  transform: scale(0.6);
+}
+
+.filtered {
+  background-color: #01ADC1;
+  color: white;
+}
+
+.menu {
+  width: 8em;
+}
+
+.filter {
+  margin: 0.5em;
+}
+
+.filter-input {
+  height: 1em;
+}
+
+.hidden {
+  display: none;
+}
+
+.date-picker {
+  display: none;
+}
+
+.filter-string {
+  text-align: center;
+  font-size: 1em;
+  color: gray;
+  font-style: italic;
+  margin: 0.2em;
+}
+
+::ng-deep .customize {
+  background: #424242 !important;
+}
+
+::ng-deep .customize_date > .mat-mdc-menu-content {
+  background: #424242 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.preserve-whitespace {
+  white-space: pre;
+}
+
+.fab {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+}
+
+.fabArchive {
+  position: absolute;
+  right: 0;
+  top: -4px;
+}

@@ -1,0 +1,47 @@
+<div style="position: absolute; margin-top: 2.5rem; margin-left: 40%; overflow: hidden;z-index: 9;" *ngIf="selectedClientDocData">
+  <mat-icon style="margin-right: 2rem;cursor: pointer;transform: scale(1.6)" (click)="decrementMonth()">keyboard_double_arrow_left</mat-icon>
+  <mat-icon style="margin-right: 2rem;cursor: pointer;" (click)="decrementDate()">arrow_back_ios</mat-icon>
+  <mat-form-field class="example-full-width" appearance="fill" color="primary">
+    <mat-label>Choose a date</mat-label>
+    <input matInput [matDatepickerFilter]="futureFilter" (dateChange)="onDateChange()"
+           [(ngModel)]="selectedDate" [matDatepicker]="picker">
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+  </mat-form-field>
+  <mat-icon style="margin-left: 2rem;cursor: pointer;" (click)="incrementDate()">arrow_forward_ios</mat-icon>
+  <mat-icon style="margin-left: 2rem;cursor: pointer;transform: scale(1.6)" (click)="incrementMonth()">keyboard_double_arrow_right</mat-icon>
+</div>
+
+<div style="position: absolute; margin-top: 8.8rem; margin-left: 38.5%; z-index: 7; text-align: center; clear: both;font-size: 1.2rem;" *ngIf="markerPositions?.length === 0">
+  There is no data available for the selected date
+</div>
+<div class="div-wrapper" *ngIf="markerPositions?.length > 0">
+  <google-map
+    height="92vh"
+    width="100%"
+    [center]="center"
+    [zoom]="zoom"
+    [mapTypeId]="MapTypeStyle"
+  >
+      <!--<map-marker #marker="mapMarker" *ngFor="let marker of markers; let i = index"
+                  [position]="marker.getPosition()"
+                  (mapClick)="openInfoWindow(marker, i)"></map-marker>
+      <map-info-window>aaaa</map-info-window>-->
+
+
+
+      <map-marker
+        #marker="mapMarker"
+        [position]="markerPosition"
+        (mapClick)="openInfoWindow(marker)"
+        icon="assets/icon-pushpin.png"
+        *ngFor="let markerPosition of markerPositions; let i = index"
+      >
+        <map-info-window><div style="width: 10rem;color: black;" [innerHTML]="getInfoWindowForMarker(i)"></div></map-info-window>
+      </map-marker>
+
+
+
+  </google-map>
+</div>
+

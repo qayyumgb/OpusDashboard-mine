@@ -1,0 +1,82 @@
+<div style="min-width: 400px;">
+    <mat-dialog-content [formGroup]="editDeviceForm" style="text-align: center;max-height: 100%;">
+        <mat-form-field style="width: 18rem;margin-bottom: 0.5rem;">
+          <mat-label>Device Number</mat-label>
+          <input matInput formControlName="deviceNumber" maxlength="8">
+        </mat-form-field>
+        <br/>
+        <mat-form-field appearance="fill"  style="width: 18rem;margin-bottom: 0.5rem;">
+            <mat-label>Select Location</mat-label>
+            <mat-select formControlName="locationId">
+                <mat-option [value]="null">Select Location</mat-option>
+                <mat-option *ngFor="let location of allLocationsList" [value]="location.id">
+                    {{location.name}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+        <br/>
+      <mat-form-field appearance="fill" style="width: 18rem;">
+        <mat-label>App Modes</mat-label>
+        <mat-select formControlName="appModes" multiple>
+          <mat-option *ngFor="let appMode of allAppModesList" [value]="appMode.id">
+            {{appMode.name}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <br/>
+      <mat-slide-toggle
+        class="edit_device_toggles"
+        formControlName="enableAutoTouchLock"
+        style="margin-left: 2rem;"
+      >
+        <mat-label>Enable auto touch lock</mat-label>
+      </mat-slide-toggle>
+      <br/>
+      <mat-slide-toggle
+        class="edit_device_toggles"
+        formControlName="enableGPS"
+        style="margin-left: 2rem;"
+      >
+        <mat-label>Enable GPS</mat-label>
+      </mat-slide-toggle>
+      <br/>
+      <mat-slide-toggle
+        class="edit_device_toggles"
+        formControlName="enableOutOfRange"
+        style="margin-left: 2rem;"
+      >
+        <mat-label>Enable out of range</mat-label>
+      </mat-slide-toggle>
+      <br/>
+      <mat-slide-toggle
+        class="edit_device_toggles"
+        formControlName="enableTrainingMode"
+        style="margin-left: 2rem;"
+      >
+        <mat-label>Enable training mode</mat-label>
+      </mat-slide-toggle>
+      <br/>
+      <mat-slide-toggle
+        class="edit_device_toggles"
+        formControlName="enableVoiceAssistance"
+        style="margin-left: 2rem;"
+      >
+        <mat-label>Enable voice assistance</mat-label>
+      </mat-slide-toggle>
+      <br/>
+      <mat-form-field style="width: 18rem; margin-top: 0.8rem;">
+        <mat-label>Notes</mat-label>
+        <textarea cdkTextareaAutosize
+                  cdkAutosizeMinRows="2"
+                  cdkAutosizeMaxRows="2" matInput placeholder="Notes" formControlName="notes" style="overflow: hidden;"
+        ></textarea>
+      </mat-form-field>
+      <br/>
+    </mat-dialog-content>
+    <div style="text-align: center;margin-bottom: 0.4rem;">
+        <mat-dialog-actions>
+            <button mat-raised-button color="primary" (click)="close()">Close</button>
+            <button mat-raised-button color="primary" (click)="updateDevice()" style="margin-left: 20px;">Save Changes</button>
+        </mat-dialog-actions>
+    </div>
+</div>
