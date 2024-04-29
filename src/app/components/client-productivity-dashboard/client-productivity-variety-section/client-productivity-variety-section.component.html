@@ -1,34 +1,32 @@
-<div
-  style="margin-left: 8rem;float: left;margin-top:1rem;margin-bottom: 2rem;border: 2px #ffffff4d solid;border-radius: 5px;padding: 0.2rem 0.2rem;display: inline-block;">
-  <mat-button-toggle-group #group="matButtonToggleGroup" [(ngModel)]="varietyChartVsTable"
-                           style="height: 2rem;padding-top: 0;">
-    <mat-button-toggle value="chart" aria-label="Text align left">
-      <mat-icon
-        style="transform: scale(1);cursor: pointer;color: whitesmoke;margin-top: -1rem;"
-        matTooltip="See Chart"
-        matTooltipClass="tooltip-class"
-        matTooltipHideDelay="100"
-        matTooltipPosition="below"
-      >bar_chart
-      </mat-icon>
-    </mat-button-toggle>
-    <mat-button-toggle value="table" aria-label="Text align center">
-      <mat-icon
-        style="transform: scale(1);cursor: pointer;color: whitesmoke;margin-top: -1rem;"
-        matTooltip="See Table"
-        matTooltipClass="tooltip-class"
-        matTooltipHideDelay="100"
-        matTooltipPosition="below"
-      >table_chart
-      </mat-icon>
-    </mat-button-toggle>
-  </mat-button-toggle-group>
-</div>
-<div class="sort-dropdown-wrapper"
-     [style.display]="isVarietyChartDisplayed()">
-  <mat-icon style="margin-top: 0.2rem;float: left;">sort</mat-icon>
-  <mat-form-field class="sort-dropdown-formfield">
-    <mat-select [(value)]="varietySortOption"
+<div class="performance-actions">
+  <div>
+    <mat-button-toggle-group #group="matButtonToggleGroup" [(ngModel)]="varietyChartVsTable">
+      <mat-button-toggle value="chart" aria-label="Text align left">
+        <mat-icon class="material-symbols-outlined"
+          matTooltip="See Chart"
+          matTooltipClass="tooltip-class"
+          matTooltipHideDelay="100"
+          matTooltipPosition="below"
+        >bar_chart
+        </mat-icon>
+      </mat-button-toggle>
+      <mat-button-toggle value="table" aria-label="Text align center">
+        <mat-icon class="material-symbols-outlined"
+          matTooltip="See Table"
+          matTooltipClass="tooltip-class"
+          matTooltipHideDelay="100"
+          matTooltipPosition="below"
+        >table_chart
+        </mat-icon>
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+  <div class="sort-dropdown-wrapper"
+    [style.display]="isVarietyChartDisplayed()">
+    
+    <mat-form-field class="sort-dropdown-formfield" appearance="outline">
+      <mat-icon matPrefix>sort</mat-icon>
+      <mat-select [(value)]="varietySortOption"
                 (selectionChange)="varietySortOptionChanged()"
                 style="margin-left: 0.4rem;"
                 [disabled]="(!varietyData || (varietyData.length === 0))">
@@ -37,26 +35,26 @@
       <mat-option value="HL">Sort High &rarr; Low</mat-option>
       <mat-option value="LH">Sort Low &rarr; High</mat-option>
     </mat-select>
-  </mat-form-field>
+    </mat-form-field>
+  </div>
 </div>
-<div style="float:left; margin-top:1.3rem;text-align: center; width: 25%;" [ngStyle]="isVarietyChartDisplayed() === 'block' ? {'margin-left': '6.5rem'} : {'margin-left': '19.3rem'}"
-     *ngIf="varietyData?.length > 0">
-  <span style="font-size: 1.1rem;">TOTAL FINISHED: {{finishedData.actual.count}} picked, {{finishedData.actual.rows}} rows</span> <br/>
-  <span style="margin-top:0.2rem;color:lightgray;">TOTAL ACTUAL: {{finishedData.total.count}} picked, {{finishedData.total.rows}} rows</span> <br/>
-</div>
-<div style="float:right; margin-right: 8rem; margin-top:1.3rem;">
-  <mat-icon
-    style="transform: scale(1.2);cursor: pointer;color: whitesmoke;"
-    (click)="downloadAsCSV('Varieties')"
-    matTooltip="Download as CSV"
-    matTooltipClass="tooltip-class"
-    matTooltipHideDelay="100"
-    matTooltipPosition="below"
+
+<div class="table-card">
+  <div class="preformance-info">
+    <div *ngIf="varietyData?.length > 0">
+        <span><span class="cstm-color">TOTAL FINISHED</span> {{finishedData.finished.count}} picked, {{finishedData.finished.rows}} rows</span> <br/>
+        <span><span class="cstm-color">TOTAL ACTUAL</span> {{finishedData.totalAll.count}} picked, {{finishedData.totalAll.rows}} rows</span> <br/>
+    </div>
+    <mat-icon
+      (click)="downloadAsCSV('Varieties')"
+      matTooltip="Download as CSV"
+      matTooltipClass="tooltip-class"
+      matTooltipHideDelay="100"
+      matTooltipPosition="below"
     *ngIf="varietyData.length > 0">download
   </mat-icon>
-</div>
-<div style="margin-top: 5rem; margin-left: 10rem; clear: both; overflow: hidden;"
-     [style.display]="isVarietyChartDisplayed()"
+  </div>
+  <div [style.display]="isVarietyChartDisplayed()"
      [style.height.px]="graphHeight"
      *ngIf="varietyData?.length > 0">
   <ngx-charts-bar-horizontal-stacked
@@ -85,13 +83,11 @@
     >
   </ngx-charts-bar-horizontal-stacked>
 </div>
-<div
-  style="margin-top: 6rem; padding-top: 2rem; text-align: center; clear: both;font-size: 1.2rem;overflow: hidden;"
-  [style.height.px]="graphHeight" *ngIf="varietyData?.length === 0">
+<div [style.height.px]="graphHeight" *ngIf="varietyData?.length === 0">
   There is no data available for the selected date
 </div>
 
-<section class="listing-container-variety" style="clear: both;" [style.display]="isVarietyTableDisplayed()">
+<section class="listing-container-variety table-styled" style="clear: both;" [style.display]="isVarietyTableDisplayed()">
   <table
     mat-table
     [dataSource]="varietiesDataSource"
@@ -111,7 +107,7 @@
 
 
     <tr mat-header-row *matHeaderRowDef="columnsHeadersToDisplay; sticky: true"></tr>
-    <tr mat-row *matRowDef="let element; columns: columnsHeadersToDisplay" class="row"></tr>
+    <tr mat-row *matRowDef="let element; columns: columnsHeadersToDisplay"></tr>
   </table>
   <mat-paginator
     [style.display]="isVarietyTableDisplayed()"
@@ -120,3 +116,5 @@
     [showFirstLastButtons]="true"
   ></mat-paginator>
 </section>
+</div>
+

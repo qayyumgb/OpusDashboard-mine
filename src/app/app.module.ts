@@ -1,7 +1,7 @@
 import {CommonModule, NgOptimizedImage} from '@angular/common';
 import {BrowserModule} from '@angular/platform-browser';
 import {APP_INITIALIZER, NgModule} from '@angular/core';
-import {HttpClientModule} from "@angular/common/http";
+import {HttpClient, HttpClientModule} from "@angular/common/http";
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -32,27 +32,30 @@ import {
 } from '@angular-material-components/datetime-picker';
 import { NgxMatMomentModule } from '@angular-material-components/moment-adapter';
 import {MatInputModule} from '@angular/material/input';
-import {MatFormFieldModule} from '@angular/material/form-field';
+import {MAT_FORM_FIELD_DEFAULT_OPTIONS, MatFormFieldModule} from '@angular/material/form-field';
+import { MatDrawerMode } from '@angular/material/sidenav';
+import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
+import {TranslateHttpLoader} from '@ngx-translate/http-loader';
 
 import {
-    NavComponent,
-    SignInComponent,
-    ActivateDeviceDialogComponent,
-    CreateWorkerDialogComponent,
-    EditWorkerDialogComponent,
-    EditDeviceDialogComponent,
-    EditTrainingDialogComponent,
-    DevDashboardComponent,
-    DevDeviceComponent,
-    DevWorkerComponent,
-    DevTrainingComponent,
-    DevActivityComponent,
-    DevClientComponent,
-    ClientDashboardComponent,
-    ClientTrainingComponent,
-    ClientTrainingDashboardComponent,
-    ClientDeviceComponent,
-    ClientWorkerComponent
+  NavComponent,
+  SignInComponent,
+  ActivateDeviceDialogComponent,
+  CreateWorkerDialogComponent,
+  EditWorkerDialogComponent,
+  EditDeviceDialogComponent,
+  EditTrainingDialogComponent,
+  DevDashboardComponent,
+  DevDeviceComponent,
+  DevWorkerComponent,
+  DevTrainingComponent,
+  DevActivityComponent,
+  DevClientComponent,
+  ClientDashboardComponent,
+  ClientTrainingComponent,
+  ClientTrainingDashboardComponent,
+  ClientDeviceComponent,
+  ClientWorkerComponent
 } from './components.module';
 import {ClientSettingsComponent} from './components/client-settings/client-settings.component';
 import {ClientProductivityDashboardComponent} from './components/client-productivity-dashboard/client-productivity-dashboard.component';
@@ -118,19 +121,39 @@ import { ClientWorkerGroupsComponent } from './components/client-worker-groups/c
 import { CreateWorkerGroupDialogComponent } from './components/client-worker-groups/create-worker-group-dialog/create-worker-group-dialog.component';
 import { EditWorkerGroupDialogComponent } from './components/client-worker-groups/edit-worker-group-dialog/edit-worker-group-dialog.component';
 import { ClientPresencesComponent } from './components/client-presences/client-presences.component';
+import { LaborPresencesSectionComponent } from './components/client-labor-dashboard/labor-presences-section/labor-presences-section.component';
+import { SidenavHelpComponent } from './common/sidenav-help/sidenav-help.component';
+import {MatSidenavModule} from "@angular/material/sidenav";
+import {MatRadioModule} from "@angular/material/radio";
+import {CustomLoader} from "./common/i18n/custom-loader";
+import 'prismjs';
+import 'prismjs/components/prism-typescript.min.js';
+import 'prismjs/plugins/line-numbers/prism-line-numbers.js';
+import 'prismjs/plugins/line-highlight/prism-line-highlight.js';
+import { LanguageSettingsComponent } from './components/language-settings/language-settings.component';
+import { EditLangElementDialogComponent } from './components/language-settings/edit-language-element/edit-lang-element-dialog.component';
+import { CreateLangElementDialogComponent } from './components/language-settings/create-lang-element-dialog/create-lang-element-dialog.component';
+import {FirestoreService} from "./services/firestore.service";
+import { RegistrationsPresencesSectionComponent } from './components/client-registrations-dashboard/registrations-presences-section/registrations-presences-section.component';
+import { RegistrationsTasksSectionComponent } from './components/client-registrations-dashboard/registrations-tasks-section/registrations-tasks-section.component';
+import { GridModalComponent } from './common/grid-modal/grid-modal.component';
+import { EditPresenceDialogComponent } from './components/client-registrations-dashboard/registrations-presences-section/edit-presence-dialog/edit-presence-dialog.component';
+import { CreatePresenceDialogComponent } from './components/client-registrations-dashboard/registrations-presences-section/create-presence-dialog/create-presence-dialog.component';
+import { InputTimeComponent } from './common/components/input-time/input-time.component';
+import { DateSelectionComponent } from './common/components/date-selection/date-selection.component';
 
 export function initializeApp(afAuth: AngularFireAuth): () => Promise<null> {
-    return () => {
-        return new Promise((resolve) => {
-            if (!environment.useEmulators) {
-                return resolve(null);
-            } else {
-                afAuth.useEmulator(`http://${location.hostname}:9099/`).then(() => {
-                    resolve(null);
-                });
-            }
+  return () => {
+    return new Promise((resolve) => {
+      if (!environment.useEmulators) {
+        return resolve(null);
+      } else {
+        afAuth.useEmulator(`http://${location.hostname}:9099/`).then(() => {
+          resolve(null);
         });
-    };
+      }
+    });
+  };
 }
 
 const CUSTOM_DATE_FORMATS: NgxMatDateFormats = {
@@ -145,86 +168,101 @@ const CUSTOM_DATE_FORMATS: NgxMatDateFormats = {
   }
 };
 
+export function FirestoreTranslationsLoaderFactory(firestoreService: FirestoreService) {
+  return new CustomLoader(firestoreService);
+}
 
 @NgModule({
-    declarations: [
-        AppComponent,
-        NavComponent,
-        DevDashboardComponent,
-        SignInComponent,
-        DevClientComponent,
-        DevDeviceComponent,
-        DevWorkerComponent,
-        DevTrainingComponent,
-        DevActivityComponent,
-        ClientDashboardComponent,
-        ClientTrainingComponent,
-        ClientTrainingDashboardComponent,
-        ClientDeviceComponent,
-        ClientWorkerComponent,
-        ActivateDeviceDialogComponent,
-        CreateWorkerDialogComponent,
-        EditWorkerDialogComponent,
-        EditDeviceDialogComponent,
-        EditTrainingDialogComponent,
-        ClientSettingsComponent,
-        ClientProductivityDashboardComponent,
-        ClientLaborDashboardComponent,
-        ClientLocationsComponent,
-        ClientLocationLayoutComponent,
-        ClientLocLytRowsComponent,
-        CreateLayoutDialogComponent,
-        EditLayoutDialogComponent,
-        CreateLocationDialogComponent,
-        ClientApisComponent,
-        EditLocationDialogComponent,
-        ConfirmationDialogComponent,
-        SafeHtmlPipe,
-        ClientUserComponent,
-        EditUserDialogComponent,
-        CreateUserDialogComponent,
-        AddAnnotationComponent,
-        ConfirmationSnackbarComponent,
-        ClientUserProfileComponent,
-        HelpComponent,
-        ClientGeneralComponent,
-        TrainingDataRequestsComponent,
-        LaborPerformanceSectionComponent,
-        ClientProductivityVarietySectionComponent,
-        LaborOverviewSectionComponent,
-        CdkDetailRowDirective,
-        LaborProductivitySectionComponent,
-        ClientProductivityRowSectionComponent,
-        ClientLabelsComponent,
-        CreateLabelDialogComponent,
-        EditLabelDialogComponent,
-        ClientVarietiesComponent,
-        CreateVarietyDialogComponent,
-        EditVarietyDialogComponent,
-        ClientProductivityRowmapSectionComponent,
-        ClientObservationsComponent,
-        ClientPositionsComponent,
-        CreatePositionDialogComponent,
-        EditPositionDialogComponent,
-        ClientTasksComponent,
-        CreateTaskDialogComponent,
-        EditTaskDialogComponent,
-        ClientRegistrationsDashboardComponent,
-        LaborTrolleySectionComponent,
-        ClientSessionsDashboardComponent,
-        EditSessionDialogComponent,
-        MultipleDeviceEditComponent,
-        EditRegistrationDialogComponent,
-        ClientTaskGroupsComponent,
-        CreateTaskGroupDialogComponent,
-        EditTaskGroupDialogComponent,
-        CreateSessionDialogComponent,
-        EnrollmentSettingsDialogComponent,
-        ClientWorkerGroupsComponent,
-        CreateWorkerGroupDialogComponent,
-        EditWorkerGroupDialogComponent,
-        ClientPresencesComponent
-    ],
+  declarations: [
+    AppComponent,
+    NavComponent,
+    DevDashboardComponent,
+    SignInComponent,
+    DevClientComponent,
+    DevDeviceComponent,
+    DevWorkerComponent,
+    DevTrainingComponent,
+    DevActivityComponent,
+    ClientDashboardComponent,
+    ClientTrainingComponent,
+    ClientTrainingDashboardComponent,
+    ClientDeviceComponent,
+    ClientWorkerComponent,
+    ActivateDeviceDialogComponent,
+    CreateWorkerDialogComponent,
+    EditWorkerDialogComponent,
+    EditDeviceDialogComponent,
+    EditTrainingDialogComponent,
+    ClientSettingsComponent,
+    ClientProductivityDashboardComponent,
+    ClientLaborDashboardComponent,
+    ClientLocationsComponent,
+    ClientLocationLayoutComponent,
+    ClientLocLytRowsComponent,
+    CreateLayoutDialogComponent,
+    EditLayoutDialogComponent,
+    CreateLocationDialogComponent,
+    ClientApisComponent,
+    EditLocationDialogComponent,
+    ConfirmationDialogComponent,
+    SafeHtmlPipe,
+    ClientUserComponent,
+    EditUserDialogComponent,
+    CreateUserDialogComponent,
+    AddAnnotationComponent,
+    ConfirmationSnackbarComponent,
+    ClientUserProfileComponent,
+    HelpComponent,
+    ClientGeneralComponent,
+    TrainingDataRequestsComponent,
+    LaborPerformanceSectionComponent,
+    ClientProductivityVarietySectionComponent,
+    LaborOverviewSectionComponent,
+    CdkDetailRowDirective,
+    LaborProductivitySectionComponent,
+    ClientProductivityRowSectionComponent,
+    ClientLabelsComponent,
+    CreateLabelDialogComponent,
+    EditLabelDialogComponent,
+    ClientVarietiesComponent,
+    CreateVarietyDialogComponent,
+    EditVarietyDialogComponent,
+    ClientProductivityRowmapSectionComponent,
+    ClientObservationsComponent,
+    ClientPositionsComponent,
+    CreatePositionDialogComponent,
+    EditPositionDialogComponent,
+    ClientTasksComponent,
+    CreateTaskDialogComponent,
+    EditTaskDialogComponent,
+    ClientRegistrationsDashboardComponent,
+    LaborTrolleySectionComponent,
+    ClientSessionsDashboardComponent,
+    EditSessionDialogComponent,
+    MultipleDeviceEditComponent,
+    EditRegistrationDialogComponent,
+    ClientTaskGroupsComponent,
+    CreateTaskGroupDialogComponent,
+    EditTaskGroupDialogComponent,
+    CreateSessionDialogComponent,
+    EnrollmentSettingsDialogComponent,
+    ClientWorkerGroupsComponent,
+    CreateWorkerGroupDialogComponent,
+    EditWorkerGroupDialogComponent,
+    ClientPresencesComponent,
+    LaborPresencesSectionComponent,
+    SidenavHelpComponent,
+    LanguageSettingsComponent,
+    EditLangElementDialogComponent,
+    CreateLangElementDialogComponent,
+    RegistrationsPresencesSectionComponent,
+    RegistrationsTasksSectionComponent,
+    GridModalComponent,
+    EditPresenceDialogComponent,
+    InputTimeComponent,
+    CreatePresenceDialogComponent,
+    DateSelectionComponent
+  ],
   imports: [
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule,
@@ -260,20 +298,34 @@ const CUSTOM_DATE_FORMATS: NgxMatDateFormats = {
     NgxMatTimepickerModule,
     NgxMatNativeDateModule,
     NgxMatMomentModule,
-    MtxTooltipModule
+    MtxTooltipModule,
+    MatSidenavModule,
+    MatRadioModule,
+    HttpClientModule,
+    TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: FirestoreTranslationsLoaderFactory,
+        deps: [FirestoreService]
+      }
+    })
   ],
-    providers: [
-        {
-            provide: APP_INITIALIZER,
-            multi: true,
-            deps: [AngularFireAuth],
-            useFactory: initializeApp
-        },
-        {provide: USE_AUTH_EMULATOR, useValue: environment.useEmulators ? ['localhost', 9099] : undefined},
-        {provide: USE_FIRESTORE_EMULATOR, useValue: environment.useEmulators ? ['localhost', 8080] : undefined},
-        {provide: USE_FUNCTIONS_EMULATOR, useValue: environment.useEmulators ? ['localhost', 5001] : undefined},
-        { provide: NGX_MAT_DATE_FORMATS, useValue: CUSTOM_DATE_FORMATS }],
-    bootstrap: [AppComponent],
+  providers: [
+    {
+      provide: APP_INITIALIZER,
+      multi: true,
+      deps: [AngularFireAuth],
+      useFactory: initializeApp
+    },
+    {provide: USE_AUTH_EMULATOR, useValue: environment.useEmulators ? ['localhost', 9099] : undefined},
+    {provide: USE_FIRESTORE_EMULATOR, useValue: environment.useEmulators ? ['localhost', 8080] : undefined},
+    {provide: USE_FUNCTIONS_EMULATOR, useValue: environment.useEmulators ? ['localhost', 5001] : undefined},
+    {
+      provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
+      useValue: { appearance: 'outline' },
+    },
+    { provide: NGX_MAT_DATE_FORMATS, useValue: CUSTOM_DATE_FORMATS }],
+  bootstrap: [AppComponent],
 })
 
 export class AppModule {}

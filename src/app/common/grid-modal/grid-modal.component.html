@@ -1,0 +1,24 @@
+
+
+<h2 mat-dialog-title>Worker Seasons</h2>
+<p class="px-4 cstm-color mb-0"><span class="pr-2">Name: </span>{{NesteTableData[0].workerName}}</p>
+<mat-dialog-content class="table-styled">
+    <table mat-table [dataSource]="NesteTableData" class="mat-elevation-z8">
+
+        <ng-container
+            matColumnDef="{{ column }}"
+            *ngFor="let column of columnsHeadersToDisplayNested"
+          >
+            <th mat-header-cell *matHeaderCellDef>
+                    {{workerAttributesReadableMap.get(column)}}
+            </th>
+            <td mat-cell *matCellDef="let element">{{ element[column] }}</td>
+          </ng-container>
+      
+        <tr mat-header-row *matHeaderRowDef="columnsHeadersToDisplayNested"></tr>
+        <tr mat-row *matRowDef="let row; columns: columnsHeadersToDisplayNested;"></tr>
+      </table>
+</mat-dialog-content>
+
+  
+  

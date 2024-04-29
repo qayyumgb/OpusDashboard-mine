@@ -73,7 +73,9 @@ export class ClientProductivityDashboardComponent implements OnInit, OnDestroy {
         });
       });
   }
-
+  isButtonDisabled(): boolean {
+    return this.isRowMapTabShown;
+  }
   navigateToRowTab() {
     this.tabIndex = 1;
     this.isRowMapTabShown = false;

@@ -128,3 +128,14 @@ input[type=number]::-webkit-outer-spin-button {
   appearance: none;
   margin: 0;
 }
+
+
+::ng-deep{
+  .custom-height-field{
+    .mat-mdc-form-field-infix{
+      padding-top: 5px !important;
+      padding-bottom: 5px !important;
+      min-height: 34px !important;
+    }
+  }
+}

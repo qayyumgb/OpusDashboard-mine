@@ -64,6 +64,16 @@ import {
 import {ClientTaskGroupsComponent} from "./components/client-task-groups/client-task-groups.component";
 import {ClientWorkerGroupsComponent} from "./components/client-worker-groups/client-worker-groups.component";
 import {ClientPresencesComponent} from "./components/client-presences/client-presences.component";
+import {
+  LaborPresencesSectionComponent
+} from "./components/client-labor-dashboard/labor-presences-section/labor-presences-section.component";
+import {LanguageSettingsComponent} from "./components/language-settings/language-settings.component";
+import {
+  RegistrationsTasksSectionComponent
+} from './components/client-registrations-dashboard/registrations-tasks-section/registrations-tasks-section.component';
+import {
+  RegistrationsPresencesSectionComponent
+} from './components/client-registrations-dashboard/registrations-presences-section/registrations-presences-section.component';
 
 const routes: Routes = [
   {
@@ -209,6 +219,11 @@ const routes: Routes = [
         pathMatch: 'full',
         component: ClientApisComponent
       },
+      {
+        path: 'languages',
+        pathMatch: 'full',
+        component: LanguageSettingsComponent
+      },
     ]
   },
   {
@@ -267,8 +282,13 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: 'overview',
+        redirectTo: 'presences',
         pathMatch: 'full'
+      },
+      {
+        path: 'presences',
+        pathMatch: 'full',
+        component: LaborPresencesSectionComponent
       },
       {
         path: 'overview',
@@ -306,7 +326,24 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     data: {
       roles: ['regular', 'manager', 'admin']
-    }
+    },
+    children: [
+      {
+        path: '',
+        redirectTo: 'tasks',
+        pathMatch: 'full'
+      },
+      {
+        path: 'tasks',
+        pathMatch: 'full',
+        component: RegistrationsTasksSectionComponent
+      },
+      {
+        path: 'presences',
+        pathMatch: 'full',
+        component: RegistrationsPresencesSectionComponent
+      }
+    ]
   },
   {
     path: 'help',

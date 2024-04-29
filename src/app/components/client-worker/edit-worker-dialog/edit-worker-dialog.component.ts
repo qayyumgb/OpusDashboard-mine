@@ -67,7 +67,34 @@ export class EditWorkerDialogComponent implements OnInit, OnDestroy {
       workerGroupId: [this.dataFromParent.workerGroupId, []],
       isLeftHanded: [this.dataFromParent.isLeftHanded, []],
       locationIds: [this.dataFromParent.locationIds, []],
+      hourlyRate: [+this.dataFromParent.hourlyRate, []],
       notes: [this.dataFromParent.notes, []],
+    });
+
+    this.form.controls.hourlyRate.valueChanges.subscribe(val => {
+      if (!val) {
+        return;
+      }
+      const valString = '' + val;
+      if (valString?.indexOf('.') === -1) {
+        return;
+      }
+
+      if (valString?.indexOf('.') !== -1) {
+        if (valString?.endsWith('.')) {
+          return;
+        }
+      }
+      const valNumber = +valString;
+      let decimalCount = 0;
+      if ((valNumber % 1) !== 0) {
+        decimalCount = valNumber.toString().split(".")[1].length;
+      }
+
+      const newVal = +valNumber.toFixed(decimalCount <= 2 ? decimalCount : 2);
+      if (newVal !== +this.form.controls.hourlyRate.value) {
+        this.form.patchValue({hourlyRate: newVal});
+      }
     });
   }
 

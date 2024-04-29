@@ -1,54 +1,46 @@
-<button mat-fab color="accent" (click)="openDialog()"
-        *ngIf="selectedClientDocData?.hasAdminRole" class="fab">
-  <mat-icon
-    matTooltip="Create new Task Group"
-    matTooltipClass="tooltip-class"
-    matTooltipHideDelay="100000"
-    style="width: 44px; height: 24px">
-    add
-  </mat-icon>
-</button>
 
 <div class="listing-container">
-  <mat-form-field appearance="outline" class="listing-filter-with-archival">
-    <mat-icon matPrefix>search</mat-icon>
-    <mat-label style="color: #808080FF">Filter</mat-label>
-    <input matInput (keyup)="applyFilter($event)" [(ngModel)]="filterValue" placeholder="name" #input/>
-  </mat-form-field>
-  <div
-    style="margin-left: 1rem;
-    float: left;
-    vertical-align: bottom;
-    margin-top: 0.8rem;
-    border: 1px #ffffff4d solid;
-    border-radius: 5px;
-    display: inline-block;">
-    <mat-button-toggle-group #group="matButtonToggleGroup" [(ngModel)]="unArchivedVsArchived"
-                             style="height: 2.15rem;padding-top: 0;" (change)="toggleArchived()">
-      <mat-button-toggle value="unarchived" aria-label="Text align left">
-        <mat-icon
-          style="transform: scale(1);cursor: pointer;color: whitesmoke;margin-top: -1rem;"
-          matTooltip="Show Task Groups"
-          matTooltipClass="tooltip-class"
-          matTooltipHideDelay="100"
-          matTooltipPosition="below"
-        >list
-        </mat-icon>
-      </mat-button-toggle>
-      <mat-button-toggle value="archived" aria-label="Text align center">
-        <mat-icon
-          style="transform: scale(1);cursor: pointer;color: whitesmoke;margin-top: -1rem;"
-          matTooltip="Show archived task groups"
-          matTooltipClass="tooltip-class"
-          matTooltipHideDelay="100"
-          matTooltipPosition="below"
-        >archive
-        </mat-icon>
-      </mat-button-toggle>
-    </mat-button-toggle-group>
+
+  <div class="controls-container">
+    <div class="date-container">
+      <mat-form-field appearance="outline" class="listing-filter-with-archival">
+        <mat-icon matPrefix>search</mat-icon>
+        <mat-label style="color: #808080FF">Filter</mat-label>
+        <input matInput (keyup)="applyFilter($event)" [(ngModel)]="filterValue" placeholder="name" #input/>
+      </mat-form-field>
+    </div>
+    <button mat-flat-button color="primary" class="setting-add-button mr-3" (click)="openDialog()"
+    *ngIf="selectedClientDocData?.hasAdminRole">
+      <mat-icon matTooltip="Create Task Group" matTooltipClass="tooltip-class" matTooltipHideDelay="100000">
+        add
+      </mat-icon> Create new Task Group</button>
+      <div>
+        <mat-button-toggle-group #group="matButtonToggleGroup" [(ngModel)]="unArchivedVsArchived" (change)="toggleArchived()">
+          <mat-button-toggle value="unarchived" aria-label="Text align left">
+            <mat-icon
+              matTooltip="Show Task Groups"
+              matTooltipClass="tooltip-class"
+              matTooltipHideDelay="100"
+              matTooltipPosition="below"
+            >list
+            </mat-icon>
+          </mat-button-toggle>
+          <mat-button-toggle value="archived" aria-label="Text align center">
+            <mat-icon
+              matTooltip="Show archived task groups"
+              matTooltipClass="tooltip-class"
+              matTooltipHideDelay="100"
+              matTooltipPosition="below"
+            >archive
+            </mat-icon>
+          </mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
   </div>
-  <div style="clear: both; font-size: 1.1rem;padding-left: 0.2rem;margin-bottom: 0.25rem;"
-       *ngIf="areArchivedTaskGroupsShown()">Archived Task Groups
+
+ 
+ <div class="table-card">
+  <div *ngIf="areArchivedTaskGroupsShown()">Archived Task Groups
   </div>
   <div class="mat-elevation-z8" style="clear:both;">
     <table
@@ -89,8 +81,7 @@
             <mat-icon matTooltip="Archive task group"
                       matTooltipClass="tooltip-class"
                       matTooltipHideDelay="100"
-                      matTooltipPosition="below"
-                      style="width: 44px; height: 24px">archive
+                      matTooltipPosition="below" >archive
             </mat-icon>
           </button>
           <button
@@ -102,8 +93,7 @@
             <mat-icon matTooltip="Unarchive this task group"
                       matTooltipClass="tooltip-class"
                       matTooltipHideDelay="100"
-                      matTooltipPosition="below"
-                      style="width: 44px; height: 24px">unarchive
+                      matTooltipPosition="below" >unarchive
             </mat-icon>
           </button>
         </td>
@@ -122,4 +112,6 @@
       [showFirstLastButtons]="true"
     ></mat-paginator>
   </div>
+ </div> 
+  
 </div>

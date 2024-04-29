@@ -78,7 +78,7 @@ export class EditRegistrationDialogComponent implements OnInit, OnDestroy {
     });
 
     this.workersListSubscription = this.firestoreService
-      .getAllWorkersForClientId(this.selectedClientDocData?.id)
+      .getUnArchivedWorkersForClientId(this.selectedClientDocData?.id)
       .subscribe((workerList) => {
         this.allWorkersList = workerList;
       });

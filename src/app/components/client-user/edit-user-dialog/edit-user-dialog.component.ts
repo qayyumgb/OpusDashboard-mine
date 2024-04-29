@@ -21,6 +21,10 @@ export class EditUserDialogComponent implements OnInit, OnDestroy {
   userRecordBeingEdited: any;
   selectedClientDocData: any;
   clientInContextServiceSubscription: Subscription;
+  languagesList: any[];
+  allWorkersList: any[];
+  workerListSubscription: Subscription;
+
 
   constructor(
     private firestoreService: FirestoreService,
@@ -33,6 +37,7 @@ export class EditUserDialogComponent implements OnInit, OnDestroy {
     private ref: ChangeDetectorRef
   ) {
     this.userRecordBeingEdited = data.userRecord;
+    this.languagesList = data.languagesList;
     this.loggedInUserFromAuthServiceSubscription = this.authService.loggedInUserFromAuthService$.subscribe(
       (userDocData) => {
         this.loggedInUserDocData = userDocData;
@@ -44,6 +49,13 @@ export class EditUserDialogComponent implements OnInit, OnDestroy {
         return;
       }
       this.selectedClientDocData = selectedClientDocData;
+
+      this.workerListSubscription = this.firestoreService.getUnArchivedWorkersForClientId(selectedClientDocData.id).subscribe((workersList) => {
+        this.allWorkersList = workersList.sort((worker1, worker2) => {
+          return worker1.name.toLowerCase() > worker2.name.toLowerCase() ? 1 : worker1.name.toLowerCase() < worker2.name.toLowerCase() ? -1 : 0;
+        });
+      });
+
     });
   }
 
@@ -51,7 +63,9 @@ export class EditUserDialogComponent implements OnInit, OnDestroy {
     this.editUserForm = this.fb.group({
       name: [this.userRecordBeingEdited.name, [Validators.required]],
       notes: [this.userRecordBeingEdited.notes, []],
-      role: [this.userRecordBeingEdited.role, []]
+      role: [this.userRecordBeingEdited.role, []],
+      languageCode: [this.userRecordBeingEdited.languageCode, []],
+      associatedWorkerId: [this.userRecordBeingEdited.associatedWorkerId, []]
     });
   }
 
@@ -73,6 +87,12 @@ export class EditUserDialogComponent implements OnInit, OnDestroy {
 
     const userDataToUpdate = this.editUserForm.value;
     userDataToUpdate.name = userDataToUpdate.name?.trim();
+
+    if (userDataToUpdate.associatedWorkerId) {
+      userDataToUpdate.associatedWorkerName = this.allWorkersList.filter(worker => worker.id === userDataToUpdate.associatedWorkerId)[0]?.name;
+      userDataToUpdate.associatedWorkerClientId = this.selectedClientDocData.id;
+    }
+
     this.firestoreService
       .updateUserByIdForClientId(this.userRecordBeingEdited.id, userDataToUpdate, this.selectedClientDocData.id)
       .subscribe({
@@ -99,6 +119,7 @@ export class EditUserDialogComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.loggedInUserFromAuthServiceSubscription?.unsubscribe();
     this.clientInContextServiceSubscription?.unsubscribe();
+    this.workerListSubscription?.unsubscribe();
   }
 
   openSnackBar(message, type) {

@@ -57,6 +57,8 @@ export class LaborTrolleySectionComponent implements AfterViewInit, OnDestroy {
   filterValue: string;
   private dateInContextSubscription: Subscription;
   selectedDate: Date;
+  clientLocInContextServiceSubscription: Subscription;
+  selectedLocationId: string;
 
   constructor(
     public firestoreService: FirestoreService,
@@ -87,8 +89,11 @@ export class LaborTrolleySectionComponent implements AfterViewInit, OnDestroy {
             return;
           }
           this.selectedClientDocData = selectedClientDocData;
-          this.sessionsData = [];
-          this.loadTrolleyTable();
+          this.clientLocInContextServiceSubscription = this.clientInContextService.clientLocSubject.subscribe(selectedLocation => {
+            this.selectedLocationId = !selectedLocation || (selectedLocation?.id === '-1') ? null : selectedLocation?.id;
+            this.sessionsData = [];
+            this.loadTrolleyTable();
+          });
         });
       });
   }
@@ -112,13 +117,15 @@ export class LaborTrolleySectionComponent implements AfterViewInit, OnDestroy {
     this.sessionsDataSubscription?.unsubscribe();
     this.archivedWorkersSubscription?.unsubscribe();
     this.locationListSubscription?.unsubscribe();
+    this.clientLocInContextServiceSubscription?.unsubscribe();
   }
 
 
   loadTrolleyTable() {
     const dateToQuery = moment(this.selectedDate).format('YYYY-MM-DD');
+    this.sessionsDataSubscription?.unsubscribe();
     this.sessionsDataSubscription = this.firestoreService
-      .getUnarchivedSessions(this.selectedClientDocData.id, dateToQuery)
+      .getUnarchivedSessions(this.selectedClientDocData.id, dateToQuery, this.selectedLocationId ?? null)
       .subscribe((sessions) => {
         sessions = sessions.filter(session => session.rowId !== null && session.rowId !== '');
         this.sessionsData = sessions.map((session) => {

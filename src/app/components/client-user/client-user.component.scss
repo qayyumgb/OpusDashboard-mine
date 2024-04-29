@@ -9,3 +9,12 @@
   right: 0;
   top: -4px;
 }
+
+.controls-container{
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  .date-container{
+    flex: 1;
+}
+}

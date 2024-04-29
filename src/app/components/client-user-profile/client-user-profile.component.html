@@ -1,15 +1,14 @@
-<div style="margin-left: 30%; margin-top: 2rem; margin-bottom: 1rem;display: flex;align-items: baseline;">
-    <mat-form-field style="width: 12rem; margin-right: 3rem;height: 2.5rem;">
+<div class="page-action">
+    <mat-form-field appearance="outline">
         <input matInput required
                placeholder="Name"
                [(ngModel)]="name"
         >
     </mat-form-field>
-    <button mat-raised-button color="primary" (click)="updateUser()" style="margin-top: 1rem;">Save Changes</button>
+    <button mat-raised-button color="primary" class="ml-3" (click)="updateUser()">Save Changes</button>
 </div>
-<mat-divider style="max-width: 70%"></mat-divider>
-<div class="listing-container-roles">
-    <div style="text-align: center;font-size: 1.35rem;font-weight: 500;margin-bottom: 2rem;">Client Roles Mapping</div>
+<div class="listing-container-roles table-card table-styled">
+    <div class="table-title">Client Roles Mapping</div>
     <table
             mat-table
             [dataSource]="dataSource"
@@ -29,6 +28,6 @@
 
 
         <tr mat-header-row *matHeaderRowDef="columnsHeadersToDisplay"></tr>
-        <tr mat-row *matRowDef="let element; columns: columnsHeadersToDisplay" class="row"></tr>
+        <tr mat-row *matRowDef="let element; columns: columnsHeadersToDisplay"></tr>
     </table>
 </div>

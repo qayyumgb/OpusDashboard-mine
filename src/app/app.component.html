@@ -1,7 +1,14 @@
-<div class="container">
+<div class="h-100 d-flex flex-column">
+  <!-- <app-sidenav-help></app-sidenav-help> -->
   <app-nav></app-nav>
-
-  <div class="router-outlet">
-    <router-outlet></router-outlet>
+  <div class="router-outlet h-100">
+     <app-sidenav-help>
+      <div [class]="isLoggedIn?'container':'login-container h-100'">
+        <router-outlet></router-outlet>
+      </div>
+      
+     </app-sidenav-help>
+     
   </div>
+
 </div>

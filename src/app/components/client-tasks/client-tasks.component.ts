@@ -31,20 +31,20 @@ export class ClientTasksComponent implements OnDestroy, AfterViewInit {
   taskAttributesReadableMap: Map<string, string> = new Map([
     ['id', 'ID'],
     ['name', 'Name'],
-    ['showOnWatch', 'Show on watch'],
-    ['showOnClock', 'Show on clock'],
+    ['targetDevices', 'Target Devices'],
     ['taskGroups', 'Task Groups'],
+    ['targetLocations', 'Target Locations'],
     ['creationTimestamp', 'Created At'],
   ]);
 
   screenSize = 'default';
 
-  columnsToDisplay: string[] = ['id', 'name', 'showOnWatch', 'showOnClock', 'taskGroups', 'creationTimestamp'];
+  columnsToDisplay: string[] = ['id', 'name', 'targetDevices', 'taskGroups', 'targetLocations', 'creationTimestamp'];
   columnsHeadersToDisplay: string[] = [
     'name',
-    'showOnWatch',
-    'showOnClock',
+    'targetDevices',
     'taskGroups',
+    'targetLocations',
     'creationTimestamp',
     'Edit',
   ];
@@ -62,6 +62,8 @@ export class ClientTasksComponent implements OnDestroy, AfterViewInit {
   archivedTasksSubscription: Subscription;
   breakpointSubscription: Subscription;
   filterValue: string
+  locationListSubscription: Subscription;
+  allLocationsList: any[];
 
   constructor(public firestoreService: FirestoreService,
               public authService: AuthService,
@@ -83,6 +85,13 @@ export class ClientTasksComponent implements OnDestroy, AfterViewInit {
         return;
       }
       this.selectedClientDocData = selectedClientDocData;
+
+      this.locationListSubscription = this.firestoreService
+        .getAllLocationsForClientId(this.selectedClientDocData?.id)
+        .subscribe((locationsList) => {
+          this.allLocationsList = locationsList;
+        });
+
       this.fetchUnarchivedTasks();
     });
   }
@@ -123,6 +132,7 @@ export class ClientTasksComponent implements OnDestroy, AfterViewInit {
     this.archivedTasksSubscription?.unsubscribe();
     this.unarchivedTasksSubscription?.unsubscribe();
     this.breakpointSubscription?.unsubscribe();
+    this.locationListSubscription?.unsubscribe();
   }
 
   async archiveTask(task) {
@@ -184,9 +194,15 @@ export class ClientTasksComponent implements OnDestroy, AfterViewInit {
     this.unarchivedTasksSubscription = this.firestoreService
       .getAllUnarchivedTasksForClientId(this.selectedClientDocData.id)
       .subscribe((tasksList) => {
+        tasksList = tasksList.filter(task => !task.isPauseTask);
         this.tasksList = tasksList.map((task) => {
           if (task.taskGroups && task.taskGroups.length > 0) {
             task.taskGroups = task.taskGroups.join(',');
+          }
+          if (task.locationIds && task.locationIds.length > 0) {
+            task.targetLocations = this.allLocationsList.filter(loc => task.locationIds.includes(loc.id)).map(loc => loc.name).join(', ');
+          } else {
+            task.targetLocations = '';
           }
           for (const [key, value] of Object.entries(task)) {
             if (this.dateColumns.includes(key)) {
@@ -197,9 +213,22 @@ export class ClientTasksComponent implements OnDestroy, AfterViewInit {
               );
             }
           }
+          const targetDevicesList = task.deviceTarget && Array.isArray(task.deviceTarget) && task.deviceTarget.length > 0 ?
+            task.deviceTarget.map(tg => {
+              switch (tg) {
+                case 'CLOCK':
+                  return 'Clock';
+                case 'WATCH':
+                  return 'Watch';
+                case 'CLOCKWEB':
+                  return 'ClockWeb';
+              }
 
+            }) : [];
+          task.targetDevices = targetDevicesList.join(', ');
           return task;
         });
+
 
         this.tasksList.sort((taskA: any, taskB: any) => {
           return taskA.name < taskB.name ? -1 : taskA.name > taskB.name ? 1 : 0;
@@ -221,6 +250,11 @@ export class ClientTasksComponent implements OnDestroy, AfterViewInit {
           if (task.taskGroups && task.taskGroups.length > 0) {
             task.taskGroups = task.taskGroups.join(',');
           }
+          if (task.locationIds && task.locationIds.length > 0) {
+            task.targetLocations = this.allLocationsList.filter(loc => task.locationIds.includes(loc.id)).map(loc => loc.name).join(', ');
+          } else {
+            task.targetLocations = '';
+          }
           for (const [key, value] of Object.entries(task)) {
             if (this.dateColumns.includes(key)) {
               const timeValue = value as Timestamp;
@@ -230,7 +264,8 @@ export class ClientTasksComponent implements OnDestroy, AfterViewInit {
               );
             }
           }
-
+          task.targetDevices = task.deviceTarget && Array.isArray(task.deviceTarget) && task.deviceTarget.length > 0 ?
+            task.deviceTarget.map(tg => tg.name) : '';
           return task;
         });
 

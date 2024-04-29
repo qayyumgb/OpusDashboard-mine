@@ -1,0 +1,90 @@
+
+.filter-container{
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  .date-container{
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+}
+.table-header-container {
+  display: flex;
+  align-items: center;
+}
+
+.hidden {
+  display: none;
+}
+
+.date-picker {
+  display: none;
+}
+
+.filter-string {
+  text-align: center;
+  font-size: 1em;
+  color: gray;
+  font-style: italic;
+  margin: 0.2em;
+}
+
+.example-element-descriptions {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.example-element-description {
+  padding: 16px;
+  width: 100%;
+}
+
+.example-element-description__cell {
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.example-element-description__header {
+  color:#777;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  padding-top: 8px;
+  padding-bottom: 4px;
+}
+
+.example-element-description__content {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.example-element-description__content div,
+.example-element-description__header div {
+  width: 12%;
+}
+
+mat-button-toggle-group,
+mat-button-toggle {
+  width: 100%;
+}
+
+.date-picker-actions-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.date-picker-actions-container > div {
+  width: 100%;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+}

@@ -47,6 +47,22 @@ export class CreateTaskDialogComponent implements OnInit, OnDestroy {
       id: 'END_BREAK_UNPAID',
       name: 'End break unpaid'
     },
+    {
+      id: 'START_BREAK',
+      name: 'Start break'
+    },
+    {
+      id: 'END_BREAK',
+      name: 'End break'
+    },
+    {
+      id: 'START_TASK',
+      name: 'Start task'
+    },
+    {
+      id: 'END_TASK',
+      name: 'End task'
+    }
   ];
   allWatchWebappFunctionsList = [
     {
@@ -60,6 +76,10 @@ export class CreateTaskDialogComponent implements OnInit, OnDestroy {
     {
       id: 'BREAK_UNPAID',
       name: 'Break unpaid'
+    },
+    {
+      id: 'ROW_TASK',
+      name: 'Row task'
     }
   ];
 
@@ -69,8 +89,8 @@ export class CreateTaskDialogComponent implements OnInit, OnDestroy {
       name: 'Watch'
     },
     {
-      id: 'WEBAPP',
-      name: 'Webapp'
+      id: 'CLOCKWEB',
+      name: 'ClockWeb'
     },
     {
       id: 'CLOCK',
@@ -80,6 +100,8 @@ export class CreateTaskDialogComponent implements OnInit, OnDestroy {
   ];
   private loggedInUserFromAuthServiceSubscription: Subscription;
   private loggedInUserDocData: any;
+  locationListSubscription: Subscription;
+  allLocationsList: any[];
 
 
   constructor(
@@ -98,6 +120,17 @@ export class CreateTaskDialogComponent implements OnInit, OnDestroy {
         return;
       }
       this.selectedClientDocData = selectedClientDocData;
+
+      this.locationListSubscription = this.firestoreService
+        .getAllLocationsForClientId(this.selectedClientDocData?.id)
+        .subscribe((locationsList) => {
+          this.form.patchValue({locationIds: locationsList.map(loc => loc.id)});
+          this.allLocationsList = locationsList.sort((locA: any, locB: any) => {
+            return locA.name?.toLowerCase() < locB.name?.toLowerCase() ? -1 : locA.name?.toLowerCase() > locB.name?.toLowerCase() ? 1 : 0;
+          });
+        });
+
+
       this.taskGroupsSubscription = this.firestoreService
         .getAllUnarchivedTaskGroupsForClientId(this.selectedClientDocData.id).subscribe(taskGroupsList => (this.allTaskGroupsList = taskGroupsList));
     });
@@ -113,6 +146,7 @@ export class CreateTaskDialogComponent implements OnInit, OnDestroy {
     this.clientInContextServiceSubscription?.unsubscribe();
     this.taskGroupsSubscription?.unsubscribe();
     this.loggedInUserFromAuthServiceSubscription?.unsubscribe();
+    this.locationListSubscription?.unsubscribe();
   }
 
   ngOnInit() {
@@ -120,22 +154,23 @@ export class CreateTaskDialogComponent implements OnInit, OnDestroy {
       name: [null, [Validators.required]],
       deviceTarget: [[], []],
       taskGroupIds: [[], []],
+      locationIds: [[], [Validators.required]],
       func: [{value: null, disabled: true}, []]
     });
 
     this.form.controls.deviceTarget?.valueChanges
       .pipe(startWith(this.form.controls.value), pairwise())
       .subscribe(([prev, next]: [any, any]) => {
-        console.log('prev:' + JSON.stringify(prev));
-        console.log('next:' + JSON.stringify(next));
-        console.log('------------------------------------------')
-        if (prev?.includes('CLOCK') && next?.includes('CLOCK') && (next?.includes('WATCH') || next?.includes('WEBAPP'))) {
+        //console.log('prev:' + JSON.stringify(prev));
+        //console.log('next:' + JSON.stringify(next));
+        //console.log('------------------------------------------')
+        if (prev?.includes('CLOCK') && next?.includes('CLOCK') && (next?.includes('WATCH') || next?.includes('CLOCKWEB'))) {
           const toSet = [];
           if (next?.includes('WATCH')) {
             toSet.push('WATCH');
           }
-          if (next?.includes('WEBAPP')) {
-            toSet.push('WEBAPP');
+          if (next?.includes('CLOCKWEB')) {
+            toSet.push('CLOCKWEB');
           }
           this.allFunctionsList = this.allWatchWebappFunctionsList;
           this.form.controls.func.enable();
@@ -143,7 +178,7 @@ export class CreateTaskDialogComponent implements OnInit, OnDestroy {
             deviceTarget: toSet,
             func: null
           });
-        } else if ((prev?.includes('WATCH') || prev?.includes('WEBAPP')) && (next?.includes('CLOCK'))) {
+        } else if ((prev?.includes('WATCH') || prev?.includes('CLOCKWEB')) && (next?.includes('CLOCK'))) {
           const toSet = ['CLOCK'];
           this.allFunctionsList = this.allClockFunctionsList;
           this.form.controls.func.enable();
@@ -151,7 +186,7 @@ export class CreateTaskDialogComponent implements OnInit, OnDestroy {
             deviceTarget: toSet,
             func: null
           });
-        } else if (next?.includes('WATCH') || next?.includes('WEBAPP')) {
+        } else if (next?.includes('WATCH') || next?.includes('CLOCKWEB')) {
           this.allFunctionsList = this.allWatchWebappFunctionsList
           this.form.controls.func.enable();
         } else if (next?.includes('CLOCK')) {
@@ -192,11 +227,15 @@ export class CreateTaskDialogComponent implements OnInit, OnDestroy {
     taskToCreate.taskGroups = taskGroups;
 
     if (this.allClockFunctionsList.map(func => func.id).includes(taskToCreate.func)) {
-      taskToCreate.type = 'CLOCK';
+      taskToCreate.type = 'PIT';
     }
 
     if (this.allWatchWebappFunctionsList.map(func => func.id).includes(taskToCreate.func)) {
-      taskToCreate.type = 'TASK';
+      if (taskToCreate.func === 'TASK' || taskToCreate.func === 'ROW_TASK' ) {
+        taskToCreate.type = 'TASK';
+      } else if (['BREAK_PAID', 'BREAK_UNPAID'].includes(taskToCreate.func)) {
+        taskToCreate.type = 'BREAK'
+      }
     }
 
     taskToCreate.createdByUserId = this.loggedInUserDocData.id ?? null;

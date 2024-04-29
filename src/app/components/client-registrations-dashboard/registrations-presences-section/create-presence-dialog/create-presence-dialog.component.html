@@ -1,0 +1,126 @@
+<div style="min-width: 60rem;min-height:30rem; padding:8px;display: flex;flex-direction: column;justify-content: space-evenly;">
+  <form #editPresenceform="ngForm">
+    <div id='Summary' style="display: flex;flex-grow: 1;flex-direction: column;justify-content:space-around;font-weight: 400;">
+      <div style="margin-bottom: 1rem;">Summary</div>
+      <div style="display: flex;flex-direction: row;justify-content: flex-start;margin-top: 0.5rem;">
+        <div id='Summary-Column1' style="display: flex; flex-direction: column;margin-left:2%;flex-grow: 1;max-width: 22%;">
+          <div style="display: flex; flex-direction: column;justify-content: space-around;max-width: 90%;align-content: flex-start;">
+            <mat-form-field appearance="fill">
+              <mat-label>Worker</mat-label>
+              <mat-select [(ngModel)]="workerId" name="workerId" autofocus required>
+                <mat-option *ngFor="let worker of allWorkersList" [value]="worker.id">
+                  {{worker.name}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div style="display: flex; flex-direction: column;margin-top: 2rem;">
+            <div>Date</div>
+            <div style="margin-top: 0.5rem;">TODO--</div>
+          </div>
+        </div>
+        <div id='Summary-Column2' style="display: flex; flex-direction: column;margin-left:2%;flex-grow: 1;max-width: 22%;align-content: flex-start;">
+          <div style="display: flex; flex-direction: column;justify-content: space-around;max-width: 90%;">
+            <div>Worker Group</div>
+            <div style="margin-top: 0.5rem;">TODO--</div>
+          </div>
+          <div style="display: flex; flex-direction: column;margin-top: 2rem;">
+            <div>Hours worked</div>
+            <div style="margin-top: 0.5rem;">TODO--</div>
+          </div>
+        </div>
+        <div id='Summary-Column3' style="display: flex; flex-direction: column;margin-left:2%;flex-grow: 1;max-width: 22%;align-content: flex-start;">
+          <div style="display: flex; flex-direction: column;justify-content: space-around;max-width: 90%;align-content: flex-start;">
+            <div style="display: flex; flex-direction: column;justify-content: space-around;">
+              <mat-form-field appearance="fill">
+              <mat-label>Location</mat-label>
+              <mat-select [(ngModel)]="locationId" name="locationId" autofocus required>
+                <mat-option *ngFor="let location of allLocationsList" [value]="location.id">
+                  {{location.name}}
+                </mat-option>
+              </mat-select>
+              </mat-form-field>
+            </div>
+            <div style="display: flex; flex-direction: column;margin-top: 2rem;">
+              <div>Break hours paid</div>
+              <div style="margin-top: 0.5rem;">TODO--</div>
+            </div>
+          </div>
+        </div>
+        <div id='Summary-Column4' style="display: flex; flex-direction: column;margin-left:2%;max-width: 22%;justify-content: flex-end;">
+          <div style="display: flex; flex-direction: column;margin-top: 2rem;">
+            <div>Break hours unpaid</div>
+            <div style="margin-top: 0.5rem;">TODO--</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id='Details' style="display: flex;flex-grow: 4;flex-direction: column;flex-basis: auto;justify-content: flex-start;margin-top: 2rem;">
+      <div>Details</div>
+      <div *ngIf="startDayTaskRegn" style="display: flex;flex-direction: row;align-items:center; justify-content: flex-start;margin-top:0.5rem;">
+        <mat-icon style="margin-left: 1rem;transform: scale(1.4);">play_circle</mat-icon>
+        <button mat-raised-button color="accent" style="margin-left:2rem;" *ngIf="!startDayTaskRegn.isShown" (click)="showStartDayRegn()">Create start time</button>
+        <mat-form-field appearance="fill" style="margin-top: 0.4rem;margin-left: 1rem;" *ngIf="startDayTaskRegn.isShown">
+          <mat-label>Start time</mat-label>
+          <input matInput type="time" required
+                 [(ngModel)]="startDayTaskRegn.startTime" name="startDayStartTime">
+        </mat-form-field>
+        <div style="display: flex;flex-direction: column;justify-content: right;margin-left: auto;margin-right: 2.4rem;">
+          <mat-icon style="transform: scale(1.1); cursor: pointer;"
+                    matTooltip="Add break" (click)="addBreakRegnOnTop()">add</mat-icon>
+        </div>
+      </div>
+      <div *ngFor="let regn of getBreakRegnsToDisplay();let idx = index" style="margin-top: 1.5rem;">
+        <div style="display: flex;flex-direction: row;flex-grow: 6;justify-content: left;">
+          <mat-icon style="margin-left: 1rem;transform: scale(1.4); margin-top: 1.05rem;" class="material-symbols-outlined">free_breakfast_outline</mat-icon>
+          <mat-form-field appearance="fill" style="margin-left: 2rem;">
+            <mat-label>Name</mat-label>
+            <input required matInput type="text"
+                   [(ngModel)]="regn.taskName" [name]="'taskName' + idx">
+          </mat-form-field>
+          <mat-form-field appearance="fill" style="margin-left: 1rem;">
+            <mat-label>Start time</mat-label>
+            <input matInput type="time" required
+                   [(ngModel)]="regn.startTime" [name]="'startTime' + idx">
+          </mat-form-field>
+          <mat-form-field appearance="fill" style="margin-left: 1rem;">
+            <mat-label>End time</mat-label>
+            <input matInput type="time" required
+                   [(ngModel)]="regn.endTime" [name]="'endTime' + idx">
+          </mat-form-field>
+          <mat-slide-toggle
+            [(ngModel)]="regn.isPaid" [name]="'isPaid' + idx" required
+            style="margin-left: 2rem;text-align: left;display: flex;flex-direction: column;justify-content: center;">
+            <mat-label>Paid</mat-label>
+          </mat-slide-toggle>
+          <div style="margin-left: 1rem;display: flex;flex-direction: column;justify-content: center;">
+            <mat-icon style="transform: scale(1.02);cursor: pointer;"
+                      matTooltip="Remove break" (click)="deleteBreakRegn(regn, idx)">remove</mat-icon>
+          </div>
+          <div style="margin-left: 1rem;display: flex;flex-direction: column;justify-content: center;">
+            <mat-icon style="transform: scale(1.1); cursor: pointer;"
+                      matTooltip="Add break" (click)="addNewBreakRegn(regn, idx)">add</mat-icon>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="endDayTaskRegn" style="display: flex;flex-direction: row;align-items:center; justify-content: flex-start;margin-top: 1.6rem;margin-bottom: 2rem;">
+        <mat-icon style="margin-left: 1rem;transform: scale(1.4);">stop_circle</mat-icon>
+        <button mat-raised-button color="accent" style="margin-left:2rem;" *ngIf="!endDayTaskRegn.isShown" (click)="showEndDayRegn()">Create end time</button>
+        <mat-form-field appearance="fill" style="margin-top: 0.4rem;margin-left: 1rem;" *ngIf="endDayTaskRegn.isShown">
+          <mat-label>End time</mat-label>
+          <input matInput type="time" required
+                 [(ngModel)]="endDayTaskRegn.endTime" name="endDayEndTime">
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div id='ButtonPanel' style="display: flex;flex-grow: 1;align-items: baseline;width: 96%;margin-top: 1rem;">
+      <div style="margin-right: 1rem;display: flex;justify-content: end;align-content:center;flex-grow: 1;align-items: center;">
+        <button mat-stroked-button color="primary" (click)="cancelPresenceSave()" style="margin-right: 2rem;">CANCEL</button>
+        <button mat-raised-button color="primary" style="height: 1.92rem;" (click)="createPresenceNRegistrations()">SAVE</button>
+      </div>
+    </div>
+  </form>
+
+</div>

@@ -22,16 +22,13 @@ import {ConfirmationDialogComponent} from "../utility/confirmation-dialog/confir
   templateUrl: './client-sessions-dashboard.component.html',
   styleUrls: ['./client-sessions-dashboard.component.scss',
     '../../common/styles/listing.scss'],
-  animations: [
-    trigger('detailExpand', [
-      state('collapsed', style({height: '0px', minHeight: '0'})),
-      state('expanded', style({height: '*'})),
-      transition(
-        'expanded <=> collapsed',
-        animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')
-      ),
-    ]),
-  ],
+    animations: [
+      trigger('detailExpand', [
+        state('collapsed', style({height: '0px', minHeight: '0'})),
+        state('expanded', style({height: '*'})),
+        transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+      ]),
+    ],
 })
 export class ClientSessionsDashboardComponent implements AfterViewInit, OnDestroy {
   columns: Column[] = [
@@ -160,7 +157,7 @@ export class ClientSessionsDashboardComponent implements AfterViewInit, OnDestro
   displayedIcon = 'play_circle_outline';
   shownRecordsType = 'unarchived';
   tableData = [];
-
+  dateToday: Date = new Date();
   constructor(private authService: AuthService,
               private firestoreService: FirestoreService,
               private router: Router,
@@ -188,7 +185,9 @@ export class ClientSessionsDashboardComponent implements AfterViewInit, OnDestro
         });
       });
   }
-
+  futureFilter = (d: Date | null): boolean => {
+    return d <= this.dateToday;
+  };
   ngAfterViewInit() {
 
   }
@@ -211,12 +210,20 @@ export class ClientSessionsDashboardComponent implements AfterViewInit, OnDestro
               const nettStartTimestamp = session?.nettStartTimestamp ? moment(session?.nettStartTimestamp?.toMillis()).format('HH:mm') : '';
               const nettEndTimestamp = session?.nettEndTimestamp ? moment(session?.nettEndTimestamp?.toMillis()).format('HH:mm') : '';
               const isOriginal = session.hasOwnProperty('isOriginal') ? session.isOriginal : true;
+              const fixAllowed =
+                (session.isManual || !isOriginal) ? false : !session.hasOwnProperty('fixRequestedAt') ||
+                  (['FIXED', 'FAILED'].includes(session.fixStatus)) ||
+                  (session.fixStatus === 'FIXING'
+                    && (session.fixingAt && moment().diff(session.fixingAt?.toDate(), 'minutes') > 10)
+                  );
+              const fixFailed = session.hasOwnProperty('fixRequestedAt') && ['FAILED'].includes(session.fixStatus); //'FIXED' can be added to this list to avoid re-fixing
               if (this.selectedClientDocData.correctionFactor && session.count && isOriginal && !session.isManual) {
                 session.count = +(session.count * (1 + (this.selectedClientDocData.correctionFactor))).toFixed(0);
               }
               return {
                 originalSessionDocument: originalSession,
                 editButtonClass: !isOriginal ? '' : 'listing-table-tools tdhover',
+                fixButtonClass: session.hasOwnProperty('fixRequestedAt') ? '' : 'listing-table-tools tdhover',
                 workerId: session.workerId,
                 workerName: session.workerName,
                 locationId: session.locationId,
@@ -239,7 +246,10 @@ export class ClientSessionsDashboardComponent implements AfterViewInit, OnDestro
                 endTs: session.endTimestamp,
                 isArchived: session.isArchived,
                 isManual: session.hasOwnProperty('isManual') ? session.isManual : false,
-                isOriginal
+                isOriginal,
+                fixAllowed,
+                fixFailed,
+                failureReason: fixFailed ? session.failureMessage : ''
               }
             });
 
@@ -533,12 +543,16 @@ export class ClientSessionsDashboardComponent implements AfterViewInit, OnDestro
     const nettStartTimestamp = session?.nettStartTimestamp ? moment(session?.nettStartTimestamp?.toMillis()).format('HH:mm') : '';
     const nettEndTimestamp = session?.nettEndTimestamp ? moment(session?.nettEndTimestamp?.toMillis()).format('HH:mm') : '';
     const isOriginal = session.hasOwnProperty('isOriginal') ? session.isOriginal : true;
+    const fixAllowed = session.isManual ? false : !session.hasOwnProperty('fixRequestedAt') ||
+      (session.hasOwnProperty('fixRequestedAt') && !['REQUESTED', 'FIXING'].includes(session.fixStatus)); //'FIXED' can be added to this list to avoid re-fixing
+    const fixFailed = session.hasOwnProperty('fixRequestedAt') && ['FAILED'].includes(session.fixStatus); //'FIXED' can be added to this list to avoid re-fixing
     if (this.selectedClientDocData.correctionFactor && session.count && session.isOriginal && !session.isManual) {
       session.count = +(session.count * (1 + (this.selectedClientDocData.correctionFactor))).toFixed(0);
     }
     return {
       originalSessionDocument: originalSession,
       editButtonClass: !isOriginal ? '' : 'listing-table-tools tdhover',
+      fixButtonClass: session.hasOwnProperty('fixRequestedAt') ? '' : 'listing-table-tools tdhover',
       workerId: session.workerId,
       workerName: session.workerName,
       locationId: session.locationId,
@@ -561,7 +575,10 @@ export class ClientSessionsDashboardComponent implements AfterViewInit, OnDestro
       endTs: session.endTimestamp,
       isArchived: session.isArchived,
       isManual: session.hasOwnProperty('isManual') ? session.isManual : false,
-      isOriginal
+      isOriginal,
+      fixAllowed,
+      fixFailed,
+      failureReason: fixFailed ? session.failureMessage : ''
     }
   }
 
@@ -718,6 +735,35 @@ export class ClientSessionsDashboardComponent implements AfterViewInit, OnDestro
     }
   }
 
+  async fixSession($event, session) {
+    $event.stopPropagation();
+    try {
+      await this.firestoreService.updateSessionForClientId({
+        fixRequestedAt: new Date(),
+        fixStatus: 'REQUESTED',
+        id: session.sessionId
+      }, this.selectedClientDocData.id, false);
+      this.snackBar.open(`Session fixing request raised successfully. Restart Streaming(if paused) to see result.`, '', {
+        duration: 10000,
+        panelClass: ['snackbar-success'],
+        horizontalPosition: 'center',
+        verticalPosition: 'bottom',
+      });
+      if (session.isArchived) {
+        this.fetchArchivedSessions(this.displayedIcon !== 'play_circle_outline');
+      } else {
+        this.fetchUnarchivedSessions(this.displayedIcon !== 'play_circle_outline');
+      }
+    } catch (error) {
+      this.snackBar.open(`Error in raising fixing request for session.\nPlease try again and/or contact support if problem persists`, '', {
+        panelClass: ['snackbar-error'],
+        duration: 6000,
+        horizontalPosition: 'center',
+        verticalPosition: 'bottom',
+      });
+    }
+  }
+
   openCreateSessionDialog() {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.autoFocus = true;
@@ -748,6 +794,13 @@ export class ClientSessionsDashboardComponent implements AfterViewInit, OnDestro
         this.archivedSessionsSubscription?.unsubscribe();
       }
       this.displayedIcon = 'play_circle_outline';
+    }
+  }
+
+  getFailedToolTip(element) {
+    return {
+      topline: `Re-initiate failed attempt to fix`,
+      bottomLine: `${element.failureReason}`
     }
   }
 

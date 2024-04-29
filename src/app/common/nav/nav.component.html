@@ -1,17 +1,20 @@
-<mat-toolbar *ngIf="loggedInUserDocData && loggedInUserDocData.email !== 'info@jacoudijk.nl'">
 
-  <h1><img width="135" height="50" src="assets/Opus%20Watch_Logo_Wit_L.svg"></h1>
 
-  <a class="action" routerLink="/dashboard/labor" style="margin-left: 2rem; margin-right: 1rem"
+<mat-toolbar  *ngIf="loggedInUserDocData && loggedInUserDocData.email !== 'info@jacoudijk.nl'">
+
+  <h1 class="pr-2"><img width="135" height="50" src="assets/Opus%20Watch_Logo_Wit_L.svg"></h1>
+
+  <div class="nav-items">
+    <a class="action px-3 px-xl-4" routerLink="/dashboard/labor"
      routerLinkActive="active-link">Labor</a>
 
   <!--<a class="action" routerLink="/dashboard/growth" style="margin-left: 2rem; margin-right: 1rem"
      routerLinkActive="active-link">Growth</a>
   -->
-  <a class="action" routerLink="/dashboard/productivity" style="margin-left: 2rem; margin-right: 1rem"
+  <a class="action px-3 px-xl-4" routerLink="/dashboard/productivity"
      routerLinkActive="active-link">Productivity</a>
 
-  <a class="action" routerLink="/dashboard/sessions" style="margin-left: 2rem; margin-right: 1rem"
+  <a class="action px-3 px-xl-4" routerLink="/dashboard/sessions"
      routerLinkActive="active-link">Sessions</a>
 
   <!--
@@ -19,18 +22,29 @@
      routerLinkActive="active-link">Observations</a>
   -->
 
-  <a class="action" routerLink="/dashboard/registrations" style="margin-left: 2rem; margin-right: 1rem"
+  <a class="action px-3 px-xl-4" routerLink="/dashboard/registrations"
      routerLinkActive="active-link">Registrations</a>
 
-  <a class="action" routerLink="/trainings" style="margin-left: 2rem; margin-right: 1rem"
+  <a class="action px-3 px-xl-4" routerLink="/trainings"
      routerLinkActive="active-link" *ngIf="this.loggedInUserDocData?.type === 'developer'">Training</a>
+  </div>
 
-  <span class="central-stretchable-space"></span>
-
-  <mat-form-field style="margin-right: 1.5rem;height: 3rem;background-color: #00D0B3"
+  <span class="central-stretchable-space flex-grow"></span>
+  <mat-form-field appearance="outline" style="height: 3rem"
+                  *ngIf="loggedInUserDocData && clientInContextDocData && (clientLocationsList?.length > 0) && locationDropDownIsVisible()">
+    <mat-select panelClass="nav-bar-select" [ngModel]="selectedClientLocationId" placeholder="Select Location"
+                style="margin-top: 0.2rem; height:1.2rem;color: white!important;" panelClass="mat-select-panel-client-list"
+                (ngModelChange)="onClientLocationChange($event)">
+      <mat-option value="-1" *ngIf="!locationDropDownIsDisabled()">All Locations</mat-option>
+      <mat-option *ngFor="let location of clientLocationsList" [value]="location.id" style="color: white;">
+        {{location.name}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field appearance="outline" style="height: 3rem"
                   *ngIf="loggedInUserDocData && clientInContextDocData && (loggedInUserDocData?.clients?.length !== 1)">
-    <mat-select [ngModel]="selectedClientId" placeholder="Select Client"
-                style="margin-top: 0.2rem; height:1.2rem; width: 12rem; color: white!important;" panelClass="mat-select-panel-client-list"
+    <mat-select panelClass="nav-bar-select" [ngModel]="selectedClientId" placeholder="Select Client"
+    style="margin-top: 0.2rem; height:1.2rem;color: white!important;" panelClass="mat-select-panel-client-list"
                 (ngModelChange)="onClientChange($event)">
       <mat-option *ngFor="let client of loggedInUserDocData.clients" [value]="client.clientId" style="color: white;">
         {{client.clientName}}
@@ -38,7 +52,8 @@
     </mat-select>
   </mat-form-field>
 
-  <mat-form-field appearance="fill" *ngIf="!loggedInUserDocData">
+
+  <mat-form-field appearance="outline" *ngIf="!loggedInUserDocData">
     <mat-select [(ngModel)]="selectedClientId">
       <mat-label>Select Client</mat-label>
       <mat-option *ngFor="let client of loggedInUserDocData.clients" [value]="client.clientId">
@@ -47,22 +62,30 @@
     </mat-select>
   </mat-form-field>
 
-  <a class="action" [matMenuTriggerFor]="menu" style="margin-left: 2rem;margin-right: 1rem;margin-top: 6px;cursor: pointer;" *ngIf="this.loggedInUserDocData">
+  <div class="mx-3 mx-xl-4" *ngIf="loggedInUserDocData">
+  <mat-icon matTooltip="Open Clock App" class="material-icons-outlined" (click)="openClockWeb()" style="cursor:pointer;transform: scale(1)">timer</mat-icon>
+  </div>
+  <button mat-mini-fab [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
     <div class="username-circle">
       {{ getInitials(this.loggedInUserDocData?.name)}}
     </div>
-  </a>
+</button>
+  <!-- <a class="action" [matMenuTriggerFor]="menu" style="margin-left: 2rem;margin-right: 1rem;margin-top: 6px;cursor: pointer;" *ngIf="this.loggedInUserDocData">
+    
+  </a> -->
   <mat-menu #menu="matMenu" class="mat-menu-custom">
-    <span mat-menu-item disabled="true">{{loggedInUserDocData.name}} <span style="float: right !important;background-color: gray !important;border: 2px solid gray; border-radius: 5px;line-height: 1rem;">{{loggedInUserDocData.type === 'developer'? 'DEV': ''}}</span></span>
-    <span mat-menu-item disabled="true" style="font-size: 0.8rem !important; font-style: italic; margin-top: -1.7rem;margin-bottom: -1rem;">{{loggedInUserDocData.email}}</span>
-    <button mat-menu-item [routerLink]="['/settings/users']" style="margin-top: -0.9rem; margin-bottom: -0.5rem;" *ngIf="selectedClientDocData?.hasManagerOrAdminRole">Add New Account</button>
-    <mat-divider style="background-color: mintcream; margin: 0 1rem 0 1rem;" *ngIf="selectedClientDocData?.hasManagerOrAdminRole"></mat-divider>
-    <button mat-menu-item [routerLink]="['/settings/userprofile']" style="margin-top: -0.1rem; margin-bottom: -0.5rem;" *ngIf="selectedClientDocData?.hasManagerOrAdminRole">Profile</button>
-    <button mat-menu-item [routerLink]="['/settings']" style="margin-top: -1rem; margin-bottom: -0.4rem;" *ngIf="selectedClientDocData?.hasManagerOrAdminRole">Settings</button>
-    <mat-divider style="background-color: mintcream; margin: 0 1rem 0 1rem;" *ngIf="selectedClientDocData?.hasManagerOrAdminRole"></mat-divider>
-    <button mat-menu-item [routerLink]="['/help']" style="margin-bottom: -0.5rem;">Help</button>
-    <mat-divider style="background-color: mintcream; margin: 0 1rem;"></mat-divider>
-    <button mat-menu-item (click)="this.authService.signOut()" style="margin-top: -0.1rem; margin-bottom: -0.5rem;">Log Out</button>
+    <div class="user_info">
+      <span>{{loggedInUserDocData.name}} <span>{{loggedInUserDocData.type === 'developer'? 'DEV': ''}}</span></span>
+      <span>{{loggedInUserDocData.email}}</span>
+    </div>
+    <button mat-menu-item [routerLink]="['/settings/users']" style="margin-top: -0.3rem; margin-bottom: -0.3rem;" *ngIf="selectedClientDocData?.hasManagerOrAdminRole">Add New Account</button>
+   
+    <button mat-menu-item [routerLink]="['/settings/userprofile']" style="margin-top: -0.3rem; margin-bottom: -0.3rem;" *ngIf="selectedClientDocData?.hasManagerOrAdminRole">Profile</button>
+    <button mat-menu-item [routerLink]="['/settings']" style="margin-top: -0.3rem; margin-bottom: -0.3rem;" *ngIf="selectedClientDocData?.hasManagerOrAdminRole">Settings</button>
+    
+    <button mat-menu-item [routerLink]="['/help']" style="margin-bottom: -0.3rem;">Help</button>
+    
+    <button mat-menu-item (click)="this.authService.signOut()" style="margin-top: -0.3rem; margin-bottom: -0.3rem;">Log Out</button>
   </mat-menu>
 </mat-toolbar>
 <mat-toolbar *ngIf="loggedInUserDocData && loggedInUserDocData.email === 'info@jacoudijk.nl'">

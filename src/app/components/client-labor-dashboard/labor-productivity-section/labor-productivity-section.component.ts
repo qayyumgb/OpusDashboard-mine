@@ -109,13 +109,15 @@ export class LaborProductivitySectionComponent implements OnInit, OnDestroy {
   completeDataMap = new Map();
   dateInContextSubscription: Subscription;
   SessionsDataSubscription: Subscription;
+  clientLocInContextServiceSubscription: Subscription;
+  selectedLocationId: string;
   laborPrdctvtyTableDataMap = new Map();
-  finishedData = {
-    total: {
+  countData = {
+    totalAll: {
       count: 0,
       rows: 0
     },
-    actual: {
+    finished: {
       count: 0,
       rows: 0
     }
@@ -141,7 +143,10 @@ export class LaborProductivitySectionComponent implements OnInit, OnDestroy {
             return;
           }
           this.selectedClientDocData = selectedClientDocData;
-          this.loadChart();
+          this.clientLocInContextServiceSubscription = this.clientInContextService.clientLocSubject.subscribe(selectedLocation => {
+            this.selectedLocationId = !selectedLocation || (selectedLocation?.id === '-1') ? null : selectedLocation?.id;
+            this.loadChart();
+          });
         });
       });
   }
@@ -150,6 +155,7 @@ export class LaborProductivitySectionComponent implements OnInit, OnDestroy {
     this.clientInContextServiceSubscription?.unsubscribe();
     this.dateInContextSubscription?.unsubscribe();
     this.SessionsDataSubscription?.unsubscribe();
+    this.clientLocInContextServiceSubscription?.unsubscribe();
   }
 
   ngOnInit(): void {
@@ -178,140 +184,151 @@ export class LaborProductivitySectionComponent implements OnInit, OnDestroy {
   loadChart() {
     const dateToQuery = moment(this.selectedDate).format('YYYY-MM-DD');
     this.laborPrdctvtyData = [];
-    this.SessionsDataSubscription = this.firestoreService.getUnarchivedSessions(this.selectedClientDocData.id, dateToQuery).subscribe(sessionsData => {
-        if (!sessionsData) {
-          return;
-        }
-
-        sessionsData = sessionsData.filter(session => session.rowId !== null && session.rowId !== '');
-        this.laborPrdctvtyTableDataMap = new Map();
-
-        const uniqueWorkers = sessionsData
-          .map((value) => value.workerName)
-          .filter(
-            (value: any, index: any, array: string | any[]) =>
-              array.indexOf(value) === index
-          );
-
-        this.graphHeight = 90 + (50 * uniqueWorkers.length);
-        let totalCount = 0;
-        let actualCount = 0;
-        const totalRowsSet = new Set();
-        const actualRowsSet = new Set();
-        let latestChartData = [];
-        // tslint:disable-next-line:prefer-for-of
-        for (let i = 0; i < uniqueWorkers.length; i++) {
-          const worker = uniqueWorkers[i];
-          let workerSessions = sessionsData.filter((v) => v.workerName === worker);
-
-          const chartRow: ChartRow = {
-            name: this.capitalizeFirstLetter(worker),
-            series: [],
-          };
-
-          if (this.selectedClientDocData.correctionFactor) {
-            workerSessions = workerSessions.map(workerSession => {
-              const isOriginal = workerSession.hasOwnProperty('isOriginal') ? workerSession.isOriginal : true;
-              if (workerSession.count && isOriginal && !workerSession.isManual) {
-                workerSession.count = +(workerSession.count * (1 + (this.selectedClientDocData.correctionFactor))).toFixed(0);
-              }
-              return workerSession;
-            });
+    this.SessionsDataSubscription?.unsubscribe();
+    this.SessionsDataSubscription = this.firestoreService.getUnarchivedSessions(this.selectedClientDocData.id, dateToQuery, this.selectedLocationId ?? null)
+      .subscribe(sessionsData => {
+          if (!sessionsData) {
+            return;
           }
 
-          this.completeDataMap.set(chartRow.name, workerSessions);
+          sessionsData = sessionsData.filter(session => session.rowId !== null && session.rowId !== '');
+          this.laborPrdctvtyTableDataMap = new Map();
 
+          const uniqueWorkers = sessionsData
+            .map((value) => value.workerName)
+            .filter(
+              (value: any, index: any, array: string | any[]) =>
+                array.indexOf(value) === index
+            );
+
+          this.graphHeight = 90 + (50 * uniqueWorkers.length);
+          let totalCount = 0;
+          let finishedCount = 0;
+          const totalRowsSet = new Set();
+          const finishedRowsSet = new Set();
+          let latestChartData = [];
           // tslint:disable-next-line:prefer-for-of
-          for (let j = 0; j < workerSessions.length; j++) {
-            const workerActivity = workerSessions[j];
+          for (let i = 0; i < uniqueWorkers.length; i++) {
+            const worker = uniqueWorkers[i];
+            let workerSessions = sessionsData.filter((v) => v.workerName === worker);
 
-            const workerActivityCount = workerActivity.count;
-
-            totalCount += workerActivityCount ?? 0;
-
-            totalRowsSet.add(workerActivity.rowId);
-            if (workerActivity.endTimestamp) {
-              actualCount += workerActivityCount ?? 0;
-              actualRowsSet.add(workerActivity.rowId);
-            }
-
-            chartRow.series.push({
-              name: workerActivity.varietyName,
-              value: workerActivityCount ?? 0,
-            });
-          }
-          latestChartData.push(chartRow);
-        }
-
-        this.finishedData = {
-          total: {
-            count: totalCount,
-            rows: totalRowsSet.size
-          },
-          actual: {
-            count: actualCount,
-            rows: actualRowsSet.size
-          },
-        }
-
-        latestChartData = latestChartData.sort((charRowA: any, chartRowB: any) => {
-          const n1 = charRowA.series.reduce((a, b) => a + b.value, 0);
-          const n2 = chartRowB.series.reduce((a, b) => a + b.value, 0);
-          return n1 > n2 ? -1 : n1 < n2 ? 1 : 0;
-        });
-
-        Object.assign(this, {laborPrdctvtyData: [...latestChartData]});
-
-        const latestLaborPrdctvtyTableData = [];
-        // tslint:disable-next-line:prefer-for-of
-        for (let i = 0; i < uniqueWorkers.length; i++) {
-          const workerName = uniqueWorkers[i];
-          const workerActivities = sessionsData.filter((v) => v.workerName === workerName);
-
-          let totalWorkingTimeMillis = 0;
-
-          // tslint:disable-next-line:prefer-for-of
-          for (let j = 0; j < workerActivities.length; j++) {
-            const tableRow: any = {
-              workerName: uniqueWorkers[i],
+            const chartRow: ChartRow = {
+              name: this.capitalizeFirstLetter(worker),
+              series: [],
             };
-            const workerActivity = workerActivities[j];
 
-            if (!tableRow.varietyName) {
-              tableRow.varietyName = this.capitalizeFirstLetter(workerActivity.varietyName);
+            if (this.selectedClientDocData.correctionFactor) {
+              workerSessions = workerSessions.map(workerSession => {
+                const isOriginal = workerSession.hasOwnProperty('isOriginal') ? workerSession.isOriginal : true;
+                if (workerSession.count && isOriginal && !workerSession.isManual) {
+                  workerSession.count = +(workerSession.count * (1 + (this.selectedClientDocData.correctionFactor))).toFixed(0);
+                }
+                return workerSession;
+              });
             }
 
-            tableRow.amountPicked = workerActivity.count;
+            this.completeDataMap.set(chartRow.name, workerSessions);
 
-            if (workerActivity.startTimestamp && workerActivity.endTimestamp) {
-              totalWorkingTimeMillis = workerActivity?.endTimestamp?.toMillis() - workerActivity?.startTimestamp?.toMillis();
+            // tslint:disable-next-line:prefer-for-of
+            for (let j = 0; j < workerSessions.length; j++) {
+              const workerActivity = workerSessions[j];
+              //if (!isNaN(workerActivity.count)) {
+
+              const workerActivityCount = workerActivity.count;
+
+              totalCount += workerActivityCount ?? 0;
+
+              totalRowsSet.add(workerActivity.rowId);
+              if (workerActivity.endTimestamp) {
+                finishedCount += workerActivityCount ?? 0;
+                finishedRowsSet.add(workerActivity.rowId);
+              } else if (workerActivity.startTimestamp) {
+                const sessionStartTime = workerActivity.startTimestamp;
+                const olderThan2Hours = moment(sessionStartTime.toDate()).isBefore(moment().subtract(2, 'hours'));
+                if (olderThan2Hours) {
+                  finishedCount += workerActivityCount ?? 0;
+                  finishedRowsSet.add(workerActivity.rowId);
+                }
+              }
+
+              chartRow.series.push({
+                name: workerActivity.varietyName,
+                value: workerActivityCount ?? 0,
+              });
+              //}
             }
+            latestChartData.push(chartRow);
+          }
 
-            let workingTimeStr = '';
-            if (totalWorkingTimeMillis) {
-              const hours = moment.duration(totalWorkingTimeMillis).hours();
-              const minutes = moment.duration(totalWorkingTimeMillis).minutes();
-              workingTimeStr += `${hours}h `;
-              workingTimeStr += `${minutes % 60}m`;
-              tableRow.workingTime = workingTimeStr;
-            }
+          this.countData = {
+            totalAll: {
+              count: totalCount,
+              rows: totalRowsSet.size
+            },
+            finished: {
+              count: finishedCount,
+              rows: finishedRowsSet.size
+            },
+          }
 
-            tableRow.time = `${workerActivity?.startTimestamp ? moment(workerActivity?.startTimestamp?.toMillis()).format('HH:mm') : ''}
+          latestChartData = latestChartData.sort((charRowA: any, chartRowB: any) => {
+            const n1 = charRowA.series.reduce((a, b) => a + b.value, 0);
+            const n2 = chartRowB.series.reduce((a, b) => a + b.value, 0);
+            return n1 > n2 ? -1 : n1 < n2 ? 1 : 0;
+          });
+
+          Object.assign(this, {laborPrdctvtyData: [...latestChartData]});
+
+          const latestLaborPrdctvtyTableData = [];
+          // tslint:disable-next-line:prefer-for-of
+          for (let i = 0; i < uniqueWorkers.length; i++) {
+            const workerName = uniqueWorkers[i];
+            const workerActivities = sessionsData.filter((v) => v.workerName === workerName);
+
+            let totalWorkingTimeMillis = 0;
+
+            // tslint:disable-next-line:prefer-for-of
+            for (let j = 0; j < workerActivities.length; j++) {
+              const tableRow: any = {
+                workerName: uniqueWorkers[i],
+              };
+              const workerActivity = workerActivities[j];
+
+              if (!tableRow.varietyName) {
+                tableRow.varietyName = this.capitalizeFirstLetter(workerActivity.varietyName);
+              }
+
+              tableRow.amountPicked = workerActivity.count;
+
+              if (workerActivity.startTimestamp && workerActivity.endTimestamp) {
+                totalWorkingTimeMillis = workerActivity?.endTimestamp?.toMillis() - workerActivity?.startTimestamp?.toMillis();
+              }
+
+              let workingTimeStr = '';
+              if (totalWorkingTimeMillis) {
+                const hours = moment.duration(totalWorkingTimeMillis).hours();
+                const minutes = moment.duration(totalWorkingTimeMillis).minutes();
+                workingTimeStr += `${hours}h `;
+                workingTimeStr += `${minutes % 60}m`;
+                tableRow.workingTime = workingTimeStr;
+              }
+
+              tableRow.time = `${workerActivity?.startTimestamp ? moment(workerActivity?.startTimestamp?.toMillis()).format('HH:mm') : ''}
                       - ${workerActivity?.endTimestamp ? moment(workerActivity?.endTimestamp?.toMillis()).format('HH:mm') : ''}`;
 
-            tableRow.rowNumber = workerActivity.rowNumber;
-            latestLaborPrdctvtyTableData.push(tableRow);
+              tableRow.rowNumber = workerActivity.rowNumber;
+              latestLaborPrdctvtyTableData.push(tableRow);
+            }
           }
-        }
 
-        latestLaborPrdctvtyTableData.sort((n1, n2) => {
-          return n1.workerName < n2.workerName ? -1 : n1.workerName > n2.workerName ? 1 : 0;
-        });
-        this.laborPrdctvtyDataSource = new MatTableDataSource(latestLaborPrdctvtyTableData);
-        this.laborPrdctvtyDataSource.paginator = this.paginator;
-        this.laborPrdctvtyDataSource.sort = this.sort;
-      }
-    );
+          latestLaborPrdctvtyTableData.sort((n1, n2) => {
+            return n1.workerName < n2.workerName ? -1 : n1.workerName > n2.workerName ? 1 : 0;
+          });
+          this.laborPrdctvtyDataSource = new MatTableDataSource(latestLaborPrdctvtyTableData);
+          this.laborPrdctvtyDataSource.paginator = this.paginator;
+          this.laborPrdctvtyDataSource.sort = this.sort;
+        }
+      );
   }
 
   isPrdctvtyChartDisplayed() {

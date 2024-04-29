@@ -42,6 +42,10 @@ import {MultipleDeviceEditComponent} from "./multiple-device-edit-dialog/multipl
 import {SNACKBAR_CLASSES} from "../../common/utils/utils";
 import {EnrollmentSettingsDialogComponent} from "./enrollment-settings-dialog/enrollment-settings-dialog.component";
 
+const moment = require("moment-timezone");
+const momentDurationFormatSetup = require("moment-duration-format");
+momentDurationFormatSetup(moment);
+
 @Component({
   selector: 'app-client-device',
   templateUrl: './client-device.component.html',
@@ -71,6 +75,7 @@ export class ClientDeviceComponent implements AfterViewInit, OnDestroy {
     ['appVersion', 'App Version'],
     ['lastActivityTimestamp', 'Last Activity Time'],
     ['lastActivityName', 'Last Activity'],
+    ['batteryLeft', 'Battery left'],
     ['qc', 'Data QC']
   ]);
 
@@ -93,6 +98,7 @@ export class ClientDeviceComponent implements AfterViewInit, OnDestroy {
     'appVersion',
     'lastActivityTimestamp',
     'lastActivityName',
+    'batteryLeft',
     'qc',
   ];
   columnsHeadersToDisplay: string[] = [
@@ -104,6 +110,7 @@ export class ClientDeviceComponent implements AfterViewInit, OnDestroy {
     'appVersion',
     'lastActivityTimestamp',
     'lastActivityName',
+    'batteryLeft',
     'qc',
     'issue',
     'edit'
@@ -217,6 +224,11 @@ export class ClientDeviceComponent implements AfterViewInit, OnDestroy {
           this.deviceList = devicesList.map((device) => {
             device.deviceId = device.id;
             device.isSelected = currentlySelectedDeviceIds.includes(device.id);
+            if (device.lastBatteryLeft) {
+              device.batteryLeft = (device.lastBatteryPercentage + '%' ?? '') + ' (' + moment.duration(device.lastBatteryLeft * 1000).format('[d]d [h]h [m]m', {trim: false}) + ')';
+            } else {
+              device.batteryLeft = '';
+            }
             const remainingAttributesList: any[] = [];
             if ((device.totalDataRecords && device.totalDataRecords > 0)) {
               if (device.consecDupDataRecords || device.consecDupDataRecords === 0) {
@@ -283,6 +295,11 @@ export class ClientDeviceComponent implements AfterViewInit, OnDestroy {
           this.deviceList = devicesList.map((device) => {
             device.deviceId = device.id;
             device.isSelected = currentlySelectedDeviceIds.includes(device.id);
+            if (device.lastBatteryLeft) {
+              device.batteryLeft = (device.lastBatteryPercentage + '%' ?? '') + ' (' + moment.duration(device.lastBatteryLeft * 1000).format('[d]d [h]h [m]m', {trim: false}) + ')';
+            } else {
+              device.batteryLeft = '';
+            }
             const remainingAttributesList: any[] = [];
             if ((device.totalDataRecords && device.totalDataRecords > 0)) {
               if (device.consecDupDataRecords || device.consecDupDataRecords === 0) {
@@ -296,7 +313,7 @@ export class ClientDeviceComponent implements AfterViewInit, OnDestroy {
             }
             if (['tablet', 'CLOCK'].includes(device.deviceType)) {
               device.deviceIcon = 'tablet_android';
-            } else if(!device.deviceType || device.deviceType === 'WATCH'){
+            } else if (!device.deviceType || device.deviceType === 'WATCH') {
               device.deviceIcon = 'watch';
             }
             for (const [key, value] of Object.entries(device)) {

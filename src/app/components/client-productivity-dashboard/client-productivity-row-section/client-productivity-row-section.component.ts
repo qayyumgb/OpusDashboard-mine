@@ -50,12 +50,12 @@ export class ClientProductivityRowSectionComponent implements OnInit, OnDestroy 
   rowChartVsTable = 'chart';
   prdctvtyRowData: any[] = [];
 
-  finishedData = {
-    total: {
+  countData = {
+    totalAll: {
       count: 0,
       rows: 0
     },
-    actual: {
+    finished: {
       count: 0,
       rows: 0
     }
@@ -125,6 +125,8 @@ export class ClientProductivityRowSectionComponent implements OnInit, OnDestroy 
   selectedClientDocData: any;
   dateInContextSubscription: Subscription;
   sessionsDataSubscription: Subscription;
+  clientLocInContextServiceSubscription: Subscription;
+  selectedLocationId: string;
 
   constructor(private authService: AuthService,
               private firestoreService: FirestoreService,
@@ -147,7 +149,10 @@ export class ClientProductivityRowSectionComponent implements OnInit, OnDestroy 
             return;
           }
           this.selectedClientDocData = selectedClientDocData;
-          this.loadChart();
+          this.clientLocInContextServiceSubscription = this.clientInContextService.clientLocSubject.subscribe(selectedLocation => {
+            this.selectedLocationId = !selectedLocation || (selectedLocation?.id === '-1') ? null : selectedLocation?.id;
+            this.loadChart();
+          });
         });
       });
   }
@@ -157,6 +162,7 @@ export class ClientProductivityRowSectionComponent implements OnInit, OnDestroy 
     this.dateInContextSubscription?.unsubscribe();
     this.sessionsDataSubscription?.unsubscribe();
     this.loggedInUserFromAuthServiceSubscription?.unsubscribe();
+    this.clientLocInContextServiceSubscription?.unsubscribe();
   }
 
   ngOnInit(): void {
@@ -189,150 +195,164 @@ export class ClientProductivityRowSectionComponent implements OnInit, OnDestroy 
   loadChart() {
     const dateToQuery = moment(this.selectedDate).format('YYYY-MM-DD');
     this.prdctvtyRowData = [];
-    this.sessionsDataSubscription = this.firestoreService.getUnarchivedSessions(this.selectedClientDocData.id, dateToQuery).subscribe(sessionsData => {
-      if (!sessionsData) {
-        return;
-      }
+    this.sessionsDataSubscription?.unsubscribe();
+    this.sessionsDataSubscription = this.firestoreService.getUnarchivedSessions(this.selectedClientDocData.id, dateToQuery, this.selectedLocationId ?? null)
+      .subscribe(sessionsData => {
+        if (!sessionsData) {
+          return;
+        }
 
-      sessionsData = sessionsData.filter(session => session.rowId !== null && session.rowId !== '');
+        const tempRowSet = new Set()
+        for (const session of sessionsData) {
+          tempRowSet.add(session.rowId);
+        }
+        console.log('tempRowSet size:' + tempRowSet.size);
 
-      this.rowTableDataMap = new Map();
-      const uniqueRows = sessionsData
+        sessionsData = sessionsData.filter(session => session.rowId !== null && session.rowId !== '');
+
+        this.rowTableDataMap = new Map();
+        const uniqueRows = Array.from(tempRowSet);/*sessionsData
         .map((value) => value.rowNumber)
         .filter(
           (value: any, index: any, array: string | any[]) =>
             array.indexOf(value) === index
-        );
+        );*/
 
-      this.graphHeight = 90 + (50 * uniqueRows.length);
-      let totalCount = 0;
-      let actualCount = 0;
-      const actualRowsSet = new Set();
-      let latestChartData = [];
-      // tslint:disable-next-line:prefer-for-of
-      for (let i = 0; i < uniqueRows.length; i++) {
-        const rowNumber = uniqueRows[i];
-        let varietySessions = sessionsData.filter((v) => v.rowNumber === rowNumber);
-
-        if (this.selectedClientDocData.correctionFactor) {
-          varietySessions = varietySessions.map(varietySession => {
-            const isOriginal = varietySession.hasOwnProperty('isOriginal') ? varietySession.isOriginal : true;
-            if (varietySession.count && isOriginal && !varietySession.isManual) {
-              varietySession.count = +(varietySession.count * (1 + (this.selectedClientDocData.correctionFactor))).toFixed(0);
-            }
-            return varietySession;
-          });
-        }
-
-        const chartRow: ChartRow = {
-          name: rowNumber,
-          series: []
-        };
-
-        this.completeDataMap.set(chartRow.name, varietySessions);
-
+        this.graphHeight = 90 + (50 * uniqueRows.length);
+        let totalCount = 0;
+        let finishedCount = 0;
+        const finishedRowsSet = new Set();
+        let latestChartData = [];
         // tslint:disable-next-line:prefer-for-of
-        for (let j = 0; j < varietySessions.length; j++) {
-          const varietyActivity = varietySessions[j];
+        for (let i = 0; i < uniqueRows.length; i++) {
+          const rowId = uniqueRows[i];
+          let varietySessions = sessionsData.filter((v) => v.rowId === rowId);
+          const rowNumber = varietySessions[0].rowNumber;
 
-          const varietyActivityCount = varietyActivity.count;
-
-          totalCount += varietyActivityCount ?? 0;
-          if (varietyActivity.endTimestamp) {
-            actualCount += varietyActivityCount ?? 0;
-            actualRowsSet.add(uniqueRows[i]);
+          if (this.selectedClientDocData.correctionFactor) {
+            varietySessions = varietySessions.map(varietySession => {
+              const isOriginal = varietySession.hasOwnProperty('isOriginal') ? varietySession.isOriginal : true;
+              if (varietySession.count && isOriginal && !varietySession.isManual) {
+                varietySession.count = +(varietySession.count * (1 + (this.selectedClientDocData.correctionFactor))).toFixed(0);
+              }
+              return varietySession;
+            });
           }
-          chartRow.series.push({
-            name: varietyActivity.workerName,
-            value: varietyActivityCount ?? 0,
-          });
-        }
-        latestChartData.push(chartRow);
-      }
 
-      this.finishedData = {
-        total: {
-          count: totalCount,
-          rows: uniqueRows.length
-        },
-        actual: {
-          count: actualCount,
-          rows: actualRowsSet.size
-        },
-      }
-
-      latestChartData = latestChartData.sort((charRowA: any, chartRowB: any) => {
-        const n1 = charRowA.series.reduce((a, b) => a + b.value, 0);
-        const n2 = chartRowB.series.reduce((a, b) => a + b.value, 0);
-        return n1 > n2 ? -1 : n1 < n2 ? 1 : 0;
-      });
-
-      const uniqueVarieties = sessionsData
-        .map((value) => value.varietyName)
-        .filter(
-          (value: any, index: any, array: string | any[]) =>
-            array.indexOf(value) === index
-        );
-
-
-      const latestRowTableData = [];
-      // tslint:disable-next-line:prefer-for-of
-      for (let i = 0; i < uniqueRows.length; i++) {
-        const rowNumber = uniqueRows[i];
-        const rowActivities = sessionsData.filter((v) => v.rowNumber === rowNumber);
-
-
-        let tableRow: any;
-
-        if (this.rowTableDataMap.get(rowNumber)) {
-          tableRow = this.rowTableDataMap.get(rowNumber);
-        } else {
-          tableRow = {
-            rowNumber,
-            amountPicked: 0,
-            waste: 0,
-            workers: [],
-            trolleyNumbers: []
+          const chartRow: ChartRow = {
+            name: rowNumber as string,
+            series: []
           };
+
+          this.completeDataMap.set(chartRow.name, varietySessions);
+
+          // tslint:disable-next-line:prefer-for-of
+          for (let j = 0; j < varietySessions.length; j++) {
+            const varietyActivity = varietySessions[j];
+
+            const varietyActivityCount = varietyActivity.count;
+
+            totalCount += varietyActivityCount ?? 0;
+            if (varietyActivity.endTimestamp) {
+              finishedCount += varietyActivityCount ?? 0;
+              finishedRowsSet.add(uniqueRows[i]);
+            } else if (varietyActivity.startTimestamp) {
+              const sessionStartTime = varietyActivity.startTimestamp;
+              const olderThan2Hours = moment(sessionStartTime.toDate()).isBefore(moment().subtract(2, 'hours'));
+              if (olderThan2Hours) {
+                finishedCount += varietyActivityCount ?? 0;
+                finishedRowsSet.add(varietyActivity.rowId);
+              }
+            }
+            chartRow.series.push({
+              name: varietyActivity.workerName,
+              value: varietyActivityCount ?? 0,
+            });
+          }
+          latestChartData.push(chartRow);
         }
+
+        this.countData = {
+          totalAll: {
+            count: totalCount,
+            rows: uniqueRows.length
+          },
+          finished: {
+            count: finishedCount,
+            rows: finishedRowsSet.size
+          },
+        }
+
+        latestChartData = latestChartData.sort((charRowA: any, chartRowB: any) => {
+          const n1 = charRowA.series.reduce((a, b) => a + b.value, 0);
+          const n2 = chartRowB.series.reduce((a, b) => a + b.value, 0);
+          return n1 > n2 ? -1 : n1 < n2 ? 1 : 0;
+        });
+
+
+        const latestRowTableData = [];
         // tslint:disable-next-line:prefer-for-of
-        for (let j = 0; j < rowActivities.length; j++) {
-          const rowActivity = rowActivities[j];
-          if (!tableRow.varietyName) {
-            tableRow.varietyName = this.capitalizeFirstLetter(rowActivity.varietyName);
-          }
+        for (let i = 0; i < uniqueRows.length; i++) {
 
-          tableRow.amountPicked += rowActivity.count ?? 0;
+          const rowId = uniqueRows[i];
+          const varietySessions = sessionsData.filter((v) => v.rowId === rowId);
+          const rowNumber = varietySessions[0].rowNumber;
 
-          tableRow.waste = (rowActivity.waste ? tableRow.waste + rowActivity.waste : null);
-          if (tableRow.workers && !tableRow.workers.includes(rowActivity.workerName)) {
-            tableRow.workers.push(rowActivity.workerName);
+
+          const rowActivities = sessionsData.filter((v) => v.rowNumber === rowNumber);
+
+
+          let tableRow: any;
+
+          if (this.rowTableDataMap.get(rowNumber)) {
+            tableRow = this.rowTableDataMap.get(rowNumber);
+          } else {
+            tableRow = {
+              rowNumber,
+              amountPicked: 0,
+              waste: 0,
+              workers: [],
+              trolleyNumbers: []
+            };
           }
-          if (tableRow.trolleyNumbers && !tableRow.trolleyNumbers.includes(rowActivity.trolleyId)) {
-            tableRow.trolleyNumbers.push(rowActivity.trolleyId);
+          // tslint:disable-next-line:prefer-for-of
+          for (let j = 0; j < rowActivities.length; j++) {
+            const rowActivity = rowActivities[j];
+            if (!tableRow.varietyName) {
+              tableRow.varietyName = this.capitalizeFirstLetter(rowActivity.varietyName);
+            }
+
+            tableRow.amountPicked += rowActivity.count ?? 0;
+
+            tableRow.waste = (rowActivity.waste ? tableRow.waste + rowActivity.waste : null);
+            if (tableRow.workers && !tableRow.workers.includes(rowActivity.workerName)) {
+              tableRow.workers.push(rowActivity.workerName);
+            }
+            if (tableRow.trolleyNumbers && !tableRow.trolleyNumbers.includes(rowActivity.trolleyId)) {
+              tableRow.trolleyNumbers.push(rowActivity.trolleyId);
+            }
           }
-        }
-        if (rowActivities && rowActivities.length > 0) {
-          tableRow.time = `${rowActivities[0]?.startTimestamp ? moment(rowActivities[0]?.startTimestamp?.toMillis()).format('HH:mm') : ''}
+          if (rowActivities && rowActivities.length > 0) {
+            tableRow.time = `${rowActivities[0]?.startTimestamp ? moment(rowActivities[0]?.startTimestamp?.toMillis()).format('HH:mm') : ''}
           - ${rowActivities[0]?.endTimestamp ? moment(rowActivities[0]?.endTimestamp?.toMillis()).format('HH:mm') : ''}`;
+          }
+          this.rowTableDataMap.set(rowNumber, tableRow);
         }
-        this.rowTableDataMap.set(rowNumber, tableRow);
-      }
 
-      this.rowTableDataMap.forEach((value, key) => {
-        latestRowTableData.push(value);
+        this.rowTableDataMap.forEach((value, key) => {
+          latestRowTableData.push(value);
+        });
+
+        Object.assign(this, {prdctvtyRowData: [...latestChartData]});
+
+        latestRowTableData.sort((n1, n2) => {
+          return +n1.rowNumber > +n2.rowNumber ? 1 : +n1.rowNumber < +n2.rowNumber ? -1 : 0;
+        });
+
+        this.rowsDataSource = new MatTableDataSource(latestRowTableData);
+        this.rowsDataSource.paginator = this.paginator;
+        this.rowsDataSource.sort = this.sort;
       });
-
-      Object.assign(this, {prdctvtyRowData: [...latestChartData]});
-
-      latestRowTableData.sort((n1, n2) => {
-        return +n1.rowNumber > +n2.rowNumber ? 1 : +n1.rowNumber < +n2.rowNumber ? -1 : 0;
-      });
-
-      this.rowsDataSource = new MatTableDataSource(latestRowTableData);
-      this.rowsDataSource.paginator = this.paginator;
-      this.rowsDataSource.sort = this.sort;
-    });
   }
 
   isRowChartDisplayed() {

@@ -37,6 +37,9 @@ export class LaborPerformanceSectionComponent implements OnInit, OnDestroy {
   dataWorkerSpecificSortOption = 'NetPerfH2L';
   selectedDate: Date;
   chartAnimation = true;
+  clientLocInContextServiceSubscription: Subscription;
+  selectedLocationId: string;
+
 
   allAvgsPerformanceData: any[] = [];
   workerSpecificPerformanceData: any[] = [];
@@ -46,7 +49,7 @@ export class LaborPerformanceSectionComponent implements OnInit, OnDestroy {
   showXAxis = true;
   showYAxis = true;
   gradient = false;
-  showLegend = true;
+  showLegend = false;
   legendTitle = '';
   showXAxisLabel = true;
   yAxisLabel = 'Worker';
@@ -62,12 +65,12 @@ export class LaborPerformanceSectionComponent implements OnInit, OnDestroy {
   graphHeight: number;
   graphHeightWorkerSpecific: number;
 
-  finishedData = {
-    total: {
+  countData = {
+    totalAll: {
       count: 0,
       rows: 0
     },
-    actual: {
+    finished: {
       count: 0,
       rows: 0
     }
@@ -160,14 +163,18 @@ export class LaborPerformanceSectionComponent implements OnInit, OnDestroy {
             return;
           }
           this.selectedClientDocData = selectedClientDocData;
-          this.sessionsData = [];
-          this.workerSpecificPerformanceData = [];
-          if ((this.isWorkerSpecificPerfChartDisplayed() === 'block') && (this.performanceSortOption !== '-1')) {
-            this.sessionsSubscription?.unsubscribe();
-            this.loadAllAveragesChart(true);
-          } else {
-            this.loadAllAveragesChart(false);
-          }
+          this.clientLocInContextServiceSubscription = this.clientInContextService.clientLocSubject.subscribe(selectedLocation => {
+            this.selectedLocationId = !selectedLocation || (selectedLocation?.id === '-1') ? null : selectedLocation?.id;
+            this.sessionsData = [];
+            this.workerSpecificPerformanceData = [];
+            if ((this.isWorkerSpecificPerfChartDisplayed() === 'block') && (this.performanceSortOption !== '-1')) {
+              this.sessionsSubscription?.unsubscribe();
+              this.loadAllAveragesChart(true);
+            } else {
+              this.loadAllAveragesChart(false);
+            }
+          });
+
         });
       });
   }
@@ -176,6 +183,7 @@ export class LaborPerformanceSectionComponent implements OnInit, OnDestroy {
     this.clientInContextServiceSubscription?.unsubscribe();
     this.dateInContextSubscription?.unsubscribe();
     this.sessionsSubscription?.unsubscribe();
+    this.clientLocInContextServiceSubscription?.unsubscribe();
   }
 
   ngOnInit(): void {
@@ -189,8 +197,7 @@ export class LaborPerformanceSectionComponent implements OnInit, OnDestroy {
     const filteredRowSection = this.completeDataMap.get(model.series);
     let tooltipHtml = `<div style="font-weight: 600;text-align: center;">Average performance</div>
                 Picked: ${filteredRowSection.count ?? 'NA'}<br/>`;
-    tooltipHtml += `Net Performance: ${filteredRowSection.nettPerformance?.toFixed(0)} per hours<br/>`
-    tooltipHtml += `Gross Performance: ${filteredRowSection.grossPerformance?.toFixed(0)} per hours<br/>`
+    tooltipHtml += `Performance: ${filteredRowSection.nettPerformance?.toFixed(0)} per hours<br/>`
     return tooltipHtml;
   }
 
@@ -228,52 +235,70 @@ export class LaborPerformanceSectionComponent implements OnInit, OnDestroy {
     this.allAvgsPerformanceData = [];
     this.sessionsData = [];
     this.sessionsSubscription?.unsubscribe();
-    this.sessionsSubscription = this.firestoreService.getUnarchivedSessions(this.selectedClientDocData.id, dateToQuery).subscribe(async sessionsData => {
+    this.sessionsSubscription = this.firestoreService.getUnarchivedSessions(this.selectedClientDocData.id, dateToQuery, this.selectedLocationId ?? null)
+      .subscribe(async sessionsData => {
       if (!sessionsData) {
         return;
       }
 
       sessionsData = sessionsData
         .filter(session => session.rowId !== null && session.rowId !== '')
-        .filter(session => (session.endTimestamp !== null) && (session.endTimestamp !== '') && session.hasOwnProperty('endTimestamp'));
+      //.filter(session => (session.endTimestamp !== null) && (session.endTimestamp !== '') && session.hasOwnProperty('endTimestamp'));
 
       console.log(dateToQuery)
+
       this.sessionsData = sessionsData;
 
       let totalCount = 0;
-      let actualCount = 0;
+      let finishedCount = 0;
       const totalRowsSet = new Set();
-      const actualRowsSet = new Set();
+      const finishedRowsSet = new Set();
 
       for (const sessionObj of sessionsData) {
         const isOriginal = sessionObj.hasOwnProperty('isOriginal') ? sessionObj.isOriginal : true;
-        if (!isNaN(sessionObj.count)) {
+
+        if (sessionObj.count && !isNaN(sessionObj.count)) {
           if (isOriginal && !sessionObj.isManual && this.selectedClientDocData.correctionFactor) {
             totalCount += +(sessionObj.count * (1 + (this.selectedClientDocData.correctionFactor))).toFixed(0);
           } else {
             totalCount += sessionObj.count;
           }
-          totalRowsSet.add(sessionObj.rowId);
+        }
+        totalRowsSet.add(sessionObj.rowId);
 
-          if (sessionObj.endTimestamp && sessionObj.count && !isNaN(sessionObj.count)) {
+        if (sessionObj.endTimestamp) {
+          if (sessionObj.count && !isNaN(sessionObj.count)) {
             if (isOriginal && !sessionObj.isManual && this.selectedClientDocData.correctionFactor) {
-              actualCount += +(sessionObj.count * (1 + (this.selectedClientDocData.correctionFactor))).toFixed(0);
+              finishedCount += +(sessionObj.count * (1 + (this.selectedClientDocData.correctionFactor))).toFixed(0);
             } else {
-              actualCount += sessionObj.count;
+              finishedCount += sessionObj.count;
             }
-            actualRowsSet.add(sessionObj.rowId);
+          }
+          finishedRowsSet.add(sessionObj.rowId);
+        } else if (sessionObj.startTimestamp) {
+          const sessionStartTime = sessionObj.startTimestamp;
+          const olderThan2Hours = moment(sessionStartTime.toDate()).isBefore(moment().subtract(2, 'hours'));
+          if (olderThan2Hours) {
+            if (sessionObj.count && !isNaN(sessionObj.count)) {
+              if (isOriginal && !sessionObj.isManual && this.selectedClientDocData.correctionFactor) {
+                finishedCount += +(sessionObj.count * (1 + (this.selectedClientDocData.correctionFactor))).toFixed(0);
+              } else {
+                finishedCount += sessionObj.count;
+              }
+            }
+            finishedRowsSet.add(sessionObj.rowId);
           }
         }
       }
 
-      this.finishedData = {
-        total: {
+      this.countData = {
+        totalAll: {
           count: totalCount,
           rows: totalRowsSet.size
         },
-        actual: {
-          count: actualCount,
-          rows: actualRowsSet.size
+        finished: {
+          count: finishedCount,
+          rows: finishedRowsSet.size
         },
       }
       this.workerSpecificData = this.getWorkerRowListMap(sessionsData);
@@ -313,14 +338,10 @@ export class LaborPerformanceSectionComponent implements OnInit, OnDestroy {
           name: this.capitalizeFirstLetter(this.tableDataMap.get(workerIdArray[j])[0]?.workerName),
           series: [
             {
-              name: 'net',
+              name: 'performance',
               value: !isNaN(avgRowForWorkerId?.nettPerformance) ? +(avgRowForWorkerId?.nettPerformance?.toFixed(0)) : 0,
               perfRatio: !isNaN(avgRowForWorkerId?.nettPerformance) && !isNaN(avgRowForWorkerId?.grossPerformance) ?
                 (+(avgRowForWorkerId?.grossPerformance) / +(avgRowForWorkerId?.nettPerformance)).toFixed(2) : 0
-            },
-            {
-              name: 'gross',
-              value: !isNaN(avgRowForWorkerId?.grossPerformance) ? +(avgRowForWorkerId?.grossPerformance?.toFixed(0)) : 0
             }
           ]
         };

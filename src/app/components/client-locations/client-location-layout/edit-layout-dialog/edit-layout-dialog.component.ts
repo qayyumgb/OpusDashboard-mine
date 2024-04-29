@@ -56,7 +56,10 @@ export class EditLayoutDialogComponent implements OnInit, OnDestroy {
       secondRowLongitude: [this.layout.secondPoint?._long, []],
     });
   }
-
+  openInGoogleMap(latitude: number, longitude: number) {
+    const url = `https://www.google.com/maps?q=${latitude},${longitude}`;
+    window.open(url, '_blank');
+  }
   async updateLayout() {
     if (!this.editLayoutForm.valid) {
       this.openSnackBar('Name is mandatory', 'error');

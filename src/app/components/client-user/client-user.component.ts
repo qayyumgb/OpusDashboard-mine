@@ -32,16 +32,18 @@ export class ClientUserComponent implements OnDestroy, AfterViewInit {
     ['name', 'Name'],
     ['notes', 'Notes'],
     ['role', 'Role'],
+    ['language', 'Language'],
     ['creationTimestamp', 'Created At'],
   ]);
 
   screenSize = 'default';
 
-  columnsToDisplay: string[] = ['id', 'name', 'notes', 'role', 'creationTimestamp'];
+  columnsToDisplay: string[] = ['id', 'name', 'notes', 'role', 'language', 'creationTimestamp'];
   columnsHeadersToDisplay: string[] = [
     'name',
     'notes',
     'role',
+    'language',
     'creationTimestamp',
     'Edit',
   ];
@@ -59,6 +61,8 @@ export class ClientUserComponent implements OnDestroy, AfterViewInit {
   archivedUsersSubscription: Subscription;
   breakpointSubscription: Subscription;
   filterValue: string;
+  webAppConfigSubscription: Subscription;
+  languagesList: any[];
 
   constructor(public firestoreService: FirestoreService,
               public authService: AuthService,
@@ -80,7 +84,10 @@ export class ClientUserComponent implements OnDestroy, AfterViewInit {
         return;
       }
       this.selectedClientDocData = selectedClientDocData;
-      this.fetchUnarchivedUsers();
+      this.webAppConfigSubscription = this.firestoreService.getWebAppConfig().subscribe((webAppDS) => {
+        this.languagesList = Object.values(webAppDS.data().languages);
+        this.fetchUnarchivedUsers();
+      });
     });
   }
 
@@ -99,7 +106,9 @@ export class ClientUserComponent implements OnDestroy, AfterViewInit {
   openDialog() {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.autoFocus = true;
-    dialogConfig.data = {};
+    dialogConfig.data = {
+      languagesList: this.languagesList
+    };
     this.dialog.open(CreateUserDialogComponent, dialogConfig);
   }
 
@@ -108,7 +117,8 @@ export class ClientUserComponent implements OnDestroy, AfterViewInit {
     dialogConfig.autoFocus = true;
 
     dialogConfig.data = {
-      userRecord: record
+      userRecord: record,
+      languagesList: this.languagesList
     };
 
     this.dialog.open(EditUserDialogComponent, dialogConfig);
@@ -120,6 +130,7 @@ export class ClientUserComponent implements OnDestroy, AfterViewInit {
     this.archivedUsersSubscription?.unsubscribe();
     this.unarchivedUsersSubscription?.unsubscribe();
     this.breakpointSubscription?.unsubscribe();
+    this.webAppConfigSubscription?.unsubscribe();
   }
 
   archiveUser(user) {
@@ -210,7 +221,8 @@ export class ClientUserComponent implements OnDestroy, AfterViewInit {
           return {
             ...user,
             isArchived: false,
-            role: user?.clients?.filter(client => client.clientId === this.selectedClientDocData.id)[0]?.role
+            role: user?.clients?.filter(client => client.clientId === this.selectedClientDocData.id)[0]?.role,
+            language: user.languageCode ? this.languagesList?.filter(lang => lang.code === user.languageCode)[0].name : ''
           };
         });
 
@@ -244,7 +256,8 @@ export class ClientUserComponent implements OnDestroy, AfterViewInit {
           return {
             ...user,
             isArchived: true,
-            role: user?.archivedClients?.filter(archivedClient => archivedClient.clientId === this.selectedClientDocData.id)[0]?.role
+            role: user?.archivedClients?.filter(archivedClient => archivedClient.clientId === this.selectedClientDocData.id)[0]?.role,
+            language: user.languageCode ? this.languagesList?.filter(lang => lang.code === user.languageCode)[0].name : ''
           };
         });
 

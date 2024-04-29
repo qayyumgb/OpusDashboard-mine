@@ -7,8 +7,6 @@ import {AuthService} from "../../../services/auth.service";
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material/dialog";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {SNACKBAR_CLASSES} from "../../../common/utils/utils";
-import firebase from 'firebase/compat/app';
-import UserCredential = firebase.auth.UserCredential;
 
 @Component({
   selector: 'app-create-user-dialog',
@@ -23,6 +21,9 @@ export class CreateUserDialogComponent implements OnInit, OnDestroy {
   loggedInUserDocData: any;
   clientInContextServiceSubscription: Subscription;
   selectedClientDocData: any;
+  languagesList: any[];
+  allWorkersList: any[];
+  workerListSubscription: Subscription;
 
   constructor(
     private firestoreService: FirestoreService,
@@ -33,7 +34,7 @@ export class CreateUserDialogComponent implements OnInit, OnDestroy {
     private dialogRef: MatDialogRef<CreateUserDialogComponent>,
     @Inject(MAT_DIALOG_DATA) data) {
 
-    this.description = data.description;
+    this.languagesList = data.languagesList;
 
     this.loggedInUserFromAuthServiceSubscription = this.authService.loggedInUserFromAuthService$.subscribe(userDocData => {
       this.loggedInUserDocData = userDocData;
@@ -43,6 +44,12 @@ export class CreateUserDialogComponent implements OnInit, OnDestroy {
       if (!selectedClientDocData) {
         return;
       }
+
+      this.workerListSubscription = this.firestoreService.getUnArchivedWorkersForClientId(selectedClientDocData.id).subscribe((workersList) => {
+        this.allWorkersList = workersList.sort((worker1, worker2) => {
+          return worker1.name.toLowerCase() > worker2.name.toLowerCase() ? 1 : worker1.name.toLowerCase() < worker2.name.toLowerCase() ? -1 : 0;
+        });
+      });
       this.selectedClientDocData = selectedClientDocData;
     });
   }
@@ -50,6 +57,7 @@ export class CreateUserDialogComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.clientInContextServiceSubscription?.unsubscribe();
     this.loggedInUserFromAuthServiceSubscription?.unsubscribe();
+    this.workerListSubscription?.unsubscribe();
   }
 
   ngOnInit() {
@@ -58,6 +66,8 @@ export class CreateUserDialogComponent implements OnInit, OnDestroy {
       email: ['', [Validators.required]],
       notes: ['', []],
       role: ['regular', []],
+      languageCode: ['', []],
+      associatedWorkerId: ['', []]
     });
   }
 
@@ -81,6 +91,12 @@ export class CreateUserDialogComponent implements OnInit, OnDestroy {
     userToCreate.clientId = this.selectedClientDocData?.id;
     userToCreate.name = userToCreate.name?.trim();
     userToCreate.email = userToCreate.email?.trim();
+
+    if (userToCreate.associatedWorkerId) {
+      userToCreate.associatedWorkerName = this.allWorkersList.filter(worker => worker.id === userToCreate.associatedWorkerId)[0]?.name;
+      userToCreate.associatedWorkerClientId = this.selectedClientDocData.id;
+    }
+
     this.firestoreService
       .createUserForClientId(userToCreate, this.selectedClientDocData)
       .subscribe({

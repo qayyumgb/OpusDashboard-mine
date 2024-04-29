@@ -1,0 +1,41 @@
+<mat-form-field [matMenuTriggerFor]="isDisabled?null:menu" (menuOpened)="setValuesOnInput()" class="till"
+  appearance="outline">
+  <mat-label>{{label}}</mat-label>
+  <input matInput type="time" [disabled]="isDisabled" [(ngModel)]="timeValue" (click)="$event.stopPropagation();"
+    (ngModelChange)="onChange($event)" class="input" />
+  <button matSuffix mat-icon-button [disabled]="isDisabled">
+    <!-- (click)="openTimeEditDialog($event)" -->
+    <mat-icon class="material-symbols-outlined timer-icon">schedule</mat-icon>
+  </button>
+  <mat-hint>{{hint}}</mat-hint>
+</mat-form-field>
+
+<mat-menu #menu="matMenu" #picker>
+  <div [formGroup]="group" class="time-container">
+    <div class="time-part-container">
+      <button mat-icon-button class="arrow-button" (click)="$event.stopPropagation();addHours(1);">
+        <mat-icon>keyboard_arrow_up</mat-icon>
+      </button>
+      <input matInput type="text" (click)="$event.stopPropagation();" formControlName="hours" pattern="[0-5][0-9]" />
+      <button mat-icon-button class="arrow-button" (click)="$event.stopPropagation();addHours(-1);">
+        <mat-icon>keyboard_arrow_down</mat-icon>
+      </button>
+    </div>
+    <div>
+      <p>:</p>
+    </div>
+    <div class="time-part-container">
+      <button mat-icon-button class="arrow-button" (click)="$event.stopPropagation();addMinutes(1);">
+        <mat-icon>keyboard_arrow_up</mat-icon>
+      </button>
+      <input matInput type="text" formControlName="minutes" (click)="$event.stopPropagation();" />
+      <button mat-icon-button class="arrow-button" (click)="$event.stopPropagation();addMinutes(-1);">
+        <mat-icon>keyboard_arrow_down</mat-icon>
+      </button>
+    </div>
+    <div></div>
+  </div>
+</mat-menu>
+<mat-menu style="opacity: 0;display: none;" #menu2="matMenu">
+
+</mat-menu>

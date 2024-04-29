@@ -1,27 +1,34 @@
 <div style="min-width: 400px;">
-  <h2 mat-dialog-title style="text-align: center; text-decoration: underline; font-size: 1.2rem; margin-bottom: 1rem;">Create Position</h2>
+  <h2 mat-dialog-title>Create Position</h2>
 
   <mat-dialog-content [formGroup]="form" style="text-align: center;">
-    <mat-form-field>
-      <mat-label>Name</mat-label>
-      <input matInput required
-             formControlName="name">
-    </mat-form-field>
-    <br/>
-    <mat-form-field appearance="fill" style="margin-top: 0.5rem;">
-      <mat-label>Select Location</mat-label>
-      <mat-select formControlName="locationId">
-        <mat-option [value]="null">Select Location</mat-option>
-        <mat-option *ngFor="let location of allLocationsList" [value]="location.id">
-          {{location.name}}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-  </mat-dialog-content>
-  <br/>
-  <div style="text-align: center; margin-bottom: 0.8rem;">
-    <mat-dialog-actions>
-      <button mat-raised-button color="primary" (click)="close()">Close</button>
+    <div class="row pb-4">
+      <div class="col-lg-12">
+        <mat-form-field class="w-100">
+          <mat-label>Name</mat-label>
+          <input matInput required
+                 formControlName="name">
+        </mat-form-field> 
+      </div>
+    </div>
+   <div class="row">
+    <div class="col-lg-12">
+      <mat-form-field class="w-100">
+        <mat-label>Select Location</mat-label>
+        <mat-select formControlName="locationId">
+          <mat-option [value]="null">Select Location</mat-option>
+          <mat-option *ngFor="let location of allLocationsList" [value]="location.id">
+            {{location.name}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+   </div>
+    
+  </mat-dialog-content> 
+  <div>
+    <mat-dialog-actions class="w-100">
+      <button mat-stroked-button color="accent" (click)="close()">Close</button>
       <button mat-raised-button color="primary" (click)="createPosition()" style="margin-left: 20px;">Create Position</button>
     </mat-dialog-actions>
   </div>

@@ -1,0 +1,25 @@
+<div class="choose-date" *ngIf="selectedClientDocData">
+  <button mat-icon-button class="matMini-icon-btn" (click)="decrementMonth()">
+    <mat-icon>keyboard_double_arrow_left</mat-icon>
+   
+  </button>
+  <button mat-icon-button class="matMini-icon-btn"  (click)="decrementDate()">
+    <mat-icon>chevron_left</mat-icon>
+  </button>
+  
+  
+  <mat-form-field class="example-full-width" appearance="outline">
+    <mat-label>Choose a date</mat-label>
+    <input matInput [matDatepickerFilter]="futureFilter" (dateChange)="onDateChange()"
+           [(ngModel)]="selectedDate" [matDatepicker]="picker">
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+  </mat-form-field>
+  <button mat-icon-button (click)="incrementDate()" class="matMini-icon-btn" >
+    <mat-icon>chevron_right</mat-icon>
+  </button>
+  <button mat-icon-button (click)="incrementMonth()" class="matMini-icon-btn" >
+    <mat-icon>keyboard_double_arrow_right</mat-icon>
+  </button>
+  
+</div>

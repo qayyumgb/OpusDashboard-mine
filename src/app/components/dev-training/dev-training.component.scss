@@ -1,9 +1,21 @@
-a {
-  color: antiquewhite;
+.controls-container{
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  .date-container{
+    flex: 1;
 }
-
-.fab {
-  position: absolute;
-  right: 0;
-  top: -4px;
+}
+.row-detail-description {
+  width: 100%;
+  max-width: 400px;
+  .row-detail-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 0;
+    strong {
+      min-width: 124px;
+  }
+  }
 }

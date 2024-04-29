@@ -1,15 +1,18 @@
 <mat-icon [matTooltip]="getTooltipForStreamingButton()" [inline]="true" (click)="toggleStreaming()"
           style="cursor: pointer; position: fixed;right: 3rem; bottom: 3rem; font-size: 3rem;"
-*ngIf="tableData?.length > 0">
+          *ngIf="tableData?.length > 0">
   {{displayedIcon}}
 </mat-icon>
-
-<div class="listing-container">
-  <div style="margin-top: 6rem; padding-top: 2rem; text-align: center; clear: both;font-size: 1.2rem;" *ngIf="tableData?.length === 0">
+<div class="inner-page-action">
+  <app-date-selection></app-date-selection>
+</div>
+<div class="listing-container table-card">
+  <div *ngIf="tableData?.length === 0">
     There is no data available for the selected date
   </div>
-  <div class="mat-elevation-z8" style="clear: both;" [style.display]="isLaborOverviewTableDisplayed()">
-    <table
+  <div  *ngIf="tableData?.length > 0" class="mat-elevation-z8" style="clear: both;" [style.display]="isLaborOverviewTableDisplayed()">
+    <div class="table-body overflow-auto">
+      <table
       mat-table
       [dataSource]="laborOverviewDataSource"
       multiTemplateDataRows
@@ -21,61 +24,45 @@
         *ngFor="let column of columnsToDisplay"
       >
         <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                {{workerAttributesReadableMap.get(column) }}
+          {{workerAttributesReadableMap.get(column) }}
         </th>
         <td mat-cell *matCellDef="let element">{{ element[column] }}</td>
+        <mat-icon class="material-symbols-outlined">
+          visibility
+          </mat-icon>
       </ng-container>
 
-      <ng-container #tpl matColumnDef="expandedDetail">
-        <td
-          mat-cell
-          *matCellDef="let element"
-          [attr.colspan]="columnsToDisplay.length"
-        >
-          <div
-            class="row-detail-expanded"
-            [@detailExpand]="
-              element.workerId == expandedElement?.workerId ? 'expanded' : 'collapsed'
-            "
-          >
-            <div class="row-detail-description">
-              <div class="example-element-description__header">
-                <div class="example-element-description__cell" *ngFor="let column of columnsHeadersToDisplayNested">{{workerNestedAttributesReadableMap.get(column)}}</div>
-              </div>
-              <div *ngFor="let nestedColumn of element['nested']; let idx = index"
-                   class="example-element-description__content">
-                <div class="example-element-description__cell" *ngFor="let column of columnsToDisplayNested">{{nestedColumn[column]}}</div>
-                <div class="example-element-description__cell">
-                  <img ngSrc="assets/lightgray.ico" height="18" width="18" style="margin-top: 4px;" *ngIf="(nestedColumn.showRedButton)">
-                </div>
-              </div>
-            </div>
-          </div>
-        </td>
-      </ng-container>
-
+     
       <ng-container matColumnDef="red-dot">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let element" class="listing-table-tools">
-          <img ngSrc="assets/lightgray.ico" height="18" width="18" style="margin-top: 4px;" *ngIf="(element.isAnyNestedRowRed)">
+          <img [mtxTooltip]="redDotTooltip" ngSrc="assets/lightgray.ico" height="18" width="18" style="margin-top: 4px;" *ngIf="(element.isAnyNestedRowRed)">
+          <ng-template #redDotTooltip>
+            <div style="background: #5b5f66; color: mintcream;padding:4px;border-radius:5px; text-align: center;font-size: 0.92rem;width:12rem !important;">
+              <div style="margin-bottom: 4px;">Check if the session is correct</div>
+              <span style="">Gross Performance is {{element.grossPerformance}}</span> <br/>
+              <span style="">Net Performance is {{element.netPerformance}}</span> <br/>
+            </div>
+          </ng-template>
         </td>
       </ng-container>
+
+
 
       <tr mat-header-row *matHeaderRowDef="columnsHeadersToDisplay"></tr>
       <tr
         mat-row
         *matRowDef="let element; columns: columnsHeadersToDisplay"
-        class="row"
         [class.expanded-row]="applyExpandedClass(element)"
-        (click)="expandRow(element)"
-      ></tr>
-      <tr
-        mat-row
-        *matRowDef="let row; columns: ['expandedDetail']"
-        class="row-detail"
-      ></tr>
+        (click)="openDialog(element)"
+      >
+      
+    </tr>
+      
     </table>
 
+    </div>
+    
     <mat-paginator
       [pageSizeOptions]="[5, 10, 25, 100]"
       [pageSize]="25"

@@ -1,59 +1,78 @@
-<div style="min-width: 400px;">
-  <h2 mat-dialog-title style="text-align: center; text-decoration: underline;font-size: 1.2rem; margin-bottom: 1rem;">Create Worker</h2>
-
-  <mat-dialog-content [formGroup]="form" style="text-align: center;">
-    <mat-form-field>
-      <mat-label>Name</mat-label>
-      <input matInput required
-             formControlName="name">
-    </mat-form-field>
-    <br/>
-    <mat-slide-toggle
-      class="left_handed_toggle"
-      formControlName="isLeftHanded"
-      style="margin-top: 0.4rem">
-      <mat-label>Left Handed</mat-label>
-    </mat-slide-toggle>
-    <br/>
-    <mat-form-field appearance="fill" style="margin-top: 0.4rem">
-      <mat-label>Location</mat-label>
-      <mat-select formControlName="locationIds" multiple>
-        <mat-option [value]="null">Select Location</mat-option>
-        <mat-option *ngFor="let location of allLocationsList" [value]="location.id">
-          {{location.name}}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-    <br/>
-    <mat-form-field appearance="fill" style="margin-top: 0.4rem">
-      <mat-label>Worker Group</mat-label>
-      <mat-select formControlName="workerGroupId">
-        <mat-option [value]="null">Select Worker Group</mat-option>
-        <mat-option *ngFor="let workerGroup of allwgGroupsList" [value]="workerGroup.id">
-          {{workerGroup.name}}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-    <br/>
-    <mat-form-field style="margin-top: 0.4rem">
-      <mat-label>Notes</mat-label>
-      <input matInput
-             formControlName="notes">
-    </mat-form-field>
-    <br/>
-    <mat-form-field style="margin-top: 0.4rem">
-      <mat-label>Worker Code</mat-label>
-      <input matInput
-             formControlName="workerCode"
-             maxlength="2"
-             minlength="2"
-      >
-    </mat-form-field>
-    <br/>
+<div class="modal-width">
+  <h2 mat-dialog-title>Add Worker</h2>
+  <mat-dialog-content [formGroup]="form">
+    <div class="row pb-4">
+      <div class="col-lg-12">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Name</mat-label>
+          <input matInput required
+                 formControlName="name">
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="row pb-4">
+      <div class="col-lg-6">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Locations</mat-label>
+          <mat-select formControlName="locationIds" multiple>
+            <mat-option *ngFor="let location of allLocationsList" [value]="location.id">
+              {{location.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="col-lg-6">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Worker Group</mat-label>
+          <mat-select formControlName="workerGroupId">
+            <mat-option *ngFor="let workerGroup of allwgGroupsList" [value]="workerGroup.id">
+              {{workerGroup.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="row pb-4">
+      <div class="col-lg-6">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Worker Code</mat-label>
+          <input matInput
+                 formControlName="workerCode"
+                 maxlength="2"
+                 minlength="2"
+          >
+        </mat-form-field>
+      </div>
+      <div class="col-lg-6">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Hourly rate</mat-label>
+          <input matInput
+                 formControlName="hourlyRate" type="number" placeholder="0.00" step="0.01" class="currency-input">
+          <span matTextPrefix>€&nbsp;</span>
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="row pb-4">
+      <div class="col-lg-12">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Notes</mat-label>
+                 <textarea matInput formControlName="notes"></textarea>
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="row pb-4">
+      <div class="col-lg-12">
+        <mat-slide-toggle
+        class="left_handed_toggle"
+        formControlName="isLeftHanded">
+        <mat-label>Left Handed</mat-label>
+      </mat-slide-toggle>
+      </div>
+    </div>
   </mat-dialog-content>
-  <div style="text-align: center;margin-bottom: 0.8rem;">
+  <div >
     <mat-dialog-actions>
-      <button mat-raised-button color="primary" (click)="close()">Close</button>
+      <button mat-stroked-button color="accent" (click)="close()">Close</button>
       <button mat-raised-button color="primary" (click)="createWorker()" style="margin-left: 20px;">Create Worker
       </button>
     </mat-dialog-actions>

@@ -30,8 +30,6 @@ export class ClientProductivityRowmapSectionComponent implements OnInit, OnDestr
   private fromDateMoment = null;
   private adjustmentDays = 0;
   selectedLocationId = null;
-  allLocationsList: any[];
-  locationListSubscription: Subscription;
 
   barChart = [
     {
@@ -72,15 +70,22 @@ export class ClientProductivityRowmapSectionComponent implements OnInit, OnDestr
 
   stateCount = [0, 0, 0, 0, 0, 0];
   filteredOn: string = null;
-  locationIdsFromRows: any[];
+  //locationIdsFromRows: any[];
   rowsToDisplay: any[];
   sessionsSubscription: Subscription;
+  clientLocInContextServiceSubscription: Subscription;
 
   constructor(private clientInContextService: ClientInContextService,
               private firestoreService: FirestoreService,
               private breakpointService: BreakpointService,
               private changeDetectorRef: ChangeDetectorRef) {
     this.breakpointSubscription = this.breakpointService.screenSize$.subscribe(screenSize => this.screenSize = screenSize);
+    this.clientLocInContextServiceSubscription = this.clientInContextService.clientLocSubject.subscribe(selectedLocation => {
+      this.selectedLocationId = !selectedLocation || (selectedLocation?.id === '-1') ? null : selectedLocation?.id;
+      //if (this.selectedClientDocData) {
+        this.loadData();
+      //}
+    });
   }
 
   ngOnInit(): void {
@@ -99,20 +104,25 @@ export class ClientProductivityRowmapSectionComponent implements OnInit, OnDestr
 
       this.doneCount = selectedClientDocData.doneCount ?? 0;
 
-      this.locationListSubscription = this.firestoreService
-        .getAllLocationsForClientId(this.selectedClientDocData?.id)
-        .subscribe((locationsList) => (this.allLocationsList = locationsList.sort((locA: any, locB: any) => {
-          return locA.name?.toLowerCase() < locB.name?.toLowerCase() ? -1 : locA.name?.toLowerCase() > locB.name?.toLowerCase() ? 1 : 0;
-        })));
       this.selectedDate = new Date();
-      this.sessionsSubscription = this.firestoreService.getUnarchivedSessions(this.selectedClientDocData.id, this.selectedDate).subscribe(sessions => {
-        sessions = sessions.filter(session => session.rowId !== null && session.rowId !== '');
-        this.sessions = sessions;
-        this.productivityDataSubscription = this.firestoreService.getAllRowsForClientId(this.selectedClientDocData.id).subscribe(rows => {
-          this.rows = rows;
-          this.fillUI();
+      this.sessionsSubscription?.unsubscribe();
+      this.sessionsSubscription = this.firestoreService.getUnarchivedSessions(this.selectedClientDocData.id, this.selectedDate, this.selectedLocationId ?? null)
+        .subscribe(sessions => {
+          sessions = sessions.filter(session => session.rowId !== null && session.rowId !== '');
+          this.sessions = sessions;
+          if (!this.selectedLocationId) {
+            this.productivityDataSubscription = this.firestoreService.getAllRowsForClientId(this.selectedClientDocData.id).subscribe(rows => {
+              this.rows = rows;
+              this.fillUI();
+            });
+          } else {
+            this.productivityDataSubscription?.unsubscribe();
+            this.productivityDataSubscription = this.firestoreService.getAllRowsForLocIdForClientId(this.selectedClientDocData.id, this.selectedLocationId).subscribe(rows => {
+              this.rows = rows;
+              this.fillUI();
+            });
+          }
         });
-      });
     });
   }
 
@@ -124,25 +134,15 @@ export class ClientProductivityRowmapSectionComponent implements OnInit, OnDestr
     this.lastClientActivityOverallMoment = this.lastClientActivityOverall ? moment(this.lastClientActivityOverall.toMillis()) : null;
 
     const locationIds = this.rows.map(row => row.locationId);
-    this.locationIdsFromRows = Array.from(new Set(locationIds));
-    if (this.locationIdsFromRows.length === 1) {
-      this.selectedLocationId = this.locationIdsFromRows[0];
-    }
-    if ((this.locationIdsFromRows.length > 1) && filterRowsByLocationId && this.selectedLocationId) {
+    if (filterRowsByLocationId && this.selectedLocationId) {
       this.rowsToDisplay = this.rows.filter(row => row.locationId === this.selectedLocationId);
     } else {
       this.rowsToDisplay = this.rows;
     }
     this.rowsToDisplay = this.rowsToDisplay
       .map(row => {
-        /*if (this.selectedClientDocData.lastActivityDeviceTimestamp
-          && (this.lastClientActivityOverallMoment.clone().startOf('day').diff(moment().startOf('day'), 'days') === 0)) {
-          this.fromDateMoment = moment();
-          this.adjustmentDays = 0;
-        }*/
 
         if (this.selectedClientDocData.lastActivityMarkerDate) {
-          //&& (this.lastClientActivityOverallMoment.clone().startOf('day').diff(moment().startOf('day'), 'days', false) !== 0)) {
           this.fromDateMoment = moment();
           if (this.selectedClientDocData.lastActivityMarkerDate) {
             this.markerTimestampMoment = moment(this.selectedClientDocData.lastActivityMarkerDate.toMillis());
@@ -206,7 +206,7 @@ export class ClientProductivityRowmapSectionComponent implements OnInit, OnDestr
 
         if (stateIdx === 0) {
           workerCountStrForCompletedRow = this.sessions
-            .filter(session => session.rowNumber === row.rowNumber)
+            .filter(session => session.rowId === row.id)
             .filter(session => session.hasOwnProperty('count'))
             .filter(session => session.count > 0)
             .map(session => `${session.workerName} (${session.count ?? 0})`)
@@ -364,12 +364,8 @@ export class ClientProductivityRowmapSectionComponent implements OnInit, OnDestr
     this.clientInContextServiceSubscription?.unsubscribe();
     this.productivityDataSubscription?.unsubscribe();
     this.breakpointSubscription?.unsubscribe();
-    this.locationListSubscription?.unsubscribe();
     this.sessionsSubscription?.unsubscribe();
-  }
-
-  onLocationChange() {
-    this.fillUI();
+    this.clientLocInContextServiceSubscription?.unsubscribe();
   }
 
   async saveMinPickingsForDone() {

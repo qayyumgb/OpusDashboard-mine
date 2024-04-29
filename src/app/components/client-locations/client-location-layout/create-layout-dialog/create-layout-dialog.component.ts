@@ -56,7 +56,10 @@ export class CreateLayoutDialogComponent implements OnInit, OnDestroy {
     this.clientInContextServiceSubscription?.unsubscribe();
     this.loggedInUserFromAuthServiceSubscription?.unsubscribe();
   }
-
+  openInGoogleMap(latitude: number, longitude: number) {
+    const url = `https://www.google.com/maps?q=${latitude},${longitude}`;
+    window.open(url, '_blank');
+  }
   ngOnInit() {
     this.createLayoutForm = this.fb.group({
       name: ['', [Validators.required]],

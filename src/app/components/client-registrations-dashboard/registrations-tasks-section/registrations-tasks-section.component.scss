@@ -1,0 +1,37 @@
+
+.hidden {
+  display: none;
+}
+
+.date-picker {
+  display: none;
+}
+
+.filter-container{
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  .date-container{
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+}
+.table-header-container {
+  display: flex;
+  align-items: center;
+}
+.row-detail-description {
+  width: 100%;
+  max-width: 400px;
+  .row-detail-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 0;
+    strong {
+      min-width: 124px;
+  }
+  }
+}

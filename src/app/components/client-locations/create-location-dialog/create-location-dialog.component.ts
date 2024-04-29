@@ -55,7 +55,10 @@ export class CreateLocationDialogComponent implements OnInit, OnDestroy {
             trolleysEnd: ['', []],
         });
     }
-
+    openInGoogleMap(latitude: number, longitude: number) {
+        const url = `https://www.google.com/maps?q=${latitude},${longitude}`;
+        window.open(url, '_blank');
+      }
     async createLocation() {
         if (!this.createLocationForm.valid) {
             this.openSnackBar('Name is mandatory', 'error');

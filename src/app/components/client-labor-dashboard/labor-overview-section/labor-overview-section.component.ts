@@ -11,6 +11,9 @@ import {ClientMainAttributes} from "../../../common/interfaces/client-interfaces
 import {MatPaginator} from "@angular/material/paginator";
 import {MatSort} from "@angular/material/sort";
 import {CdkDetailRowDirective} from './cdk-detail-row.directive';
+import {TranslateService} from "@ngx-translate/core";
+import { GridModalComponent } from 'src/app/common/grid-modal/grid-modal.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-labor-overview-section',
@@ -52,13 +55,11 @@ export class LaborOverviewSectionComponent implements OnInit, OnDestroy {
 
   workerAttributesReadableMap: Map<string, string> = new Map([
     ['workerName', 'Workers'],
-    ['startTime', 'Start Time'],
+    ['startTime', 'Time'],
     ['rowNumber', 'Row'],
     ['trolleyNumber', 'Trolley'],
     ['varietyName', 'Variety'],
-    ['grossPerformance', 'Avg. Gross Performance'],
-    ['netPerformance', 'Avg. Net Performance'],
-    ['perfRatio', 'Performance Ratio'],
+    ['netPerformance', 'Performance'],
   ]);
 
   workerNestedAttributesReadableMap: Map<string, string> = new Map([
@@ -66,9 +67,7 @@ export class LaborOverviewSectionComponent implements OnInit, OnDestroy {
     ['rowNumber', 'Row'],
     ['trolleyNumber', 'Trolley'],
     ['varietyName', 'Variety'],
-    ['grossPerformance', 'Gross Performance'],
-    ['netPerformance', 'Net Performance'],
-    ['perfRatio', 'Performance Ratio'],
+    ['netPerformance', 'Performance'],
     ['amountPicked', 'Count'],
   ]);
 
@@ -78,9 +77,7 @@ export class LaborOverviewSectionComponent implements OnInit, OnDestroy {
     'rowNumber',
     'trolleyNumber',
     'varietyName',
-    'grossPerformance',
     'netPerformance',
-    'perfRatio',
   ];
 
   columnsToDisplayNested: string[] = [
@@ -88,9 +85,7 @@ export class LaborOverviewSectionComponent implements OnInit, OnDestroy {
     'rowNumber',
     'trolleyNumber',
     'varietyName',
-    'grossPerformance',
     'netPerformance',
-    'perfRatio',
     'amountPicked',
   ];
 
@@ -100,9 +95,7 @@ export class LaborOverviewSectionComponent implements OnInit, OnDestroy {
     'rowNumber',
     'trolleyNumber',
     'varietyName',
-    'grossPerformance',
     'netPerformance',
-    'perfRatio',
     'red-dot'
   ];
 
@@ -111,21 +104,22 @@ export class LaborOverviewSectionComponent implements OnInit, OnDestroy {
     'rowNumber',
     'trolleyNumber',
     'varietyName',
-    'grossPerformance',
     'netPerformance',
-    'perfRatio',
     'amountPicked',
     'red-dot'
   ];
 
   tableData: any[];
   laborSessionsDataSubscription: Subscription;
+  clientLocInContextServiceSubscription: Subscription;
+  selectedLocationId: string;
 
 
   constructor(private authService: AuthService,
               private firestoreService: FirestoreService,
               private router: Router,
-              private clientInContextService: ClientInContextService) {
+              private clientInContextService: ClientInContextService,
+              public translate: TranslateService,public dialog: MatDialog) {
 
     this.dateInContextSubscription = this.clientInContextService.dateInContextSubject
       .subscribe(dateInContext => {
@@ -142,12 +136,24 @@ export class LaborOverviewSectionComponent implements OnInit, OnDestroy {
             return;
           }
           this.selectedClientDocData = selectedClientDocData;
-          this.rawLaborPerfData = [];
-          this.loadTable();
+          this.clientLocInContextServiceSubscription = this.clientInContextService.clientLocSubject.subscribe(selectedLocation => {
+            this.selectedLocationId = !selectedLocation || (selectedLocation?.id === '-1') ? null : selectedLocation?.id;
+            this.rawLaborPerfData = [];
+            this.loadTable();
+          });
         });
       });
-  }
 
+     
+  }
+  openDialog(element:any) {
+    this.expandedElement = element;
+    this.dialog.open(GridModalComponent, {
+      data: {
+        nestedTable: this.expandedElement,
+      },
+    });
+  }
   isExpansionDetailRow = (index, row) => row.hasOwnProperty('detailRow');
 
   ngOnInit(): void {
@@ -163,8 +169,10 @@ export class LaborOverviewSectionComponent implements OnInit, OnDestroy {
     this.workerSpecificData = new Map();
     this.tableDataMap = new Map();
     this.tableData = [];
+    this.laborSessionsDataSubscription?.unsubscribe();
     this.laborSessionsDataSubscription = this.firestoreService
-      .getUnarchivedSessions(this.selectedClientDocData.id, this.selectedDate).pipe(throttle(val => interval(8000))).subscribe(async sessionsData => {
+      .getUnarchivedSessions(this.selectedClientDocData.id, this.selectedDate, this.selectedLocationId ?? null)
+      .pipe(throttle(val => interval(8000))).subscribe(async sessionsData => {
         this.laborSessionsData = sessionsData;
         this.laborSessionsData = this.laborSessionsData.filter(session => session.rowId !== null && session.rowId !== '');
         this.laborSessionsDataSubscription?.unsubscribe();
@@ -356,8 +364,8 @@ export class LaborOverviewSectionComponent implements OnInit, OnDestroy {
       workerSpecificActivity.amountPicked = session.count;
 
       workerSpecificActivity.perfRatio = !isNaN(perfRatio) ? perfRatio.toFixed(2) : '-';
-      workerSpecificActivity.showRedButton = ((session.perfRatio < 0.85) && (session.count >= 100)
-        && moment(session?.nettEndTimestamp?.toMillis()).diff(moment(session?.nettStartTimestamp?.toMillis()), 'minutes', true) >= 10);
+      workerSpecificActivity.showRedButton = ((session.perfRatio < 0.80) && (session.count > 150)
+        && moment(session?.nettEndTimestamp?.toMillis()).diff(moment(session?.nettStartTimestamp?.toMillis()), 'minutes', true) > 15);
       if (!session.varietyName?.startsWith('na')) {
         session.varietyName = this.capitalizeFirstLetter(session.varietyName);
         workerRowList.push(workerSpecificActivity);
@@ -411,6 +419,7 @@ export class LaborOverviewSectionComponent implements OnInit, OnDestroy {
 
   expandRow(element: any) {
     this.expandedElement = this.expandedElement?.workerId === element.workerId ? null : element;
+    console.log('this.expandedElement',this.expandedElement)
   }
 
   applyExpandedClass(element: any) {
@@ -421,6 +430,30 @@ export class LaborOverviewSectionComponent implements OnInit, OnDestroy {
     this.laborSessionsDataSubscription?.unsubscribe();
     this.clientInContextServiceSubscription.unsubscribe();
     this.dateInContextSubscription.unsubscribe();
+    this.clientLocInContextServiceSubscription?.unsubscribe();
     //this.laborPerformanceDataSubscription.unsubscribe();
+  }
+
+  doLanguageWork() {
+    this.translate.addLangs(['en', 'fr', 'nl']);
+    this.translate.setDefaultLang('en');
+
+    const browserLang = this.translate.getBrowserLang();
+    this.translate.use(browserLang.match(/en|fr|nl/) ? browserLang : 'en');
+
+    // Example code Translate Reference
+    const path = ['SETTINGS', 'GENERAL', 'SECURITY'];
+    const type = 'TITLE';
+    const text = 'Security settings';
+
+    const firestoreField = {};
+    path.push(type, 'TEXT');
+    const translateReference = path.join('.');
+    path.reduce(
+      (o: any, s: string, i: number) =>
+        (o[s] = i === path.length - 1 ? text : {}),
+      firestoreField
+    );
+
   }
 }

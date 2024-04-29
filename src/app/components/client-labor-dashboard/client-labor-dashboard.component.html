@@ -1,41 +1,41 @@
-<div>
-  <div style="text-align: center; margin-top: 2.5rem;" *ngIf="selectedClientDocData">
-    <mat-icon style="margin-right: 2rem;cursor: pointer;transform: scale(1.6)" (click)="decrementMonth()">keyboard_double_arrow_left</mat-icon>
-    <mat-icon style="margin-right: 2rem;cursor: pointer;" (click)="decrementDate()">arrow_back_ios</mat-icon>
-    <mat-form-field class="example-full-width" appearance="fill">
-      <mat-label>Choose a date</mat-label>
-      <input matInput [matDatepickerFilter]="futureFilter" (dateChange)="onDateChange()"
-             [(ngModel)]="selectedDate" [matDatepicker]="picker">
-      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-      <mat-datepicker #picker></mat-datepicker>
-    </mat-form-field>
-    <mat-icon style="margin-left: 2rem;cursor: pointer;" (click)="incrementDate()">arrow_forward_ios</mat-icon>
-    <mat-icon style="margin-left: 2rem;cursor: pointer;transform: scale(1.6)" (click)="incrementMonth()">keyboard_double_arrow_right</mat-icon>
-  </div>
-  <nav mat-tab-nav-bar mat-align-tabs="center" style="margin-left: 3%; margin-right: 3%;margin-top: 0.5rem;"
-  [tabPanel]="tabPanel">
-    <a mat-tab-link label="OVERVIEW" (click)="tabIndex = 0"
-       [routerLink]="'/dashboard/labor/overview'"
-       [active]="tabIndex === 0">
-      OVERVIEW
-    </a>
-    <a mat-tab-link label="TROLLEY" (click)="tabIndex = 1"
-       [routerLink]="'/dashboard/labor/trolley'"
-       [active]="tabIndex === 1">
-      TROLLEY
-    </a>
-    <a mat-tab-link label="PERFORMANCE" (click)="tabIndex = 2"
-       [routerLink]="'/dashboard/labor/performance'"
-       [active]="tabIndex === 2">
-      PERFORMANCE
-    </a>
-    <a mat-tab-link label="PRODUCTIVITY" (click)="tabIndex = 3"
-       [routerLink]="'/dashboard/labor/productivity'"
-       [active]="tabIndex === 3">
-      PRODUCTIVITY
-    </a>
-  </nav>
-  <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
-  <router-outlet></router-outlet>
+<div class="page-top-space">
+  <mat-card class="page-main-card">
+    <mat-card-content>
+      <div class="d-flex align-item-center page-action">
+        <nav class="tabs-selection" mat-tab-nav-bar mat-align-tabs="center"
+        [tabPanel]="tabPanel">
+          <a mat-tab-link label="PRESENCES" (click)="tabIndex = -1"
+             [routerLink]="'/dashboard/labor/presences'"
+             [active]="tabIndex === -1">
+            Presences
+          </a>
+          <a mat-tab-link label="OVERVIEW" (click)="tabIndex = 0"
+             [routerLink]="'/dashboard/labor/overview'"
+             [active]="tabIndex === 0">
+            Overview
+          </a>
+          <a mat-tab-link label="TROLLEY" (click)="tabIndex = 1"
+             [routerLink]="'/dashboard/labor/trolley'"
+             [active]="tabIndex === 1">
+            Trolley
+          </a>
+          <a mat-tab-link label="PERFORMANCE" (click)="tabIndex = 2"
+             [routerLink]="'/dashboard/labor/performance'"
+             [active]="tabIndex === 2">
+            Performance
+          </a>
+          <a mat-tab-link label="PRODUCTIVITY" (click)="tabIndex = 3"
+             [routerLink]="'/dashboard/labor/productivity'"
+             [active]="tabIndex === 3">
+            Productivity
+          </a>
+        </nav>
+      </div>
+      
+      <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
+      <router-outlet></router-outlet>
+    </mat-card-content>
+  </mat-card>
+ 
 
 </div>

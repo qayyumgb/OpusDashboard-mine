@@ -10,6 +10,7 @@ import firebase from 'firebase/compat/app';
 import {Timestamp} from 'firebase/firestore'
 //import { Timestamp } from "@firebase/firestore"
 import * as moment from "moment";
+import {TIME_ZONE} from '../common/utils/time-utils';
 
 @Injectable({
   providedIn: 'root',
@@ -193,12 +194,20 @@ export class FirestoreService {
       .valueChanges({idField: 'id'});
   }
 
-  getUnArchivedWorkersForClientId(clientId: string): Observable<any> {
-    return this.afs.collection('clients').doc(clientId)
-      .collection('workers', (ref) => ref
-        .where('isArchived', '==', false)
-      )
-      .valueChanges({idField: 'id'});
+  getUnArchivedWorkersForClientId(clientId: string, locationId = null): Observable<any> {
+    if (!locationId) {
+      return this.afs.collection('clients').doc(clientId)
+        .collection('workers', (ref) => ref
+          .where('isArchived', '==', false)
+        )
+        .valueChanges({idField: 'id'});
+    } else {
+      return this.afs.collection('clients').doc(clientId)
+        .collection('workers', (ref) => ref
+          .where('locationIds', 'array-contains', locationId).where('isArchived', '==', false)
+        )
+        .valueChanges({idField: 'id'});
+    }
   }
 
   getArchivedWorkersForClientId(clientId: string): Observable<any> {
@@ -352,6 +361,7 @@ export class FirestoreService {
       .collection('workers').doc(worker.id).update({
         name: worker.name,
         workerCode: worker.workerCode ?? null,
+        hourlyRate: worker.hourlyRate ?? null,
         notes: worker.notes,
         locationIds: worker.locationIds,
         isLeftHanded: worker.isLeftHanded,
@@ -614,15 +624,26 @@ export class FirestoreService {
       ).valueChanges({idField: 'id'});
   }
 
-  getUnarchivedSessions(clientId, dateToQuery): Observable<any> {
+  getUnarchivedSessions(clientId, dateToQuery, locationId = null): Observable<any> {
     const fromMoment = Timestamp.fromDate(moment(dateToQuery).startOf('day').toDate());
     const toMoment = Timestamp.fromDate(moment(dateToQuery).endOf('day').toDate());
-    return this.afs
-      .collection('clients')
-      .doc(clientId)
-      .collection('sessions', (ref) =>
-        ref.where('startTimestamp', '>=', fromMoment).where('startTimestamp', '<=', toMoment).where('isArchived', '==', false)
-      ).valueChanges({idField: 'id'});
+    if (!locationId) {
+      return this.afs
+        .collection('clients')
+        .doc(clientId)
+        .collection('sessions', (ref) =>
+          ref.where('startTimestamp', '>=', fromMoment).where('startTimestamp', '<=', toMoment)
+            .where('isArchived', '==', false)
+        ).valueChanges({idField: 'id'});
+    } else {
+      return this.afs
+        .collection('clients')
+        .doc(clientId)
+        .collection('sessions', (ref) =>
+          ref.where('startTimestamp', '>=', fromMoment).where('startTimestamp', '<=', toMoment)
+            .where('locationId', '==', locationId).where('isArchived', '==', false)
+        ).valueChanges({idField: 'id'});
+    }
   }
 
   getSessionByIdForClientId(sessionId, clientId): Observable<DocumentData> {
@@ -901,6 +922,17 @@ export class FirestoreService {
       .valueChanges({idField: 'id'});
   }
 
+  getPresencesForClientId(clientId: string, dateToQuery: Date, isArchived: boolean): Observable<any> {
+    const fromTimestamp = Timestamp.fromDate(moment(dateToQuery)/*.tz(TIME_ZONE)*/.startOf('isoWeek').toDate()); //dateToQuery now comes in GMT from range picker
+    const toTimestamp = Timestamp.fromDate(moment(dateToQuery)/*.tz(TIME_ZONE)*/.endOf('isoWeek').toDate());
+    console.log('start of week:' + fromTimestamp.toDate());
+    console.log('end of week:' + toTimestamp.toDate());
+    return this.afs.collection('clients').doc(clientId).collection('presences',
+      (ref) => ref.where('startTimestamp', '>=', fromTimestamp).where('startTimestamp', '<=', toTimestamp)
+        .where('isArchived', '==', isArchived))
+      .valueChanges({idField: 'id'});
+  }
+
   getArchivedRegnsForClientId(clientId: string, dateToQuery: Date): Observable<any> {
     const fromTimestamp = Timestamp.fromDate(moment(dateToQuery).startOf('day').toDate());
     const toTimestamp = Timestamp.fromDate(moment(dateToQuery).endOf('day').toDate());
@@ -1044,6 +1076,97 @@ export class FirestoreService {
         await this.afs.collection('clients').doc(clientId)
           .collection('presences').doc(presenceId).collection('registrations').doc(regnId).collection('versions').doc(backupDocId).delete();
       });
+  }
+
+  getWebAppConfig(): Observable<any> {
+    return this.afs.collection('config').doc('webApp').get();
+  }
+
+  getAllLanguageElements(clientId: string): Observable<any> {
+    return this.afs.collection('languages').doc('elements').collection('elements')
+      .valueChanges({idField: 'id'});
+  }
+
+  updateLanguageElementById(elementId, elementUpdateObj): Promise<any> {
+    elementUpdateObj.updatedTimestamp = firebase.firestore.FieldValue.serverTimestamp();
+    elementUpdateObj.translations.nl.updatedTimestamp = firebase.firestore.FieldValue.serverTimestamp();
+    elementUpdateObj.translations.en.updatedTimestamp = firebase.firestore.FieldValue.serverTimestamp();
+    delete elementUpdateObj.id; //id does not need to be saved
+    return this.afs
+      .collection('languages')
+      .doc('elements')
+      .collection('elements')
+      .doc(elementId)
+      .update(elementUpdateObj);
+
+  }
+
+  createLanguageElement(elementCreateObj): Observable<any> {
+    const callable = this.angularFireFunctions.httpsCallable('createLanguageElement');
+    return callable({
+      secret: 'orangeswereneverapples',
+      elementCreateObj,
+    });
+  }
+
+  deleteLanguageElementById(elementId): Promise<any> {
+    return this.afs
+      .collection('languages')
+      .doc('elements')
+      .collection('elements')
+      .doc(elementId)
+      .delete();
+  }
+
+  getLanguageJSON(languageCode): Observable<any> {
+    return this.afs.collection('languages').doc(languageCode).get();
+  }
+
+  getAllUnarchivedTaskRegnsForPresence(presence: any): Observable<any> {
+    return this.afs
+      .collection('clients').doc(presence.clientId)
+      .collection('presences').doc(presence.id)
+      .collection('registrations', (ref) =>
+        ref.where('isArchived', '==', false)
+      ).valueChanges({idField: 'id'});
+  }
+
+  async archiveAllTaskRegnsNPresence(taskRegns: any[], presenceId: any, clientId: string): Promise<any> {
+    for (const taskRegn of taskRegns) {
+      if (taskRegn.id) {
+        await this.afs
+          .collection('clients').doc(clientId)
+          .collection('presences').doc(presenceId)
+          .collection('registrations').doc(taskRegn.id)
+          .update({
+            isArchived: true,
+            updatedTimestamp: firebase.firestore.FieldValue.serverTimestamp()
+          });
+      }
+    }
+    return await this.afs
+      .collection('clients').doc(clientId)
+      .collection('presences').doc(presenceId)
+      .update({
+        isArchived: true,
+        updatedTimestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+  }
+
+  async deleteRegn(regnId: string, presenceId: string, clientId: string): Promise<any> {
+    return await this.afs
+      .collection('clients').doc(clientId)
+      .collection('presences').doc(presenceId)
+      .collection('registrations').doc(regnId)
+      .delete();
+  }
+
+  async createRegn(regn: any, presenceId: string, clientId: string): Promise<any> {
+    regn.updatedTimestamp = firebase.firestore.FieldValue.serverTimestamp();
+    return await this.afs
+      .collection('clients').doc(clientId)
+      .collection('presences').doc(presenceId)
+      .collection('registrations').add(regn);
   }
 
 }

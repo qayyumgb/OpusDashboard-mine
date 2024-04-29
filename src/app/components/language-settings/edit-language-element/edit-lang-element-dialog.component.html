@@ -1,0 +1,81 @@
+<div style="min-width: 36rem;min-height: 30rem;">
+  <mat-dialog-content [formGroup]="editLanguageElementForm" style="min-height: 86vh;overflow: hidden;width: 68vw;">
+    <div style="display: flex;justify-content: space-between;">
+      <mat-form-field appearance="fill" style="width:45%">
+        <mat-label>Reference</mat-label>
+        <input matInput required
+               formControlName="pathStr" [disabled]="true">
+      </mat-form-field>
+      <mat-form-field appearance="fill" style="width:45%">
+        <mat-label>Type</mat-label>
+        <input matInput required
+               formControlName="typeFriendlyName">
+      </mat-form-field>
+    </div>
+    <br/>
+    <div style="display: flex;">
+      <mat-form-field style="margin-top: 0.4rem;width:40%;">
+        <mat-label>Release Date(coming soon...)</mat-label>
+        <input matInput
+               formControlName="releaseDate" [disabled]="true">
+      </mat-form-field>
+      <!--<div style="font-style: italic;margin-top:1.6rem;font-size: 0.8rem;">(Only applicable for 'Release Notes' elements)</div>-->
+    </div>
+    <br/>
+    <div style="display: flex;justify-content: center;">
+      <mat-tab-group mat-align-tabs="center" style="width:100%;" (selectedTabChange)="onTabChange($event)">
+        <mat-tab label="EN">
+          <div style="display: flex;flex-direction: column;">
+            <mat-form-field appearance="fill" style="margin-top: 0.8rem;width:46%;">
+              <mat-label>Header</mat-label>
+              <input matInput
+                     formControlName="header_en">
+            </mat-form-field>
+            <div style="display: flex;justify-content: space-between;overflow: auto;">
+              <mat-form-field appearance="fill" style="margin-top: 0.8rem;width:46%">
+                <mat-label>Plain/Markup</mat-label>
+                <textarea matInput rows="10"
+                          formControlName="plain_en"></textarea>
+              </mat-form-field>
+              <div style="margin-top: 0.4rem;width:46%; display: flex;flex-direction: column;">
+                <mat-label>Preview</mat-label>
+                <mat-divider></mat-divider>
+                <div [innerHTML]="getPreview('EN')" style="height: 16rem;overflow-y: auto;overflow-x: hidden;"></div>
+              </div>
+            </div>
+            <mat-slide-toggle class="lang-enabled-toggle" formControlName="enabled_en">Language enabled</mat-slide-toggle>
+          </div>
+        </mat-tab>
+        <mat-tab label="NL">
+          <div style="display: flex;flex-direction: column;overflow: hidden;">
+            <mat-form-field appearance="fill" style="margin-top: 0.8rem;width:46%;">
+              <mat-label>Header</mat-label>
+              <input matInput
+                     formControlName="header_nl">
+            </mat-form-field>
+            <div style="display: flex;justify-content: space-between;overflow: auto;">
+              <mat-form-field appearance="fill" style="margin-top: 0.8rem;width:46%">
+                <mat-label>Plain/Markup</mat-label>
+                <textarea matInput rows="10"
+                          formControlName="plain_nl"></textarea>
+              </mat-form-field>
+              <div style="margin-top: 0.4rem;width:46%; display: flex;flex-direction: column;">
+                <mat-label>Preview</mat-label>
+                <mat-divider></mat-divider>
+                <div class="text-preview" [innerHTML]="getPreview('NL') | safeHtml" style="height: 16rem;overflow-y: auto;overflow-x: hidden;"></div>
+              </div>
+            </div>
+            <mat-slide-toggle class="lang-enabled-toggle" formControlName="enabled_nl">Language enabled</mat-slide-toggle>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+  </mat-dialog-content>
+
+  <div style="text-align: right;margin-right: 2rem;max-width: 100%;">
+    <mat-dialog-actions>
+      <button mat-raised-button color="primary" (click)="close()">Close</button>
+      <button mat-raised-button color="primary" (click)="updateElement()" style="margin-left: 20px;">Save</button>
+    </mat-dialog-actions>
+  </div>
+</div>

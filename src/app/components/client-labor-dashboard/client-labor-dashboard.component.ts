@@ -24,26 +24,22 @@ import {EUROPEAN_DATE_FORMATS} from "../../common/utils/date-utils";
   ]
 })
 export class ClientLaborDashboardComponent implements OnInit, OnDestroy {
-  tabIndex = 0;
+  tabIndex = -1;
 
-  links = ['Overview', 'Trolley', 'Peformance', 'Productivity'];
+  links = ['Presences', 'Overview', 'Trolley', 'Peformance', 'Productivity'];
   activeLink = this.links[0];
 
-  dateToday: Date = new Date();
-  selectedDate: Date;
-
-  clientInContextServiceSubscription: Subscription;
-  selectedClientDocData: any;
-  dateInContextSubscription: Subscription;
 
   constructor(private authService: AuthService,
               private firestoreService: FirestoreService,
               private router: Router,
-              private clientInContextService: ClientInContextService,
               public route: ActivatedRoute) {
     const url = this.router.url;
 
     switch (url) {
+      case '/dashboard/labor/presences':
+        this.tabIndex = -1;
+        break;
       case '/dashboard/labor/overview':
         this.tabIndex = 0;
         break;
@@ -58,58 +54,14 @@ export class ClientLaborDashboardComponent implements OnInit, OnDestroy {
         break;
     }
 
-    this.dateInContextSubscription = this.clientInContextService.dateInContextSubject
-      .subscribe(dateInContext => {
-        if (!dateInContext) {
-          const dateNow = new Date();
-          this.selectedDate = dateNow;
-          this.clientInContextService.dateInContextSubject.next(dateNow);
-        } else {
-          this.selectedDate = dateInContext;
-        }
-
-        this.clientInContextServiceSubscription = this.clientInContextService.clientInContextSubject.subscribe(selectedClientDocData => {
-          if (!selectedClientDocData) {
-            return;
-          }
-          this.selectedClientDocData = selectedClientDocData;
-        });
-      });
   }
 
-  futureFilter = (d: Date | null): boolean => {
-    return d <= this.dateToday;
-  };
 
   ngOnDestroy(): void {
-    this.clientInContextServiceSubscription?.unsubscribe();
-    this.dateInContextSubscription?.unsubscribe();
+    
   }
 
   ngOnInit(): void {
   }
 
-  decrementDate() {
-    this.selectedDate = moment(this.selectedDate).subtract(1, 'day').toDate();
-    this.clientInContextService.dateInContextSubject.next(this.selectedDate);
-  }
-
-  decrementMonth() {
-    this.selectedDate = moment(this.selectedDate).subtract(1, 'month').toDate();
-    this.clientInContextService.dateInContextSubject.next(this.selectedDate);
-  }
-
-  incrementDate() {
-    this.selectedDate = moment(this.selectedDate).add(1, 'day').toDate();
-    this.clientInContextService.dateInContextSubject.next(this.selectedDate);
-  }
-
-  incrementMonth() {
-    this.selectedDate = moment(this.selectedDate).add(1, 'month').toDate();
-    this.clientInContextService.dateInContextSubject.next(this.selectedDate);
-  }
-
-  onDateChange() {
-    this.clientInContextService.dateInContextSubject.next(this.selectedDate);
-  }
 }

@@ -14,6 +14,9 @@ export class ClientInContextService {
   dateInContextSubject = new BehaviorSubject(null);
   dateInContext: Date;
 
+  clientLocSubject = new BehaviorSubject(null);
+  clientLocationInContext: any;
+
   constructor(private router: Router, private authService: AuthService) {
     this.clientInContextSubject.subscribe({
       next: (clientInContextObject) => {
@@ -28,14 +31,18 @@ export class ClientInContextService {
             }
           }
         );
-        //console.log('Client change event captured in client-in-context-service with clientDocData:' + JSON.stringify(clientInContextObject))
       }
     });
 
     this.dateInContextSubject.subscribe({
       next: (dateInContext) => {
         this.dateInContext = dateInContext;
-        //console.log('Client change event captured in client-in-context-service with clientDocData:' + JSON.stringify(dateInContext))
+      }
+    });
+
+    this.clientLocSubject.subscribe({
+      next: (clientLocInContext) => {
+        this.clientLocationInContext = clientLocInContext;
       }
     });
   }

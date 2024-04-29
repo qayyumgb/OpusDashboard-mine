@@ -1,10 +1,6 @@
-<div
-  style="margin-left: 8rem;float: left;
-  margin-top:2rem;margin-bottom: 2rem;/*border: 2px #ffffff4d solid;border-radius: 5px;padding: 0.2rem 0.2rem;*/
-  width: 75%;
-  display: inline-block;" *ngIf="rowsToDisplay?.length > 0">
-  <div style="float:right; margin-right: 3rem;">
-  <mat-form-field style="width: 12rem;" [matTooltip]="getInputBoxToolTip()">
+
+<div *ngIf="rowsToDisplay?.length > 0" class="mb-2">
+  <mat-form-field style="width: 12rem;" [matTooltip]="getInputBoxToolTip()" appearance="outline">
       <mat-label>Min. pickings for done<span style="color: darkred;" *ngIf="doneCountField.dirty">*</span></mat-label>
     <input matInput
            id="doneCount"
@@ -25,92 +21,85 @@
     </button>
   </mat-form-field>
   </div>
-  <mat-form-field style="width: 11rem; float:left;">
-    <mat-label>Location</mat-label>
-    <mat-select [(value)]="selectedLocationId"
-                (selectionChange)="onLocationChange()"
-                [disabled]="(locationIdsFromRows?.length === 1)">
-      <mat-option [value]="null">Select Location</mat-option>
-      <mat-option *ngFor="let location of allLocationsList" [value]="location.id">
-        {{location.name}}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-  <h4 style="float: left;clear: both;">Actual status</h4>
-  <div class="bar">
-    <mat-card  appearance="outlined"  *ngFor="let item of barChart; let idx = index"
-               class="bar-card"
-               [ngClass]="item.classes"
-               [style.flexGrow]="item.percentage"
-               [matTooltip]="getBarChartToolTip(item)"
-               style="cursor: pointer;"
-               (click)="filterData(item)">
-      <mat-card-content class="bar-card-content"> {{item.percentage}}% ({{item.numberOfRows}})</mat-card-content>
-    </mat-card>
-  </div>
-
-  <div *ngFor="let row of rowsToDisplay">
-    <ng-template #tooltipTpl>
-      <div style="background: #5b5f66; color: mintcream;padding:5px;border-radius:3px; text-align: center;font-size: 0.95rem;">
-        <div style="margin-bottom: 4px;">{{row.tooltip.topLine}}</div>
-        <div>({{row.tooltip.bottomLine}})</div>
-      </div>
-    </ng-template>
-    <mat-card
-      appearance="outlined"
-      [ngClass]="getRowClass(row)"
-      class="card"
-      mtxTooltipPosition="below"
-      [mtxTooltip]="tooltipTpl"
-      (click)="rowClick(row.rowNumber)"
-      *ngIf="!filteredOn || (filteredOn === row.state)">
-      <mat-card-content>
-        <div class="row-content row-state"></div>
-        <div class="row-spacer-wide"></div>
-        <div class="row-content row-number">{{row.rowNumber}}</div>
-        <div class="row-spacer-small"></div>
-        <div class="row-content row-varierty">{{row.varietyName}}</div>
-        <div class="row-spacer-wide"></div>
-        <div class="row-content row-state-info">
-          <span *ngIf="row.state === 'done' || row.state === 'done-below'">{{row.workerCountStrForCompletedRow ?? ''}}</span>
-          <mat-icon
-            *ngIf="row.state === 'done' || row.state === 'done-below'"
-            class="material-symbols-outlined row-state-icon"
-            fontIcon="done"
-            matTooltip="Row done"
-          ></mat-icon>
-          <mat-icon
-            *ngIf="row.state === 'pending'"
-            class="material-symbols-outlined row-state-icon"
-            fontIcon="pending"
-            matTooltip="Pending"
-          ></mat-icon>
-          <mat-icon
-            *ngIf="row.state === 'add'"
-            class="material-symbols-outlined row-state-icon"
-            fontIcon="add_circle"
-            matTooltip="Row added to today"
-          ></mat-icon>
-          <mat-icon
-            *ngIf="row.state === 'skip'"
-            class="material-symbols-outlined row-state-icon"
-            fontIcon="add"
-            matTooltip="Add row to today"
-          ></mat-icon>
-          <span *ngIf="row.inProgress">{{row.rowLatestWorkerName ?? ''}}</span>
-          <mat-icon
-            *ngIf="row.inProgress"
-            class="material-symbols-outlined row-state-icon"
-            fontIcon="directions_walk"
-            matTooltip="In progress"
-          ></mat-icon>
+<div class="table-card">
+  <div *ngIf="rowsToDisplay?.length > 0">
+    <h4>Actual status</h4>
+    <div class="bar">
+      <mat-card  appearance="outlined"  *ngFor="let item of barChart; let idx = index"
+                 class="bar-card"
+                 [ngClass]="item.classes"
+                 [style.flexGrow]="item.percentage"
+                 [matTooltip]="getBarChartToolTip(item)"
+                 style="cursor: pointer;"
+                 (click)="filterData(item)">
+        <mat-card-content class="bar-card-content"> {{item.percentage}}% ({{item.numberOfRows}})</mat-card-content>
+      </mat-card>
+    </div>
+  
+    <div *ngFor="let row of rowsToDisplay">
+      <ng-template #tooltipTpl>
+        <div *ngIf="row?.tooltip" style="background: #5b5f66; color: mintcream;padding:5px;border-radius:3px; text-align: center;font-size: 0.95rem;">
+          <div style="margin-bottom: 4px;">{{row.tooltip.topLine}}</div>
+          <div>({{row.tooltip.bottomLine}})</div>
         </div>
-      </mat-card-content>
-    </mat-card>
+      </ng-template>
+      <mat-card
+        appearance="outlined"
+        [ngClass]="getRowClass(row)"
+        class="card"
+        mtxTooltipPosition="below"
+        [mtxTooltip]="tooltipTpl"
+        (click)="rowClick(row.rowNumber)"
+        *ngIf="!filteredOn || (filteredOn === row.state)">
+        <mat-card-content>
+          <div class="row-content row-state"></div>
+          <div class="row-spacer-wide"></div>
+          <div class="row-content row-number">{{row.rowNumber}}</div>
+          <div class="row-spacer-small"></div>
+          <div class="row-content row-varierty">{{row.varietyName}}</div>
+          <div class="row-spacer-wide"></div>
+          <div class="row-content row-state-info">
+            <span *ngIf="row.state === 'done' || row.state === 'done-below'">{{row.workerCountStrForCompletedRow ?? ''}}</span>
+            <mat-icon
+              *ngIf="row.state === 'done' || row.state === 'done-below'"
+              class="material-symbols-outlined row-state-icon"
+              fontIcon="done"
+              matTooltip="Row done"
+            ></mat-icon>
+            <mat-icon
+              *ngIf="row.state === 'pending'"
+              class="material-symbols-outlined row-state-icon"
+              fontIcon="pending"
+              matTooltip="Pending"
+            ></mat-icon>
+            <mat-icon
+              *ngIf="row.state === 'add'"
+              class="material-symbols-outlined row-state-icon"
+              fontIcon="add_circle"
+              matTooltip="Row added to today"
+            ></mat-icon>
+            <mat-icon
+              *ngIf="row.state === 'skip'"
+              class="material-symbols-outlined row-state-icon"
+              fontIcon="add"
+              matTooltip="Add row to today"
+            ></mat-icon>
+            <span *ngIf="row.inProgress">{{row.rowLatestWorkerName ?? ''}}</span>
+            <mat-icon
+              *ngIf="row.inProgress"
+              class="material-symbols-outlined row-state-icon"
+              fontIcon="directions_walk"
+              matTooltip="In progress"
+            ></mat-icon>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+  <div
+   
+    *ngIf="rowsToDisplay?.length === 0">
+    There is no data available for today
   </div>
 </div>
-<div
-  style="margin-top: 6rem; padding-top: 2rem; text-align: center; clear: both;font-size: 1.2rem;overflow: hidden;"
-  *ngIf="rowsToDisplay?.length === 0">
-  There is no data available for today
-</div>
+

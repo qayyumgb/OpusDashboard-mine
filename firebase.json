@@ -1,7 +1,7 @@
 {
   "hosting": [
   {
-    "target": "dashboard",
+    "target": "devui",
     "public": "dist/opus-dashboard",
     "ignore": [
       "firebase.json",
@@ -14,24 +14,6 @@
         "destination": "/index.html"
       }
     ]
-  },
-    {
-      "target": "apis",
-      "public": "api-static-resources",
-      "rewrites": [
-        {
-          "source": "/training/**",
-          "function": "training"
-        },
-        {
-          "source": "/operation/**",
-          "function": "operation"
-        },
-        {
-          "source": "/ext/**",
-          "function": "ext"
-        }
-      ]
-    }
+  }
  ]
 }

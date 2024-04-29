@@ -1,0 +1,61 @@
+<div>
+  <div>
+    <mat-button-toggle-group #group="matButtonToggleGroup" [(ngModel)]="toggleGroupedUngrouped" (change)="onToggleChange()">
+      <mat-button-toggle value="ungrouped" aria-label="Text align left">
+        <mat-icon class="material-symbols-outlined" matTooltip="Show alphabetically"
+        matTooltipClass="tooltip-class"
+        matTooltipHideDelay="100"
+        matTooltipPosition="below">person</mat-icon>
+      
+      </mat-button-toggle>
+      <mat-button-toggle value="grouped" aria-label="Text align center">
+        <mat-icon
+        class="material-symbols-outlined"
+          matTooltip="Show grouped"
+          matTooltipClass="tooltip-class"
+          matTooltipHideDelay="100"
+          matTooltipPosition="below"
+        >group
+        </mat-icon>
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+
+  <ng-container *ngIf="groupedListReady && toggleGroupedUngrouped=== 'grouped'">
+    <div *ngFor="let group of getKeyArrayFromMap();let i=index;" [ngStyle]="i === 0? {'margin-top': '2rem'}:{'margin-top': '3rem'} ">
+      <div class="group-name" *ngIf="group !== 'NOGROUP'">{{ group }}</div>
+      <mat-grid-list [cols]="getNumberOfCols()" gutterSize="1rem" style="margin-top: 0.9rem;">
+        <div class="worker-grid">
+          <ng-container *ngFor="let worker of groupedWorkersMap.get(group)">
+            <button mat-raised-button class="worker-items p-0"
+                    [class]="getClassForWorker(worker)">
+                    <span class="icon">
+                      <mat-icon>person</mat-icon>
+                    </span>
+                    <span>{{ worker.name }}<br><small>{{getStatusForWorker(worker)}}</small></span>
+            </button>
+          </ng-container>
+        </div>
+        
+      </mat-grid-list>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="allWorkersList?.length > 0 && toggleGroupedUngrouped=== 'ungrouped'">
+    <div style="margin-top: 2rem;">
+      <mat-grid-list [cols]="getNumberOfCols()" gutterSize="1rem" style="margin-top: 0.9rem;">
+        <div class="worker-grid">
+          <ng-container *ngFor="let worker of allWorkersList">
+            <button mat-raised-button class="worker-items p-0"
+                    [class]="getClassForWorker(worker)">
+                    <span class="icon">
+                      <mat-icon>person</mat-icon>
+                    </span>
+                    <span>{{ worker.name }}<br><small>{{getStatusForWorker(worker)}}</small></span>
+            </button>
+          </ng-container>
+        </div>
+        
+      </mat-grid-list>
+    </div>
+  </ng-container>
+</div>

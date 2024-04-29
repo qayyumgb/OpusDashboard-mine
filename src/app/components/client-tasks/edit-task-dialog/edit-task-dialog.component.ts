@@ -48,6 +48,22 @@ export class EditTaskDialogComponent implements OnInit, OnDestroy {
       id: 'END_BREAK_UNPAID',
       name: 'End break unpaid'
     },
+    {
+      id: 'START_BREAK',
+      name: 'Start break'
+    },
+    {
+      id: 'END_BREAK',
+      name: 'End break'
+    },
+    {
+      id: 'START_TASK',
+      name: 'Start task'
+    },
+    {
+      id: 'END_TASK',
+      name: 'End task'
+    }
   ];
 
   allWatchWebappFunctionsList = [
@@ -62,6 +78,10 @@ export class EditTaskDialogComponent implements OnInit, OnDestroy {
     {
       id: 'BREAK_UNPAID',
       name: 'Break unpaid'
+    },
+    {
+      id: 'ROW_TASK',
+      name: 'Row task'
     }
   ];
 
@@ -71,8 +91,8 @@ export class EditTaskDialogComponent implements OnInit, OnDestroy {
       name: 'Watch'
     },
     {
-      id: 'WEBAPP',
-      name: 'Webapp'
+      id: 'CLOCKWEB',
+      name: 'ClockWeb'
     },
     {
       id: 'CLOCK',
@@ -82,6 +102,8 @@ export class EditTaskDialogComponent implements OnInit, OnDestroy {
   ];
   private loggedInUserFromAuthServiceSubscription: Subscription;
   private loggedInUserDocData: any;
+  allLocationsList: any[];
+  locationListSubscription: Subscription;
 
 
   constructor(
@@ -101,6 +123,15 @@ export class EditTaskDialogComponent implements OnInit, OnDestroy {
         return;
       }
       this.selectedClientDocData = selectedClientDocData;
+
+      this.locationListSubscription = this.firestoreService
+        .getAllLocationsForClientId(this.selectedClientDocData?.id)
+        .subscribe((locationsList) => {
+          this.allLocationsList = locationsList.sort((locA: any, locB: any) => {
+            return locA.name?.toLowerCase() < locB.name?.toLowerCase() ? -1 : locA.name?.toLowerCase() > locB.name?.toLowerCase() ? 1 : 0;
+          });
+        });
+
       this.taskGroupsSubscription = this.firestoreService
         .getAllUnarchivedTaskGroupsForClientId(this.selectedClientDocData.id).subscribe(taskGroupsList => (this.allTaskGroupsList = taskGroupsList));
     });
@@ -108,36 +139,36 @@ export class EditTaskDialogComponent implements OnInit, OnDestroy {
     this.loggedInUserFromAuthServiceSubscription = this.authService.loggedInUserFromAuthService$.subscribe(
       (userDocData) => {
         this.loggedInUserDocData = userDocData;
-      }
-    );
+      });
   }
 
   ngOnInit() {
-    if (this.taskRecordBeingEdited.type === 'CLOCK') {
+    if (this.taskRecordBeingEdited.type === 'PIT') {
       this.allFunctionsList = this.allClockFunctionsList;
-    } else if (this.taskRecordBeingEdited.type === 'TASK') {
+    } else if (this.taskRecordBeingEdited.type === 'TASK' || this.taskRecordBeingEdited.type === 'BREAK') {
       this.allFunctionsList = this.allWatchWebappFunctionsList;
     }
     this.editTaskForm = this.fb.group({
       name: [this.taskRecordBeingEdited.name, [Validators.required]],
       deviceTarget: [{value: this.taskRecordBeingEdited.deviceTarget, disabled: false}, []],
       func: [{value: this.taskRecordBeingEdited.func, disabled: this.allFunctionsList.length === 0}, []],
-      taskGroupIds: [this.taskRecordBeingEdited.taskGroupIds, []]
+      taskGroupIds: [this.taskRecordBeingEdited.taskGroupIds, []],
+      locationIds: [this.taskRecordBeingEdited.locationIds, [Validators.required]]
     });
 
     this.editTaskForm.controls.deviceTarget?.valueChanges
       .pipe(startWith(this.editTaskForm.controls.value), pairwise())
       .subscribe(([prev, next]: [any, any]) => {
-        console.log('prev:' + JSON.stringify(prev));
-        console.log('next:' + JSON.stringify(next));
-        console.log('------------------------------------------');
-        if (prev?.includes('CLOCK') && next?.includes('CLOCK') && (next?.includes('WATCH') || next?.includes('WEBAPP'))) {
+        //console.log('prev:' + JSON.stringify(prev));
+        //console.log('next:' + JSON.stringify(next));
+        //console.log('------------------------------------------');
+        if (prev?.includes('CLOCK') && next?.includes('CLOCK') && (next?.includes('WATCH') || next?.includes('CLOCKWEB'))) {
           const toSet = [];
           if (next?.includes('WATCH')) {
             toSet.push('WATCH');
           }
-          if (next?.includes('WEBAPP')) {
-            toSet.push('WEBAPP');
+          if (next?.includes('CLOCKWEB')) {
+            toSet.push('CLOCKWEB');
           }
           this.allFunctionsList = this.allWatchWebappFunctionsList;
           this.editTaskForm.controls.func.enable();
@@ -145,7 +176,7 @@ export class EditTaskDialogComponent implements OnInit, OnDestroy {
             deviceTarget: toSet,
             func: null
           });
-        } else if ((prev?.includes('WATCH') || prev?.includes('WEBAPP')) && (next?.includes('CLOCK'))) {
+        } else if ((prev?.includes('WATCH') || prev?.includes('CLOCKWEB')) && (next?.includes('CLOCK'))) {
           const toSet = ['CLOCK'];
           this.allFunctionsList = this.allClockFunctionsList;
           this.editTaskForm.controls.func.enable();
@@ -153,13 +184,13 @@ export class EditTaskDialogComponent implements OnInit, OnDestroy {
             deviceTarget: toSet,
             func: null
           });
-        } else if (!prev && next.includes('CLOCK') && (this.taskRecordBeingEdited.type === 'CLOCK') && (next.includes('WATCH') || next.includes('WEBAPP'))) {
+        } else if (!prev && next.includes('CLOCK') && (this.taskRecordBeingEdited.type === 'CLOCK') && (next.includes('WATCH') || next.includes('CLOCKWEB'))) {
           const toSet = [];
           if (next?.includes('WATCH')) {
             toSet.push('WATCH');
           }
-          if (next?.includes('WEBAPP')) {
-            toSet.push('WEBAPP');
+          if (next?.includes('CLOCKWEB')) {
+            toSet.push('CLOCKWEB');
           }
           this.allFunctionsList = this.allWatchWebappFunctionsList;
           this.editTaskForm.controls.func.enable();
@@ -167,7 +198,7 @@ export class EditTaskDialogComponent implements OnInit, OnDestroy {
             deviceTarget: toSet,
             func: null
           });
-        } else if (!prev && next.includes('CLOCK') && (['WATCH', 'WEBAPP'].includes(this.taskRecordBeingEdited.type)) && (next.includes('WATCH') || next.includes('WEBAPP'))) {
+        } else if (!prev && next.includes('CLOCK') && (['BREAK', 'TASK'].includes(this.taskRecordBeingEdited.type)) && (next.includes('WATCH') || next.includes('CLOCKWEB'))) {
           const toSet = ['CLOCK'];
           this.allFunctionsList = this.allClockFunctionsList;
           this.editTaskForm.controls.func.enable();
@@ -175,7 +206,7 @@ export class EditTaskDialogComponent implements OnInit, OnDestroy {
             deviceTarget: toSet,
             func: null
           });
-        } else if (next?.includes('WATCH') || next?.includes('WEBAPP')) {
+        } else if (next?.includes('WATCH') || next?.includes('CLOCKWEB')) {
           this.allFunctionsList = this.allWatchWebappFunctionsList
           this.editTaskForm.controls.func.enable();
         } else if (next?.includes('CLOCK')) {
@@ -192,7 +223,7 @@ export class EditTaskDialogComponent implements OnInit, OnDestroy {
 
   async updateTask() {
     if (!this.editTaskForm.valid) {
-      this.openSnackBar('Name is mandatory', 'error');
+      this.openSnackBar('Please enter all mandatory values', 'error');
       return;
     }
 
@@ -221,11 +252,15 @@ export class EditTaskDialogComponent implements OnInit, OnDestroy {
     taskDataToUpdate.taskGroups = taskGroups;
 
     if (this.allClockFunctionsList.map(func => func.id).includes(taskDataToUpdate.func)) {
-      taskDataToUpdate.type = 'CLOCK';
+      taskDataToUpdate.type = 'PIT';
     }
 
     if (this.allWatchWebappFunctionsList.map(func => func.id).includes(taskDataToUpdate.func)) {
-      taskDataToUpdate.type = 'TASK';
+      if (taskDataToUpdate.func === 'TASK' || taskDataToUpdate.func === 'ROW_TASK') {
+        taskDataToUpdate.type = 'TASK';
+      } else if (['BREAK_PAID', 'BREAK_UNPAID'].includes(taskDataToUpdate.func)) {
+        taskDataToUpdate.type = 'BREAK'
+      }
     }
 
     taskDataToUpdate.updatedByUserId = this.loggedInUserDocData.id ?? null;
@@ -251,6 +286,7 @@ export class EditTaskDialogComponent implements OnInit, OnDestroy {
     this.clientInContextServiceSubscription?.unsubscribe();
     this.taskGroupsSubscription?.unsubscribe();
     this.loggedInUserFromAuthServiceSubscription?.unsubscribe();
+    this.locationListSubscription?.unsubscribe();
   }
 
   openSnackBar(message, type) {

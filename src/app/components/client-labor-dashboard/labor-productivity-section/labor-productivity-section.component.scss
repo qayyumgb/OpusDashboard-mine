@@ -1,6 +1,11 @@
-.listing-container-laborPrdctvty {
-  margin-left: 10%;
-  max-width: 80%;
-  min-width: 20%;
-  overflow: hidden;
+
+::ng-deep{
+  .sort-dropdown-formfield{
+    .mat-mdc-form-field-infix{
+      min-height: 50px !important;
+      padding-top: 12px !important;
+      padding-bottom: 12px !important;
+    }
+  }
+  
 }

@@ -41,16 +41,20 @@ export class ClientWorkerComponent implements AfterViewInit, OnDestroy {
     ['isLeftHanded', 'Left Handed'],
     ['notes', 'Notes'],
     ['locationNames', 'Locations'],
+    ['workerGroupName', 'Worker Group'],
+    ['hourlyRate', 'Hourly Rate(€)'],
     ['creationTimestamp', 'Created At'],
   ]);
 
-  columnsToDisplay: string[] = ['id', 'workerCode', 'name', 'isLeftHanded', 'notes', 'locationNames', 'creationTimestamp'];
+  columnsToDisplay: string[] = ['id', 'workerCode', 'name', 'isLeftHanded', 'notes', 'locationNames', 'workerGroupName', 'hourlyRate', 'creationTimestamp'];
   columnsHeadersToDisplay: string[] = [
     'name',
     'workerCode',
     'isLeftHanded',
     'notes',
     'locationNames',
+    'workerGroupName',
+    'hourlyRate',
     'creationTimestamp',
     'Edit',
   ];
@@ -131,6 +135,7 @@ export class ClientWorkerComponent implements AfterViewInit, OnDestroy {
     dialogConfig.data = {
       id: record.id,
       workerCode: record.workerCode,
+      hourlyRate: record.hourlyRate ?? null,
       name: record.name,
       locationIds: record.locationIds,
       notes: record.notes,
@@ -216,6 +221,9 @@ export class ClientWorkerComponent implements AfterViewInit, OnDestroy {
       .getUnArchivedWorkersForClientId(this.selectedClientDocData.id)
       .subscribe((workerList) => {
         this.workerList = workerList.map((worker) => {
+          if (worker.hourlyRate) {
+            worker.hourlyRate = (+worker.hourlyRate).toFixed(2);
+          }
           for (const [key, value] of Object.entries(worker)) {
             if (this.dateColumns.includes(key)) {
               const timeValue = value as Timestamp;
@@ -228,7 +236,7 @@ export class ClientWorkerComponent implements AfterViewInit, OnDestroy {
           let locationNames = '';
           if (worker.locationIds && Array.isArray(worker.locationIds) && (worker.locationIds.length > 0)) {
             locationNames = this.allLocationsList.filter(loc => worker.locationIds.includes(loc.id))
-              .map(loc => loc.name).sort((a,b) => a.toLowerCase() < b.toLowerCase() ? -1 : a?.toLowerCase() > b?.toLowerCase() ? 1 : 0).join(', ');
+              .map(loc => loc.name).sort((a, b) => a.toLowerCase() < b.toLowerCase() ? -1 : a?.toLowerCase() > b?.toLowerCase() ? 1 : 0).join(', ');
           }
           worker.locationNames = locationNames;
           return {
@@ -253,6 +261,9 @@ export class ClientWorkerComponent implements AfterViewInit, OnDestroy {
       .getArchivedWorkersForClientId(this.selectedClientDocData.id)
       .subscribe((workerList) => {
         this.workerList = workerList.map((worker) => {
+          if (worker.hourlyRate) {
+            worker.hourlyRate = (+worker.hourlyRate).toFixed(2);
+          }
           for (const [key, value] of Object.entries(worker)) {
             if (this.dateColumns.includes(key)) {
               const timeValue = value as Timestamp;

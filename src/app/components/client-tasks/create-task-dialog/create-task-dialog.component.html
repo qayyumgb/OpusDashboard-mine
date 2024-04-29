@@ -1,46 +1,65 @@
 <div style="min-width: 400px;">
-  <h2 mat-dialog-title style="text-align: center; text-decoration: underline; font-size: 1.2rem;">Create Task</h2>
-
+  <h2 mat-dialog-title>Create Tasks</h2>
   <mat-dialog-content [formGroup]="form" style="text-align: center;">
-    <br/>
-    <mat-form-field>
-      <mat-label>Name</mat-label>
-      <input matInput required
-             formControlName="name">
-    </mat-form-field>
-    <br/>
-    <mat-form-field appearance="fill" style="margin-top: 0.5rem;">
-      <mat-label>Task Groups</mat-label>
-      <mat-select formControlName="taskGroupIds" multiple>
-        <mat-option *ngFor="let taskGroup of allTaskGroupsList" [value]="taskGroup.id">
-          {{taskGroup.name}}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-    <br/>
-    <mat-form-field appearance="fill" style="margin-top: 0.5rem;">
-      <mat-label>Target device</mat-label>
-      <mat-select formControlName="deviceTarget" required multiple>
-        <mat-option *ngFor="let targetDevice of allTargetDevicesList" [value]="targetDevice.id">
-          {{targetDevice.name}}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-    <br/>
-    <mat-form-field appearance="fill" style="margin-top: 0.5rem;">
-      <mat-label>Function</mat-label>
-      <mat-select formControlName="func" required>
-        <mat-option *ngFor="let funcObj of allFunctionsList" [value]="funcObj.id">
-          {{funcObj.name}}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-    <br/>
+    <div class="row pb-4">
+      <div class="col-lg-12">
+        <mat-form-field class="w-100">
+          <mat-label>Name</mat-label>
+          <input matInput required formControlName="name">
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="row pb-4">
+      <div class="col-lg-6">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Task Groups</mat-label>
+          <mat-select formControlName="taskGroupIds" multiple>
+            <mat-option *ngFor="let taskGroup of allTaskGroupsList" [value]="taskGroup.id">
+              {{taskGroup.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="col-lg-6 ">
+
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Target device</mat-label>
+          <mat-select formControlName="deviceTarget" required multiple>
+            <mat-option *ngFor="let targetDevice of allTargetDevicesList" [value]="targetDevice.id">
+              {{targetDevice.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="row pb-4">
+      <div class="col-lg-12">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Target Locations</mat-label>
+          <mat-select formControlName="locationIds" multiple>
+            <mat-option *ngFor="let location of allLocationsList" [value]="location.id">
+              {{location.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+    <div class="row pb-4">
+      <div class="col-lg-12">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Function</mat-label>
+          <mat-select formControlName="func" required>
+            <mat-option *ngFor="let funcObj of allFunctionsList" [value]="funcObj.id">
+              {{funcObj.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
   </mat-dialog-content>
-  <br/>
-  <div style="text-align: center;margin-bottom: 0.4rem;">
-    <mat-dialog-actions>
-      <button mat-raised-button color="primary" (click)="close()">Close</button>
+  <div>
+    <mat-dialog-actions class="w-100">
+      <button mat-stroked-button color="accent" (click)="close()">Close</button>
       <button mat-raised-button color="primary" (click)="createTask()" style="margin-left: 20px;">Create Task</button>
     </mat-dialog-actions>
   </div>

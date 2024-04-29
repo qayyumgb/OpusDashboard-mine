@@ -38,7 +38,7 @@ export interface Column {
   filterOptions: any[];
   filtered: boolean;
   showInFooter: boolean;
-  footerType: 'total' | 'sum' | 'count' | null,
+  footerType: 'total' | 'sum' | 'count' | 'sumDurations' | null,
   footerValue: any;
 }
 

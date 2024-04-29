@@ -1,213 +1,146 @@
-<button
-  *ngIf="selectedClientDocData?.hasAdminRole"
-  mat-fab
-  color="accent"
-  class="fab"
-  (click)="openDialog()"
->
-  <mat-icon
-    matTooltip="Enter Activation Key for New Device"
-    matTooltipClass="tooltip-class"
-    matTooltipHideDelay="100000"
-    style="width: 44px; height: 24px"
-    >vpn_key
-  </mat-icon>
-</button>
-
 <div class="listing-container">
-  <mat-form-field appearance="outline" class="listing-filter-with-archival">
-    <mat-icon matPrefix>search</mat-icon>
-    <mat-label style="color: gray">Type Filter String Here...</mat-label>
-    <input matInput (keyup)="applyFilter($event)" [(ngModel)]="filterValue" placeholder="client" #input />
-  </mat-form-field>
-  <div
-    style="margin-left: 1rem;
-    float: left;
-    vertical-align: bottom;
-    margin-top: 0.8rem;
-    border: 1px #ffffff4d solid;
-    border-radius: 5px;
-    display: inline-block;">
-    <mat-button-toggle-group #group="matButtonToggleGroup" [(ngModel)]="unArchivedVsArchived"
-                             style="height: 2.15rem;padding-top: 0;" (change)="toggleArchived()">
-      <mat-button-toggle value="unarchived" aria-label="Text align left">
-        <mat-icon
-          style="transform: scale(1);cursor: pointer;color: whitesmoke;margin-top: -1rem;"
-          matTooltip="Show devices"
-          matTooltipClass="tooltip-class"
-          matTooltipHideDelay="100"
-          matTooltipPosition="below"
-        >list
-        </mat-icon>
-      </mat-button-toggle>
-      <mat-button-toggle value="archived" aria-label="Text align center">
-        <mat-icon
-          style="transform: scale(1);cursor: pointer;color: whitesmoke;margin-top: -1rem;"
-          matTooltip="Show archived devices"
-          matTooltipClass="tooltip-class"
-          matTooltipHideDelay="100"
-          matTooltipPosition="below"
-        >archive
-        </mat-icon>
-      </mat-button-toggle>
-    </mat-button-toggle-group>
+  <div class="controls-container">
+    <div class="date-container">
+      <mat-form-field appearance="outline" class="listing-filter-with-archival">
+        <mat-icon matPrefix>search</mat-icon>
+        <mat-label style="color: gray">Type Filter String Here...</mat-label>
+        <input matInput (keyup)="applyFilter($event)" [(ngModel)]="filterValue" placeholder="client" #input />
+      </mat-form-field>
+    </div>
+    <button mat-flat-button color="primary" class="setting-add-button mr-3" (click)="openDialog()"
+      *ngIf="selectedClientDocData?.hasAdminRole">
+      <mat-icon matTooltip="Create Label" matTooltipClass="tooltip-class" matTooltipHideDelay="100000">
+        vpn_key
+      </mat-icon>Enter Activation Key for New Device</button>
+    <div>
+      <mat-button-toggle-group #group="matButtonToggleGroup" [(ngModel)]="unArchivedVsArchived"
+        (change)="toggleArchived()">
+        <mat-button-toggle value="unarchived" aria-label="Text align left">
+          <mat-icon matTooltip="Show devices" matTooltipClass="tooltip-class" matTooltipHideDelay="100"
+            matTooltipPosition="below">list
+          </mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="archived" aria-label="Text align center">
+          <mat-icon matTooltip="Show archived devices" matTooltipClass="tooltip-class" matTooltipHideDelay="100"
+            matTooltipPosition="below">archive
+          </mat-icon>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
   </div>
-  <div style="clear: both; font-size: 1.1rem;padding-left: 0.2rem;margin-bottom: 0.25rem;padding-top:0.25rem;">
+  <div class="button-grid d-flex pb-3">
     <button mat-flat-button color="primary" style="height: 2rem;font-size: 0.95rem;"
-            [disabled]="!areMultipleDevicesSelected()" (click)="editMultipleDevices()">Edit Settings {{getSelectedDeviceCount()}}</button>
+      [disabled]="!areMultipleDevicesSelected()" (click)="editMultipleDevices()">Edit Settings
+      {{getSelectedDeviceCount()}}</button>
     <button mat-flat-button color="primary" style="height: 2rem;font-size: 0.95rem;margin-left: 2rem;"
-            [disabled]="!areMultipleDevicesSelected() || beingArchived" (click)="archiveMultipleDevices()"
-    *ngIf="areUnArchivedDevicesShown()">Archive {{getSelectedDeviceCount()}}</button>
+      [disabled]="!areMultipleDevicesSelected() || beingArchived" (click)="archiveMultipleDevices()"
+      *ngIf="areUnArchivedDevicesShown()">Archive {{getSelectedDeviceCount()}}</button>
     <button mat-button style="height: 2rem;font-size: 0.95rem;margin-left: 2rem;color: #01ADC1"
-            (click)="editEnrollmentSettings()">Enrollment Settings</button>
+      (click)="editEnrollmentSettings()">Enrollment Settings</button>
   </div>
-  <div style="clear: both; font-size: 1.1rem;padding-left: 0.2rem;margin-bottom: 0.25rem;" *ngIf="areArchivedDevicesShown()">Archived Devices</div>
-  <div class="mat-elevation-z8" style="clear: both;">
-    <table
-      mat-table
-      [dataSource]="dataSource"
-      multiTemplateDataRows
-      matSort
-      class="listing-table"
-    >
-      <ng-container matColumnDef="select">
-        <th mat-header-cell *matHeaderCellDef>
-          <mat-checkbox (click)="toggleMultiSelect()" [(ngModel)]="selectAll" [indeterminate]="determineIndeterminate()"></mat-checkbox>
-        </th>
-        <td mat-cell *matCellDef="let element" class="listing-table-tools">
-          <mat-checkbox
-            [(ngModel)]="element.isSelected" (click)="$event.stopPropagation()">
-          </mat-checkbox>
-        </td>
-      </ng-container>
+  <div class="table-card">
+    <div *ngIf="areArchivedDevicesShown()">Archived Devices</div>
+    <div class="mat-elevation-z8 expandable-table" style="clear: both;">
+      <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort class="listing-table">
+        <ng-container matColumnDef="select">
+          <th mat-header-cell *matHeaderCellDef>
+            <mat-checkbox (click)="toggleMultiSelect()" [(ngModel)]="selectAll"
+              [indeterminate]="determineIndeterminate()"></mat-checkbox>
+          </th>
+          <td mat-cell *matCellDef="let element" class="listing-table-tools">
+            <mat-checkbox [(ngModel)]="element.isSelected" (click)="$event.stopPropagation()">
+            </mat-checkbox>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="deviceIcon">
-        <th mat-header-cell *matHeaderCellDef>
+        <ng-container matColumnDef="deviceIcon">
+          <th mat-header-cell *matHeaderCellDef>
 
-        </th>
-        <td mat-cell *matCellDef="let element" class="listing-table-tools">
-          <span class="material-symbols-outlined">{{element.deviceIcon}}</span>
-        </td>
-      </ng-container>
+          </th>
+          <td mat-cell *matCellDef="let element" class="listing-table-tools">
+            <span class="material-symbols-outlined">{{element.deviceIcon}}</span>
+          </td>
+        </ng-container>
 
-      <ng-container
-        matColumnDef="{{ column }}"
-        *ngFor="let column of columnsToDisplay"
-      >
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>
-          {{ deviceAttributesReadableMap.get(column) }}
-        </th>
-        <td mat-cell *matCellDef="let element">{{ element[column] }}</td>
-      </ng-container>
+        <ng-container matColumnDef="{{ column }}" *ngFor="let column of columnsToDisplay">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>
+            {{ deviceAttributesReadableMap.get(column) }}
+          </th>
+          <td mat-cell *matCellDef="let element">{{ element[column] }}</td>
+        </ng-container>
 
-      <ng-container matColumnDef="expandedDetail">
-        <td
-          mat-cell
-          *matCellDef="let element"
-          [attr.colspan]="columnsToDisplay.length"
-        >
-          <div
-            class="row-detail"
-            [@detailExpand]="
-              element.deviceId == expandedElement?.deviceId ? 'expanded' : 'collapsed'
-            "
-          >
-            <div class="row-detail-description">
-              <table>
-                <tr *ngFor="let column of element.remainingAttributesList">
-                  <td class="details key">
-                    {{ column[0] }}
-                  </td>
-                  <td class="details value" *ngIf="column[0] !== 'Last Geolocation'">
-                    {{ column[1] }}
-                  </td>
-                  <td class="details value" *ngIf="(column[0] === 'Last Geolocation') && column[1]">
-                    <a href="https://maps.google.com/maps?z=2&t=m&q=loc:{{column[1].latitude}}+{{column[1].longitude}}" style="color: lightgray;" target="_blank">Click here to open in Google Maps</a>
-                  </td>
-                  <td class="details value" *ngIf="(column[0] === 'Last Geolocation') && !column[1]">
-                          &nbsp;
-                  </td>
-                </tr>
-              </table>
+        <ng-container matColumnDef="expandedDetail">
+          <td mat-cell *matCellDef="let element" colspan="12">
+            <div class="row-detail expanded-row-detail" [@detailExpand]="
+                element.deviceId == expandedElement?.deviceId ? 'expanded' : 'collapsed'
+              ">
+              <div class="row-detail-description">
+                <table>
+                  <tr *ngFor="let column of element.remainingAttributesList">
+                    <td class="details key">
+                      {{ column[0] }}
+                    </td>
+                    <td class="details value" *ngIf="column[0] !== 'Last Geolocation'">
+                      {{ column[1] }}
+                    </td>
+                    <td class="details value" *ngIf="(column[0] === 'Last Geolocation') && column[1]">
+                      <a href="https://maps.google.com/maps?z=2&t=m&q=loc:{{column[1].latitude}}+{{column[1].longitude}}"
+                        style="color: lightgray;" target="_blank">Click here to open in Google Maps</a>
+                    </td>
+                    <td class="details value" *ngIf="(column[0] === 'Last Geolocation') && !column[1]">
+                      &nbsp;
+                    </td>
+                  </tr>
+                </table>
+              </div>
             </div>
-          </div>
-        </td>
-      </ng-container>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="issue">
-        <th mat-header-cell *matHeaderCellDef>Issue</th>
-        <td mat-cell *matCellDef="let element" class="listing-table-tools">
-          <mat-checkbox
-                 [disabled]="!selectedClientDocData?.hasAdminRole" [(ngModel)]="element.hasIssue" (click)="$event.stopPropagation()" (change)="saveIssue($event, element)">
-          </mat-checkbox>
-        </td>
-      </ng-container>
+        <ng-container matColumnDef="issue">
+          <th mat-header-cell *matHeaderCellDef>Issue</th>
+          <td mat-cell *matCellDef="let element" class="listing-table-tools">
+            <mat-checkbox [disabled]="!selectedClientDocData?.hasAdminRole" [(ngModel)]="element.hasIssue"
+              (click)="$event.stopPropagation()" (change)="saveIssue($event, element)">
+            </mat-checkbox>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="edit">
-        <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let element" class="listing-table-tools">
-          <button
-            mat-icon-button
-            color="accent"
-            (click)="openEditDialog($event, element)"
-            class="listing-table-tools"
-            matTooltip="Edit device"
-            matTooltipClass="tooltip-class"
-            matTooltipHideDelay="100"
-            matTooltipPosition="below"
-            style="margin-left: 14px;"
-            [disabled]="!selectedClientDocData?.hasManagerOrAdminRole"
-          >
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button
-            mat-icon-button
-            color="accent"
-            (click)="archiveDevice($event, element)"
-            class="listing-table-tools"
-            matTooltip="Archive this device"
-            matTooltipClass="tooltip-class"
-            matTooltipHideDelay="100"
-            matTooltipPosition="below"
-            [disabled]="!selectedClientDocData?.hasManagerOrAdminRole"
-            *ngIf="!element.isArchived">
-            <mat-icon style="width: 44px; height: 24px">archive</mat-icon>
-          </button>
-          <button
-            mat-icon-button
-            color="accent"
-            (click)="unarchiveDevice(element)"
-            class="listing-table-tools"
-            matTooltip="Unarchive this device"
-            matTooltipClass="tooltip-class"
-            matTooltipHideDelay="100"
-            matTooltipPosition="below"
-            [disabled]="!selectedClientDocData?.hasManagerOrAdminRole"
-            *ngIf="element.isArchived">
-            <mat-icon style="width: 44px; height: 24px">unarchive</mat-icon>
-          </button>
-        </td>
-      </ng-container>
+        <ng-container matColumnDef="edit">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let element" class="listing-table-tools">
+            <div class="d-flex">
+              <button mat-icon-button color="accent" (click)="openEditDialog($event, element)"
+                class="listing-table-tools" matTooltip="Edit device" matTooltipClass="tooltip-class"
+                matTooltipHideDelay="100" matTooltipPosition="below" style="margin-left: 14px;"
+                [disabled]="!selectedClientDocData?.hasManagerOrAdminRole">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="accent" (click)="archiveDevice($event, element)"
+                class="listing-table-tools" matTooltip="Archive this device" matTooltipClass="tooltip-class"
+                matTooltipHideDelay="100" matTooltipPosition="below"
+                [disabled]="!selectedClientDocData?.hasManagerOrAdminRole" *ngIf="!element.isArchived">
+                <mat-icon>archive</mat-icon>
+              </button>
+              <button mat-icon-button color="accent" (click)="unarchiveDevice(element)" class="listing-table-tools"
+                matTooltip="Unarchive this device" matTooltipClass="tooltip-class" matTooltipHideDelay="100"
+                matTooltipPosition="below" [disabled]="!selectedClientDocData?.hasManagerOrAdminRole"
+                *ngIf="element.isArchived">
+                <mat-icon>unarchive</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="columnsHeadersToDisplay"></tr>
-      <tr
-        mat-row
-        *matRowDef="let element; columns: columnsHeadersToDisplay"
-        class="row"
-        [class.expanded-row]="applyExpandedClass(element)"
-        (click)="expandRow(element)"
-      ></tr>
-      <tr
-        mat-row
-        *matRowDef="let row; columns: ['expandedDetail']"
-        class="row-detail"
-      ></tr>
-    </table>
+        <tr mat-header-row *matHeaderRowDef="columnsHeadersToDisplay"></tr>
+        <tr mat-row *matRowDef="let element; columns: columnsHeadersToDisplay"
+          [class.expanded-row]="applyExpandedClass(element)" (click)="expandRow(element)"></tr>
+        <tr style="height: 0;" mat-row *matRowDef="let row; columns: ['expandedDetail']"
+          class="row-detail expandable-row"></tr>
+      </table>
 
-    <mat-paginator
-      [pageSizeOptions]="[5, 10, 25, 100]"
-      [pageSize]="25"
-      [showFirstLastButtons]="true"
-    ></mat-paginator>
+      <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [pageSize]="25" [showFirstLastButtons]="true"></mat-paginator>
+    </div>
   </div>
+
 </div>

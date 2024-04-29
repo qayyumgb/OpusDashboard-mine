@@ -1,0 +1,25 @@
+<mat-sidenav-container class="example-container">
+  <mat-sidenav #sidenav [mode]="sideNavMode" position="end">
+    <div class="help-section">
+      <div class="help-header">
+        <span style="font-size: 1.9rem;">Help</span>
+        <button mat-icon-button (click)="sidenav.toggle()">
+          <mat-icon class="material-icons-outlined">close</mat-icon>
+        </button>
+      </div>
+      <div class="help-content" [innerHtml]="helpContent"></div>
+    </div>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <button
+      *ngIf="!sidenav.opened"
+      class="help-button"
+      mat-icon-button
+      (click)="sidenav.toggle()"
+    >
+      <mat-icon class="material-icons-outlined">help</mat-icon>
+    </button>
+    <ng-content></ng-content>
+  </mat-sidenav-content>
+</mat-sidenav-container>

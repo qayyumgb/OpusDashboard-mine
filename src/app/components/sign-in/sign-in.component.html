@@ -1,4 +1,4 @@
-<div class="bg-image"></div>
+<!-- <div class="bg-image"></div>
 <div class="image-overlay"></div>
 <img class="logo" width='170' height='50' src="assets/Opus%20Watch_Logo_Wit_L.svg" alt="Opus Logo" />
 
@@ -35,3 +35,53 @@
     </form>
   </mat-card-content>
 </mat-card>
+ -->
+
+
+
+<div class="login__wrapper h-100">
+  <div class="login__row row no-gutters h-100">
+      <div class="col-md-7 d-md-block d-none">
+          <div class="login__left">
+              <div class="left__overlay">
+                  <div class="left__content">
+                      <div class="left__logo">
+                          <img src="/assets/images/Opus Watch_Logo_Wit_L.svg" width="200px" alt="">
+                      </div>
+                      <h2 class="mb-3">Precisie tuinbouw in een handomdraai</h2>
+                      <!-- <p>Digital time and task management operates a heart of your marketing ecosystem. A single source of truth 
+                          for all your digital assets, ensures maximum value from your digital assets and 100% brand consistency.
+                      </p> -->
+                  </div>
+              </div>
+          </div>
+      </div>
+      <div class="col-md-5">
+          <div class="login__right">
+              <div class="login__section">
+                  <h2 class="mb-4">Sign In</h2>
+                <form [formGroup]="form" (ngSubmit)="submit()" style="max-width: 100%;">
+                  <div class="mb-1">
+                      <label for="" class="d-block mb-2">Email</label>
+                      <mat-form-field class="w-100" appearance="outline">
+                          <mat-label>Enter your email</mat-label>
+                          <input type="text"  matInput required formControlName="email" />
+                      </mat-form-field>
+                  </div>
+                  <div class="mb-1">
+                      <label for="" class="d-block mb-2">Password</label>
+                      <mat-form-field class="w-100" appearance="outline">
+                          <mat-label>Enter your password</mat-label>
+                          <input type="password" matInput required formControlName="password"  />
+                      </mat-form-field>
+                  </div>
+                  <div class="text-right">
+                      <a (click)="initiatePasswordRecovery($event)" class="cstm-color">Forgot password?</a>
+                  </div>
+                  <button mat-flat-button class="p-4 mt-4 w-100 cstm-primary" color="primary">Login</button>
+                </form>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>

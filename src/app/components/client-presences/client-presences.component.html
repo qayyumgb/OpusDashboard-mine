@@ -1,10 +1,13 @@
-<div style="margin-left: 0;margin-bottom: 1rem;width: 100%;max-width: 1200px;">
-  <mat-card appearance="outlined" style="display: flex; flex-direction: column;margin-top: 4rem;max-width: 1200px;">
+<div class="w-100">
+  <div class="table-card" appearance="outlined">
     <mat-card-header style="display: flex; flex-direction: column;">
-      <mat-card-title style="font-size: 1.2rem;margin-bottom: 0.4rem;">Sessions auto archive</mat-card-title>
-      <mat-card-subtitle style="font-weight: 200;">Automatically archive previous sessions that are shorter then 4 minutes and at least have one of the following matching fields: row number, trolley number or variety.</mat-card-subtitle>
+      <mat-card-title style="font-size: 1.2rem;margin-bottom: 0.4rem;font-weight: 500;">Sessions auto archive
+      </mat-card-title>
+      <mat-card-subtitle style="font-weight: 200;">Automatically archive previous sessions that are shorter then 2
+        minutes and at least have one of the following matching fields: row number, trolley number or variety.
+      </mat-card-subtitle>
     </mat-card-header>
-    <br/>
+    <br />
     <mat-card-content>
       <div style="margin-left: 16px; display:flex; flex-direction: column;">
         <mat-slide-toggle [(ngModel)]="autoArchiveShortSessions" style="margin-top: 0.6rem;">
@@ -15,6 +18,224 @@
     <mat-card-actions align="end" style="margin-right: 1rem;">
       <button mat-flat-button (click)="saveAutoArchiveSessionFlag()" color="primary">SAVE</button>
     </mat-card-actions>
-  </mat-card>
+  </div>
+
+  <div appearance="outlined" class="table-card my-5">
+    <div style="display: flex; flex-direction: column;">
+      <mat-card-title style="font-size: 1.2rem;margin-bottom: 0.4rem;font-weight: 500;">Breaks</mat-card-title>
+      <mat-card-title style="font-size: 1.15rem;margin-bottom: 0.4rem;font-weight: 400;">Default Break</mat-card-title>
+      <div style="display: flex;flex-direction: column;justify-content: left;">
+        <mat-card-subtitle style="font-weight: 200;">Default break to fall back on if no other break applies based on
+          the break schedule.
+        </mat-card-subtitle>
+        <div style="display: flex; flex-direction: row;justify-content: left;max-width: 70%;">
+          <mat-form-field appearance="outline" style="margin-top: 0.8rem;flex-grow: 2">
+            <mat-label>Name</mat-label>
+            <input matInput [(ngModel)]="defaultBreak.name" required>
+          </mat-form-field>
+          <mat-form-field appearance="outline" style="margin-top: 0.8rem; margin-left: 2.5rem;flex-grow: 1">
+            <mat-label>Type</mat-label>
+            <mat-select [(ngModel)]="defaultBreak.breakTaskFunction">
+              <mat-option value="BREAK_PAID">PAID</mat-option>
+              <mat-option value="BREAK_UNPAID">UNPAID</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+      <div style="font-size: 1.15rem;margin-bottom: 0.4rem;font-weight: 400;margin-top: 1.5rem;">Break notification
+      </div>
+      <div style="display: flex; flex-direction: column;">
+        <mat-card-subtitle style="font-weight: 200;margin-bottom: 0.5rem;">Notify the worker that an Auto break is
+          started by vibrating the watch.
+          When the worker falls within a worker group of an Auto break enabled break scheme option the worker receives
+          a notification message the break is started and watch vibrates.
+        </mat-card-subtitle>
+        <mat-slide-toggle [(ngModel)]="breakNotificationsWatchEnabled" style="margin-bottom: 1rem;margin-left:8px;">
+          <mat-label style="font-size: 1rem;font-weight: 300;color: #ffffffb3;">Enable break notifications</mat-label>
+        </mat-slide-toggle>
+      </div>
+      <div style="font-size: 1.15rem;margin-bottom: 0.4rem;font-weight: 400;margin-top: 1.5rem;">Break Scheme</div>
+      <div style="display: flex; flex-direction: row; gap: 16px;">
+        <mat-card-subtitle style="font-weight: 200;">When Auto is enabled and the presence time falls between the Start
+          and End time a break will be automatically created at the break time
+          moment with a certain duration in minutes. The break can be set to paid or unpaid. When the Device break is
+          enabled the break type will be
+          set accordingly to the period (start/stop time) in which the break falls. By default it’s paid if it’s not
+          set. Break time is based on the
+          registration on the device.
+        </mat-card-subtitle>
+
+      </div>
+      <div class="d-flex justify-content-between my-3">
+        <button mat-flat-button *ngIf="areUnArchivedBreakSchemesShown()" color="primary"
+          (click)="createNewBreakScheme()">
+          <mat-icon matTooltip="Add new break scheme" matTooltipClass="tooltip-class" matTooltipHideDelay="100000">
+            playlist_add
+          </mat-icon> Add new break scheme</button>
+          <span class="f-grow"></span>
+          <mat-button-toggle-group #group="matButtonToggleGroup" [(ngModel)]="unArchivedVsArchived">
+            <mat-button-toggle value="unarchived" aria-label="Text align left">
+              <mat-icon matTooltip="Show break schemes" matTooltipClass="tooltip-class" matTooltipHideDelay="100"
+                matTooltipPosition="below">list
+              </mat-icon>
+            </mat-button-toggle>
+            <mat-button-toggle value="archived" aria-label="Text align center">
+              <mat-icon matTooltip="Show archived break schemes" matTooltipClass="tooltip-class"
+                matTooltipHideDelay="100" matTooltipPosition="below">archive
+              </mat-icon>
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+      </div>
+    </div>
+    <div>
+      <div>
+        <span *ngIf="areArchivedBreakSchemesShown()">Archived break schemes</span>
+      </div>
+      <div *ngIf="getBreakSchemesToDisplay().length > 0">
+        <div>
+          <div class="mat-elevation-z8" *ngFor="let breakScheme of getBreakSchemesToDisplay()">
+            <div appearance="outlined" class="outline-card">
+              <div class="outline-card-content">
+                <!--<div style="position: relative; left: 2px;top:0;font-size: 0.5rem;z-index: -1;"
+                   *ngIf="schemeIsUnsaved(breakScheme)">UNSAVED</div>-->
+                <div class="card-wrapper">
+
+                  <div class="card-form">
+                    <div class="breakFields-wrapper">
+                      <div class="card-action">
+
+                        <mat-slide-toggle [(ngModel)]="breakScheme.isAutoEnabled"
+                          (change)="breakSchemeChanged('isAutoEnabled', breakScheme)">
+                          <mat-label>Auto</mat-label>
+                        </mat-slide-toggle>
+                        <mat-slide-toggle [(ngModel)]="breakScheme.isDeviceEnabled"
+                          (change)="breakSchemeChanged('isDeviceEnabled', breakScheme)">
+                          <mat-label>Device</mat-label>
+                        </mat-slide-toggle>
+                      </div>
+                      <mat-form-field appearance="outline">
+                        <mat-label>Name</mat-label>
+                        <input matInput [(ngModel)]="breakScheme.name">
+                      </mat-form-field>
+                      <mat-form-field appearance="outline">
+                        <mat-label>Worker Groups</mat-label>
+                        <mat-select [(ngModel)]="breakScheme.workerGroupIds" multiple>
+                          <mat-option *ngFor="let workerGroup of allwgGroupsList" [value]="workerGroup.id">
+                            {{ workerGroup.name }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                      <mat-form-field appearance="outline">
+                        <mat-label>Type</mat-label>
+                        <mat-select [(ngModel)]="breakScheme.breakType">
+                          <mat-option value="PAID">PAID</mat-option>
+                          <mat-option value="UNPAID">UNPAID</mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+                    <div class="breakFields-wrapper">
+                      <mat-form-field appearance="outline" style="margin-top: 0.4rem">
+                        <mat-label>Start time</mat-label>
+                        <input matInput type="time" [(ngModel)]="breakScheme.startTime">
+                      </mat-form-field>
+                      <mat-form-field appearance="outline" style="margin-top: 0.4rem">
+                        <mat-label>End time</mat-label>
+                        <input matInput type="time" [(ngModel)]="breakScheme.endTime">
+                      </mat-form-field>
+                      <mat-form-field appearance="outline">
+                        <mat-label>Break time</mat-label>
+                        <input matInput type="time" [(ngModel)]="breakScheme.breakTime">
+                      </mat-form-field>
+                      <mat-form-field appearance="outline">
+                        <mat-label>Duration</mat-label>
+                        <input matInput type="number" [(ngModel)]="breakScheme.duration">
+                        <small matSuffix class="mr-3">minutes</small>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                  <div>
+                    <button mat-icon-button color="accent" (click)="archiveBreakScheme($event, breakScheme, true)"
+                      matTooltip="Archive break scheme" matTooltipClass="tooltip-class" matTooltipHideDelay="100"
+                      matTooltipPosition="below" *ngIf="!breakScheme.isArchived">
+                      <mat-icon>archive</mat-icon>
+                    </button>
+                    <button mat-icon-button color="accent" (click)="archiveBreakScheme($event, breakScheme, false)"
+                      matTooltip="Unarchive break scheme" matTooltipClass="tooltip-class" matTooltipHideDelay="100"
+                      matTooltipPosition="below" *ngIf="breakScheme.isArchived">
+                      <mat-icon>unarchive</mat-icon>
+                    </button>
+                  </div>
+
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div style="margin-left: 16px; display:flex; flex-direction: column;"
+        *ngIf="getBreakSchemesToDisplay().length === 0">
+        <div style="min-width: 95%;">
+          <div
+            style="margin-left: 35%; margin-top: 1.5rem; margin-bottom: 2px; display:flex; flex-direction: column;justify-content: space-around;">
+            <span *ngIf="areArchivedBreakSchemesShown()">No archived break schemes found</span>
+            <span *ngIf="areUnArchivedBreakSchemesShown()">No unarchived break schemes found</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+    <mat-card-actions align="end" style="margin-right: 1rem;">
+      <button mat-stroked-button (click)="cancelClickedOnBreakSchemes()" color="primary"
+        style="margin-right: 2rem;">CANCEL</button>
+      <button (click)="saveBreakSchemes()" mat-raised-button color="primary">SAVE</button>
+    </mat-card-actions>
+  </div>
+
+  <div class="table-card" appearance="outlined">
+    <mat-card-header style="display: flex; flex-direction: column;">
+      <mat-card-title style="font-size: 1.2rem;margin-bottom: 1rem;font-weight: 500;">Presences For
+        Watch</mat-card-title>
+    </mat-card-header>
+    <br />
+    <mat-card-content>
+      <div style="margin-left: 16px; display:flex; flex-direction: column;">
+        <div style="font-size: 1.15rem;margin-bottom: 0.6rem;font-weight: 400;">Breaks Via Watch</div>
+        <div style="font-weight: 200;margin-bottom: 1rem;margin-left:8px;color: #ffffffb3;">On the device the workers
+          can break their sessions or tasks.</div>
+        <mat-slide-toggle [(ngModel)]="registerWatchBreaksFlag" style="margin-bottom: 1.85rem;margin-left:8px;">
+          <mat-label style="font-size: 1rem;font-weight: 300;color: #ffffffb3;">Register breaks for presence
+            determination via watch</mat-label>
+        </mat-slide-toggle>
+
+        <div style="font-size: 1.15rem;margin-bottom: 0.6rem;font-weight: 400;">Check-in registration via watch</div>
+        <div style="font-weight: 200;margin-bottom: 1rem;max-width: 80%;margin-left:8px;color: #ffffffb3;">When the
+          worker selects his/her name on the watch a check-in registration is made automatically. Tip: enable the
+          2-digit code in General
+          Settings to avoid selecting mistakes.</div>
+        <mat-slide-toggle [(ngModel)]="registerWatchCheckInFlag" style="margin-bottom: 1.85rem;margin-left:8px;">
+          <mat-label style="font-size: 1rem;font-weight: 300;color: #ffffffb3;">Register breaks for presence
+            determination via watch</mat-label>
+        </mat-slide-toggle>
+
+
+        <div style="font-size: 1.15rem;margin-bottom: 0.6rem;font-weight: 400;">Check-out registration via watch</div>
+        <div style="font-weight: 200;margin-bottom: 1rem;max-width: 80%;margin-left:8px;color: #ffffffb3;">When the
+          worker logs out his/her name on the watch check-out registration is made automatically.</div>
+        <mat-slide-toggle [(ngModel)]="registerWatchCheckOutFlag" style="margin-bottom: 1rem;margin-left:8px;">
+          <mat-label style="font-size: 1rem;font-weight: 300;color: #ffffffb3;">Register breaks for presence
+            determination via watch</mat-label>
+        </mat-slide-toggle>
+      </div>
+
+    </mat-card-content>
+    <mat-card-actions align="end" style="margin-right: 1rem;">
+      <button mat-stroked-button (click)="cancelClickedPresenceFlags()" color="primary"
+        style="margin-right: 2rem;">CANCEL</button>
+      <button mat-raised-button (click)="savePresenceFlags()" color="primary">SAVE</button>
+    </mat-card-actions>
+  </div>
 
 </div>

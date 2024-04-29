@@ -1,121 +1,128 @@
-<div
-  style="margin-left: 8rem;float: left;margin-top:1rem;margin-bottom: 2rem;border: 2px #ffffff4d solid;border-radius: 5px;padding: 0.2rem 0.2rem;display: inline-block;">
-  <mat-button-toggle-group #group="matButtonToggleGroup" [(ngModel)]="laborPrdctvtyChartVsTable"
-                           style="height: 2rem;padding-top: 0;">
-    <mat-button-toggle value="chart" aria-label="Text align left">
-      <mat-icon
-        style="transform: scale(1);cursor: pointer;color: whitesmoke;margin-top: -1rem;"
-        matTooltip="See Chart"
-        matTooltipClass="tooltip-class"
-        matTooltipHideDelay="100"
-        matTooltipPosition="below"
-      >bar_chart
-      </mat-icon>
-    </mat-button-toggle>
-    <mat-button-toggle value="table" aria-label="Text align center">
-      <mat-icon
-        style="transform: scale(1);cursor: pointer;color: whitesmoke;margin-top: -1rem;"
-        matTooltip="See Table"
-        matTooltipClass="tooltip-class"
-        matTooltipHideDelay="100"
-        matTooltipPosition="below"
-      >table_chart
-      </mat-icon>
-    </mat-button-toggle>
-  </mat-button-toggle-group>
+<div class="performance-actions">
+  <div class="inner-page-action f-grow">
+    <app-date-selection></app-date-selection>
+  </div>
+ 
+  <div class="sort-dropdown-wrapper"
+       [style.display]="isPrdctvtyChartDisplayed()">
+    
+    <mat-form-field class="sort-dropdown-formfield" appearance="outline">
+      <mat-icon matPrefix>sort</mat-icon>
+      <mat-select [(value)]="laborPrdctvtySortOption"
+                  (selectionChange)="prdctvtySortOptionChanged()"
+                  style="margin-left: 0.4rem;"
+                  [disabled]="(!laborPrdctvtyData || (laborPrdctvtyData.length === 0))">
+        <mat-option value="AZ">Sort A &rarr; Z</mat-option>
+        <mat-option value="ZA">Sort Z &rarr; A</mat-option>
+        <mat-option value="HL">Sort High &rarr; Low</mat-option>
+        <mat-option value="LH">Sort Low &rarr; High</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+  <div>
+    <mat-button-toggle-group #group="matButtonToggleGroup" [(ngModel)]="laborPrdctvtyChartVsTable">
+      <mat-button-toggle value="chart" aria-label="Text align left">
+        <mat-icon class="material-symbols-outlined"
+          matTooltip="See Chart"
+          matTooltipClass="tooltip-class"
+          matTooltipHideDelay="100"
+          matTooltipPosition="below"
+        >bar_chart
+        </mat-icon>
+      </mat-button-toggle>
+      <mat-button-toggle value="table" aria-label="Text align center">
+        <mat-icon class="material-symbols-outlined"
+          matTooltip="See Table"
+          matTooltipClass="tooltip-class"
+          matTooltipHideDelay="100"
+          matTooltipPosition="below"
+        >table_chart
+        </mat-icon>
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
 </div>
-<div class="sort-dropdown-wrapper"
-     [style.display]="isPrdctvtyChartDisplayed()">
-  <mat-icon style="margin-top: 0.2rem;float: left;">sort</mat-icon>
-  <mat-form-field class="sort-dropdown-formfield">
-    <mat-select [(value)]="laborPrdctvtySortOption"
-                (selectionChange)="prdctvtySortOptionChanged()"
-                style="margin-left: 0.4rem;"
-                [disabled]="(!laborPrdctvtyData || (laborPrdctvtyData.length === 0))">
-      <mat-option value="AZ">Sort A &rarr; Z</mat-option>
-      <mat-option value="ZA">Sort Z &rarr; A</mat-option>
-      <mat-option value="HL">Sort High &rarr; Low</mat-option>
-      <mat-option value="LH">Sort Low &rarr; High</mat-option>
-    </mat-select>
-  </mat-form-field>
-</div>
-<div style="float:left; margin-top:1.3rem;text-align: center; width: 25%;" [ngStyle]="isPrdctvtyChartDisplayed() === 'block' ? {'margin-left': '6.5rem'} : {'margin-left': '19.3rem'}"
-     *ngIf="laborPrdctvtyData?.length > 0">
-  <span style="font-size: 1.1rem;">TOTAL FINISHED: {{finishedData.actual.count}} picked, {{finishedData.actual.rows}} rows</span> <br/>
-  <span style="margin-top:0.2rem;color:lightgray;">TOTAL ACTUAL: {{finishedData.total.count}} picked, {{finishedData.total.rows}} rows</span> <br/>
-</div>
-<div style="float:right; margin-right: 8rem; margin-top:1.3rem;">
+
+<div class="table-card">
+  <div class="preformance-info">
+    <div
+    *ngIf="laborPrdctvtyData?.length > 0">
+  <span><span class="cstm-color">TOTAL FINISHED</span> {{countData.finished.count}} picked, {{countData.finished.rows}} rows</span> <br/>
+  <span><span class="cstm-color">TOTAL ACTUAL</span> {{countData.totalAll.count}} picked, {{countData.totalAll.rows}} rows</span> <br/>
+  </div>
   <mat-icon
-    style="transform: scale(1.2);cursor: pointer;color: whitesmoke;"
-    matTooltip="Download as CSV"
-    matTooltipClass="tooltip-class"
-    matTooltipHideDelay="100"
-    matTooltipPosition="below"
-    (click)="downloadAsCSV('Productivity')"
-    *ngIf="laborPrdctvtyData.length > 0">download
+  matTooltip="Download as CSV"
+  matTooltipClass="tooltip-class"
+  matTooltipHideDelay="100"
+  matTooltipPosition="below"
+  (click)="downloadAsCSV('Productivity')"
+  *ngIf="laborPrdctvtyData.length > 0">download
   </mat-icon>
+  </div>
+  
+
+<div [style.height.px]="graphHeight"
+  [style.display]="isPrdctvtyChartDisplayed()"
+  *ngIf="laborPrdctvtyData?.length > 0">
+<ngx-charts-bar-horizontal-stacked
+ [view]=""
+ [scheme]="colorScheme"
+ [results]="laborPrdctvtyData"
+ [gradient]="gradient"
+ [xAxis]="showXAxis"
+ [yAxis]="showYAxis"
+ [legend]="showLegend"
+ [legendTitle]="legendTitle"
+ [roundDomains]="roundDomains"
+ [showXAxisLabel]="showXAxisLabel"
+ [showYAxisLabel]="showYAxisLabel"
+ [xAxisLabel]="xAxisLabel"
+ [yAxisLabel]="yAxisLabel"
+ [showGridLines]="false"
+ [showDataLabel]="showDataLabel"
+ [animations]="chartAnimation"
+ (select)="onSelect($event)"
+ style="fill: #F3F3F3;" *ngIf="laborPrdctvtyData">
+ <ng-template #tooltipTemplate let-model="model">
+   <div class="tooltip" style='text-align: left;' [innerHTML]="getToolTip(model) | safeHtml">
+   </div>
+ </ng-template>
+ >
+</ngx-charts-bar-horizontal-stacked>
 </div>
 
-<div style="margin-top: 5rem; margin-left: 10rem; clear: both;" [style.height.px]="graphHeight"
-     [style.display]="isPrdctvtyChartDisplayed()"
-     *ngIf="laborPrdctvtyData?.length > 0">
-  <ngx-charts-bar-horizontal-stacked
-    [view]=""
-    [scheme]="colorScheme"
-    [results]="laborPrdctvtyData"
-    [gradient]="gradient"
-    [xAxis]="showXAxis"
-    [yAxis]="showYAxis"
-    [legend]="showLegend"
-    [legendTitle]="legendTitle"
-    [roundDomains]="roundDomains"
-    [showXAxisLabel]="showXAxisLabel"
-    [showYAxisLabel]="showYAxisLabel"
-    [xAxisLabel]="xAxisLabel"
-    [yAxisLabel]="yAxisLabel"
-    [showGridLines]="false"
-    [showDataLabel]="showDataLabel"
-    [animations]="chartAnimation"
-    (select)="onSelect($event)"
-    style="fill: #F3F3F3;" *ngIf="laborPrdctvtyData">
-    <ng-template #tooltipTemplate let-model="model">
-      <div class="tooltip" style='text-align: left;' [innerHTML]="getToolTip(model) | safeHtml">
-      </div>
-    </ng-template>
-    >
-  </ngx-charts-bar-horizontal-stacked>
+<div [style.height.px]="graphHeight" *ngIf="laborPrdctvtyData?.length === 0">
+There is no data available for the selected date
 </div>
 
-<div style="margin-top: 6rem; padding-top: 2rem; text-align: center; clear: both;font-size: 1.2rem;" [style.height.px]="graphHeight" *ngIf="laborPrdctvtyData?.length === 0">
-  There is no data available for the selected date
-</div>
-
-<section class="listing-container-laborPrdctvty" style="clear: both;" [style.display]="isPrdctvtyTableDisplayed()">
-  <table
-    mat-table
-    [dataSource]="laborPrdctvtyDataSource"
-    multiTemplateDataRows
-    matSort
-    class="listing-table"
-  >
-    <ng-container
-      matColumnDef="{{ column }}"
-      *ngFor="let column of laborPrdctvtyColumnsToDisplay"
-    >
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>
-        <span [innerHTML]="laborPrdctvtyAttributesReadableMap.get(column) | safeHtml"></span>
-      </th>
-      <td mat-cell *matCellDef="let element">{{ element[column] }}</td>
-    </ng-container>
+<section class="listing-container-laborPrdctvty table-styled" style="clear: both;" [style.display]="isPrdctvtyTableDisplayed()">
+<table
+ mat-table
+ [dataSource]="laborPrdctvtyDataSource"
+ multiTemplateDataRows
+ matSort
+ class="listing-table"
+>
+ <ng-container
+   matColumnDef="{{ column }}"
+   *ngFor="let column of laborPrdctvtyColumnsToDisplay"
+ >
+   <th mat-header-cell *matHeaderCellDef mat-sort-header>
+     <span [innerHTML]="laborPrdctvtyAttributesReadableMap.get(column) | safeHtml"></span>
+   </th>
+   <td mat-cell *matCellDef="let element">{{ element[column] }}</td>
+ </ng-container>
 
 
-    <tr mat-header-row *matHeaderRowDef="columnsHeadersToDisplay; sticky: true"></tr>
-    <tr mat-row *matRowDef="let element; columns: columnsHeadersToDisplay" class="row"></tr>
-  </table>
-  <mat-paginator
-    [style.display]="isPrdctvtyTableDisplayed()"
-    [pageSizeOptions]="[5, 10, 25, 100]"
-    [pageSize]="25"
-    [showFirstLastButtons]="true"
-  ></mat-paginator>
+ <tr mat-header-row *matHeaderRowDef="columnsHeadersToDisplay; sticky: true"></tr>
+ <tr mat-row *matRowDef="let element; columns: columnsHeadersToDisplay"></tr>
+</table>
+<mat-paginator
+ [style.display]="isPrdctvtyTableDisplayed()"
+ [pageSizeOptions]="[5, 10, 25, 100]"
+ [pageSize]="25"
+ [showFirstLastButtons]="true"
+></mat-paginator>
 </section>
+</div>
+

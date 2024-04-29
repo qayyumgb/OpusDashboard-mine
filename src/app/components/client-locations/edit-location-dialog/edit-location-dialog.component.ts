@@ -38,7 +38,10 @@ export class EditLocationDialogComponent implements OnInit, OnDestroy {
       this.loggedInUserDocData = userDocData;
     });
   }
-
+  openInGoogleMap(latitude: number, longitude: number) {
+    const url = `https://www.google.com/maps?q=${latitude},${longitude}`;
+    window.open(url, '_blank');
+  }
   ngOnDestroy(): void {
     this.loggedInUserFromAuthServiceSubscription?.unsubscribe();
   }

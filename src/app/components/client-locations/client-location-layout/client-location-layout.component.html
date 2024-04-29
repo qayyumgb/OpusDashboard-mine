@@ -5,10 +5,11 @@
         <span style="font-size: 1.1rem;" (focusout)="saveNewLayoutName($event, layout)" [disabled]="!selectedClientDocData?.hasAdminRole" ngDefaultControl contenteditable (click)="preventPropagation($event)" [(ngModel)]="layoutList[counter].name"></span>
       </mat-panel-title>
       <mat-panel-description style="display: flex; justify-content: right; margin-right: 1rem;">
-        <button mat-raised-button color="primary" matTooltip='Edit {{layout.name}}'
-                (click)="openEditLayoutDialog($event, layout)"
-                style="margin-left: 20px;"
-        *ngIf="selectedClientDocData?.hasAdminRole">Edit</button>
+        <button mat-icon-button color="accent" matTooltip='Edit {{layout.name}}'
+        (click)="openEditLayoutDialog($event, layout)"
+        style="margin-left: 20px;" *ngIf="selectedClientDocData?.hasAdminRole">
+            <mat-icon>edit</mat-icon>
+          </button>
       </mat-panel-description>
       </mat-expansion-panel-header>
     <app-client-loc-lyt-rows [clientId]="clientId" [locationId]="locationId" [layoutId]="layout.id"></app-client-loc-lyt-rows>

@@ -2,13 +2,6 @@
 @import '@angular/material/theming';
 $primary: mat.define-palette($mat-blue-gray);
 
-.listing-container {
-  margin: auto;
-  padding: 32px 100px;
-  max-width: 80%;
-  min-width: 600px;
-}
-
 ngx-simplebar {
   max-height: 60vh;
   overflow: auto;
@@ -44,74 +37,6 @@ ngx-simplebar {
   text-decoration: underline;
 }
 
-table.listing-table {
-  width: 100%;
-}
-
-button.listing-table-tools {
-  visibility: hidden;
-}
-
-a.listing-table-tools {
-  visibility: hidden;
-}
-
-td.listing-table-tools {
-  text-align: right;
-  width: 1%;
-  white-space: nowrap;
-}
-
-table.listing-table tr:hover .listing-table-tools {
-  visibility: visible;
-}
-
-td:hover .tdhover{
-  visibility: visible !important;
-}
-
-tr.row-detail {
-  height: 0;
-}
-
-tr.row:not(.expanded-row):hover {
-  background-color: mat-color($primary, 700);
-  cursor: pointer;
-}
-
-tr.row {
-  cursor: pointer;
-  border-bottom-width: 0;
-}
-
-div.row-detail {
-  overflow: hidden;
-  display: flex;
-}
-
-div.row-detail-description {
-  padding: 16px;
-}
-
-div.row-detail-description > table {
-  border-collapse: collapse;
-}
-
-td.details {
-  border: 0px solid #545454;
-  color: #9c9c9c;
-  padding-right: 6px;
-  text-align: left;
-  font-weight: 500;
-}
-
-td.key {
-  font-weight: 400;
-}
-
-td.value {
-  font-weight: 100;
-}
 
 /* TODO(mdc-migration): The following rule targets internal classes of paginator that may no longer apply for the MDC version. */
 /* TODO(mdc-migration): The following rule targets internal classes of paginator that may no longer apply for the MDC version. */
@@ -128,28 +53,43 @@ mat-paginator {
   height: 0 !important;
 }
 
-.sort-dropdown-wrapper {
-  float: left;
-  margin-left: 2rem;
-  margin-top: 18px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 5px;
-  padding: 0 0.4rem 0 0.2rem;
-  display: block;
-  height: 39px;
-}
-
-.sort-dropdown-formfield {
-  float: left;
-  height: 34px;
-  width: 11.5rem;
-  margin-top: 0.1rem;
-}
 
 .mat-mdc-form-field-type-mat-select:not(.mat-form-field-disabled) .mat-mdc-text-field-wrapper {
   background-color: #0e62ff !important;
 }
 
+.performance-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+.preformance-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  >div{
+    display: flex;
+    gap: 10px;
+  }
+}
 
-
-
+.video-streaming{
+  cursor: pointer;
+  position: fixed;
+  right: 3rem;
+  bottom: 3rem;
+  font-size: 3rem;
+}
+.setting-add-button{
+  height: 47px !important;
+}
+.controls-container{
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  .date-container{
+    flex: 1;
+}
+}

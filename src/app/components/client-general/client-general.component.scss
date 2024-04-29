@@ -1,0 +1,20 @@
+.client-general-wrapper{
+    gap: 30px;
+    mat-card{
+        gap: 3px;
+        &:first-child{
+            flex: 2;
+        }
+        &:last-child{
+            flex: 1.5;
+        }
+        mat-card-content{
+            flex: 1 1 auto;
+        }
+    }
+    .transparent-effect-card{
+        mat-card-title{
+            font-size: 22px;
+        }
+    }
+}
