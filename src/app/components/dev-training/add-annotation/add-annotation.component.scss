@@ -13,6 +13,7 @@
   main{
     display: flex;
     flex: 1 1 auto;
+    min-height: 1px;
 
     .left-section{
       max-width: 270px;
@@ -35,9 +36,9 @@
     }
 
     .right-section{
-      max-width: 270px;
+      max-width: 300px;
       width: 100%;
-      height: calc(100% - 300px);
+      height: calc(100% - 5px);
       overflow: auto;
       background-color: #1b2429;
       flex: 0 0 auto;
@@ -117,21 +118,11 @@
 
 /* TRAINING INFO */
 
-.training_info_container {
-  // display: flex;
-  // flex-direction: column;
-  // justify-content: flex-start;
-  // align-items: center;
-  // padding: 2px 20px 10px 10px;
-  // margin-top: 0.2rem;
-  // width: 81%;
-}
-
 .training_info_card_form {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 0.25rem 0.25rem 0.05rem 0.25rem !important;
+  padding: 8px !important;
   width: 90%;
   margin: auto;
   margin-top: 1rem;
@@ -180,17 +171,6 @@
     align-items: center;
 }
 
-/* ANNOTATION BUTTONS */
-.annotation_buttons_container {
-  // min-width: 18rem;
-  // height: 100%;
-  // display: flex;
-  // flex-direction: column;
-  // justify-content: flex-start;
-  // padding: 2px;
-  // margin-left: 1%;
-  // width: 82%;
-}
 
 .annotation_button {
   height: 2rem;
@@ -234,132 +214,7 @@
   height: 0.8rem;
 }
 
-/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
-/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
-/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
 
-@media only screen and (min-width: 1300px) and (max-width: 1599px) {
-  .annotation-list-container {
-    // flex: 1 1 auto;
-    // overflow-y: auto;
-    // border-top: 2px solid mintcream;
-    // margin-left: 1rem;
-    // padding-left: 0;
-    // margin-top: 0;
-    // width: 77%;
-    // margin-bottom: 4.5rem;
-
-    // &::-webkit-scrollbar-corner {
-    //   border-radius: 5px;
-    //   width: 8px;
-    // }
-    /* TODO(mdc-migration): The following rule targets internal classes of list that may no longer apply for the MDC version. */
-    /* TODO(mdc-migration): The following rule targets internal classes of list that may no longer apply for the MDC version. */
-    // .mat-list-option-custom {
-    //   max-width: 13rem;
-    //   margin-left: 0;
-    //   overflow: hidden;
-    //   max-height: 2rem;
-    //   font-size: 0.90rem;
-    // }
-
-    /*.mat-list-item-content {
-      padding: 0 0 0 0.6rem !important;
-    }*/
-  }
-
-  .training_info_container {
-    // display: flex;
-    // flex-direction: column;
-    // justify-content: flex-start;
-    // align-items: center;
-    // padding: 2px 20px 6px 22px;
-    // margin-top: 0.2rem;
-    // width: 75%;
-    // font-size: 0.8rem;
-  }
-
-  .training_info_card_form {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 0.25rem 0.25rem 0.05rem 0.5rem !important;
-  }
-
-  // .training_info_card_display {
-  //   margin-top: 0.2rem;
-  //   display: flex;
-  //   width: 68%;
-  //   flex-direction: column;
-  //   justify-content: flex-start;
-  //   padding: 0.5rem 0 0.5rem 0.7rem !important;
-  //   margin-left: 1.4rem;
-  //   font-size: 0.75rem;
-  //   line-height: 0.85rem;
-  //   border-radius: 0;
-  // }
-
-  .card {
-    width: 100%;
-    height: auto;
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 auto;
-    margin: 10px;
-  }
-}
-
-@media only screen and (min-width: 1200px) and (max-width: 1299px) {
-  .annotation-list-container {
-    // flex: 1 1 auto;
-    // overflow-y: auto;
-    // border-top: 2px solid mintcream;
-    // margin-left: 2rem;
-    // padding-left: 0;
-    // margin-top: 0;
-    // width: 67%;
-    // margin-bottom: 4.8rem;
-
-    // &::-webkit-scrollbar-corner {
-    //   border-radius: 5px;
-    //   width: 8px;
-    // }
-    /* TODO(mdc-migration): The following rule targets internal classes of list that may no longer apply for the MDC version. */
-    /* TODO(mdc-migration): The following rule targets internal classes of list that may no longer apply for the MDC version. */
-    // .mat-list-option-custom {
-    //   max-width: 12.5rem;
-    //   margin-left: 0;
-    //   overflow: hidden;
-    //   max-height: 2rem;
-    //   font-size: 0.87rem;
-    // }
-  }
-
-  .training_info_container {
-    // display: flex;
-    // flex-direction: column;
-    // justify-content: center;
-    // align-items: center;
-    // padding: 2px 20px 6px 22px;
-    // margin-top: 0.2rem;
-    // width: 69%;
-    // font-size: 0.78rem;
-  }
-
-  .training_info_container > input {
-    // max-width: 70%;
-  }
-
-  .training_info_card_form {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 0.25rem 0.25rem 0.05rem 0.6rem !important;
-    max-width: 80%;
-  }
-  /* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
-  /* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
-  /* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
   .mat-form-field-wrapper {
     /* margin-bottom: -0.45rem; */
     max-width: 9rem;
@@ -368,28 +223,9 @@
     line-height: 1.15;
     padding: 0 0 0.5rem;
   }
-
-  // .training_info_card_display {
-  //   margin-top: 0.2rem;
-  //   display: flex;
-  //   width: 60%;
-  //   flex-direction: column;
-  //   justify-content: flex-start;
-  //   padding: 0.5rem 0 0.5rem 0.7rem !important;
-  //   margin-left: 2.4rem;
-  //   font-size: 0.65rem;
-  //   line-height: 0.75rem;
-  //   border-radius: 0;
-  //   overflow: auto;
-  // }
-
-  /*.annotation_button{
-    max-height: 1.8rem;
-    padding-bottom: 2rem;
-    margin-top: 0.2rem;
-    font-size: 0.85rem;
+  .gap-4{
+    gap: 4px;
   }
-*/
   .card {
     width: 100%;
     height: auto;
@@ -398,7 +234,6 @@
     flex: 1 1 auto;
     margin: 10px;
   }
-}
 
 @media only screen and (max-width: 1199px) {
   .annotation-list-container {
@@ -415,15 +250,7 @@
       border-radius: 5px;
       width: 8px;
     }
-    /* TODO(mdc-migration): The following rule targets internal classes of list that may no longer apply for the MDC version. */
-    /* TODO(mdc-migration): The following rule targets internal classes of list that may no longer apply for the MDC version. */
-    // .mat-list-option-custom {
-    //   max-width: 12.5rem;
-    //   margin-left: 0;
-    //   overflow: hidden;
-    //   max-height: 2.2rem;
-    //   font-size: 0.88rem;
-    // }
+ 
   }
 
   .video-container {
