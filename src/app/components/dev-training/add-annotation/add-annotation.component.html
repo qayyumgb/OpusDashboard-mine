@@ -1,4 +1,282 @@
-<div class="container scrollbar-hidden">
+<div class="main-video-wrapper">
+    <header>
+        <mat-toolbar class="toolbar">
+            <button
+                    mat-icon-button
+                    matTooltip="Go back to trainings"
+                    (click)="goBack()"
+            >
+                <mat-icon>arrow_back</mat-icon>
+            </button>
+    
+            <span>Video Annotation</span>
+    
+            <span class="spacer"></span>
+    
+            <!--<button mat-icon-button matTooltip="Save" (click)="savePageState()">
+                <mat-icon>save</mat-icon>
+            </button>-->
+            <button
+                    mat-icon-button
+                    matTooltip="Duplication"
+                    (click)="duplicateVideoAnnotation()"
+            >
+                <mat-icon>file_copy</mat-icon>
+            </button>
+            <button
+                    mat-icon-button
+                    matTooltip="Download"
+                    [matMenuTriggerFor]="downloadMenu"
+            >
+                <mat-icon>download</mat-icon>
+            </button>
+            <mat-menu #downloadMenu="matMenu">
+                <button mat-menu-item (click)="downloadJSON('LABELS')">Labels</button>
+                <button mat-menu-item (click)="downloadJSON('TRAINING_DATA')">
+                    Training data
+                </button>
+                <button mat-menu-item (click)="downloadJSON('LABELED_TRAINING_DATA')">
+                    Labeled training data
+                </button>
+                <button mat-menu-item (click)="routeToPastRequests()">
+                    Past Requests
+                </button>
+            </mat-menu>
+        </mat-toolbar>
+    </header>
+    <main>
+        <div class="left-section">
+            <div>
+                <button [disabled]="selectionList?.selectedOptions?.selected?.length === 0" mat-icon-button
+                    matTooltip="Delete selected items" (click)="deleteSelectedAnnotationItems()">
+                    <mat-icon>delete</mat-icon>
+                </button>
+                <button [disabled]="selectionList?.selectedOptions?.selected?.length < 1" mat-icon-button
+                    matTooltip="Delete selected and later items" (click)="deleteSelectedNAboveAnnotationItems()">
+                    <mat-icon style="font-size: 1.70rem;">delete_sweep</mat-icon>
+                </button>
+                <button [disabled]="annotationList?.length === 0" mat-icon-button matTooltip="Clear list"
+                    (click)="deleteAnnotationList()">
+                    <mat-icon>clear_all</mat-icon>
+                </button>
+            </div>
+            <div class="px-2">
+                <p *ngIf="annotations.selectedOptions.selected.length === 0 && annotationList.length > 0 ">
+                    annotations# {{ annotationList.length }}
+                </p>
+                <p *ngIf="annotations.selectedOptions.selected.length > 0">
+                    {{ annotations.selectedOptions.selected.length }} selected
+                </p>
+            </div>
+            <mat-divider class="my-3"></mat-divider>
+            <div class="px-2">
+                <form>
+                    <mat-slide-toggle
+                            class="relative_time_toggle"
+                            [(ngModel)]="isRelativeTime"
+                            [ngModelOptions]="{ standalone: true }"
+                    >
+                        Relative time
+                    </mat-slide-toggle>
+                </form>
+            </div>
+            <mat-divider class="mt-3"></mat-divider>
+            <div class="annotation-list-container">
+                <mat-selection-list #annotations>
+                    <p style="margin-top: 1rem;max-height: 2.5rem;" *ngIf="annotationList.length === 0">
+                        Start annotating to fill the list
+                    </p>
+                    <mat-list-option
+                            class="mat-list-option-custom"
+                            *ngFor="let item of annotationList"
+                            [value]="item"
+                            (click)="setCurrentTime(item.videoTime)"
+                    >
+                        <p class="m-0">
+                            <span class="list_item_time"
+                                  *ngIf="!isRelativeTime">{{item.videoTimestampAbsolute | date: 'HH:mm:ss.SSS':'+0000'}}</span>
+                            <span *ngIf="item.id === highLightClosestAnnotationWithId">!!!</span>
+                            <span class="list_item_time"
+                                  *ngIf="isRelativeTime">{{item.videoTimestampRelative | date: 'HH:mm:ss.SSS':'+0000'}}</span>
+                            <span class="list_item_label">{{ item.label }}</span>
+                        </p>
+                    </mat-list-option>
+                </mat-selection-list>
+            </div>
+
+        </div>
+        <div class="video-section">
+            <div class="video-container" #youTubePlayerContainer>
+                <div class="video-center">
+                    <youtube-player
+                            [videoId]="videoId"
+                            [width]="videoWidth"
+                            [height]="videoHeight"
+                            #player
+                    ></youtube-player>
+                </div>
+            </div>
+        </div>
+        <div class="right-section">
+            <div class="annotation_buttons_container" *ngIf="annotationButtons">
+                <div class="p-3">
+                    <div>Playback Rate: {{playBackRate}}x</div>
+                    <mat-slider min=".25" max="2" step="0.25" [thumbLabel]="true" [(ngModel)]="playBackRate" #ngSlider>
+                        <input matSliderThumb />
+                        <input matSliderThumb (change)="setPlayBackRate()" #ngSliderThumb="matSliderThumb" />
+                    </mat-slider>
+                </div>
+                <mat-list #labelButtons>
+                    <mat-list-item>
+                        <button mat-raised-button
+                                color="primary"
+                                (click)="startTimeLabel()"
+                                [disabled]="startTimeDisabled"
+                                class="annotation_button">
+                            <mat-icon>timer</mat-icon>
+                            Start time
+                        </button>
+                    </mat-list-item>
+                </mat-list>
+
+                <mat-list #labelButtons>
+                    <mat-list-item>
+                        <button
+                                mat-raised-button
+                                color="primary"
+                                (mousedown)="annotate($event, annotationButtons.keyboard_arrow_up, true)"
+                                (focusout)="saveAnnotationButtonLabel($event, 'keyboard_arrow_up')"
+                                [disabled]="isEditLabel"
+                                class="annotation_button"
+                        >
+                            <mat-icon>keyboard_arrow_up</mat-icon>
+                            <span *ngIf="!isEditLabel">{{ annotationButtons.keyboard_arrow_up }}</span>
+                            <input *ngIf="isEditLabel" matInput placeholder="Label" [(ngModel)]="annotationButtons.keyboard_arrow_up"
+                                    [ngModelOptions]="{ standalone: true }" />
+                        </button>
+                    </mat-list-item>
+                    <mat-list-item>
+                        <button
+                                mat-raised-button
+                                color="primary"
+                                (mousedown)="annotate($event, annotationButtons.keyboard_arrow_down, true)"
+                                (focusout)="saveAnnotationButtonLabel($event, 'keyboard_arrow_down')"
+                                [disabled]="isEditLabel"
+                                class="annotation_button"
+                        >
+                            <mat-icon>keyboard_arrow_down</mat-icon>
+                            <span *ngIf="!isEditLabel">{{ annotationButtons.keyboard_arrow_down }}</span>
+                            <input
+                                    *ngIf="isEditLabel"
+                                    matInput
+                                    placeholder="Label"
+                                    [(ngModel)]="annotationButtons.keyboard_arrow_down"
+                                    [ngModelOptions]="{ standalone: true }"
+                            />
+                        </button>
+                    </mat-list-item>
+                    <mat-list-item>
+                        <button
+                                mat-raised-button
+                                color="primary"
+                                (mousedown)="annotate($event, annotationButtons.keyboard_arrow_left, true)"
+                                (focusout)="saveAnnotationButtonLabel($event, 'keyboard_arrow_left')"
+                                [disabled]="isEditLabel"
+                                class="annotation_button"
+                        >
+                            <mat-icon>keyboard_arrow_left</mat-icon>
+                            <span *ngIf="!isEditLabel">{{ annotationButtons.keyboard_arrow_left }}</span>
+                            <input
+                                    *ngIf="isEditLabel"
+                                    matInput
+                                    placeholder="Label"
+                                    [(ngModel)]="annotationButtons.keyboard_arrow_left"
+                                    [ngModelOptions]="{ standalone: true }"
+                            />
+                        </button>
+                    </mat-list-item>
+                    <mat-list-item>
+                        <button
+                                mat-raised-button
+                                color="primary"
+                                (mousedown)="annotate($event, annotationButtons.keyboard_arrow_right, true)"
+                                (focusout)="saveAnnotationButtonLabel($event, 'keyboard_arrow_right')"
+                                [disabled]="isEditLabel"
+                                class="annotation_button"
+                        >
+                            <mat-icon>keyboard_arrow_right</mat-icon>
+                            <span *ngIf="!isEditLabel">{{ annotationButtons.keyboard_arrow_right }}</span>
+                            <input
+                                    *ngIf="isEditLabel"
+                                    matInput
+                                    placeholder="Label"
+                                    [(ngModel)]="annotationButtons.keyboard_arrow_right"
+                                    [ngModelOptions]="{ standalone: true }"
+                            />
+                        </button>
+                    </mat-list-item>
+                </mat-list>
+                <mat-slide-toggle class="px-2" [(ngModel)]="isEditLabel">Edit labels
+                </mat-slide-toggle>
+                <mat-divider class="mt-3"></mat-divider>
+                <div class="training_info_container">
+                    <mat-card appearance="outlined" class="training_info_card_form">
+                        <mat-form-field appearance="fill">
+                            <mat-label class="video_id_label">Video ID</mat-label>
+                            <input
+                                    matInput
+                                    type="text"
+                                    class="video_id_input"
+                                    (focusout)="savePageState('videoId')"
+                                    [(ngModel)]="videoId"
+                            />
+                        </mat-form-field>
+                        <mat-form-field appearance="fill">
+                            <mat-label>Description</mat-label>
+                            <textarea matInput
+                                      class="video_id_input"
+                                      (focusout)="savePageState('description')"
+                                      [(ngModel)]="description"></textarea>
+                        </mat-form-field>
+                        <mat-form-field appearance="fill">
+                            <mat-label>Notes</mat-label>
+                            <textarea matInput
+                                      class="video_id_input"
+                                      (focusout)="savePageState('notes')"
+                                      [(ngModel)]="notes"></textarea>
+                        </mat-form-field>
+                    </mat-card>
+                </div>
+                <div>
+                    <mat-card appearance="outlined" class="training_info_card_display" *ngIf="trainingDocData">
+                        <span>Training Start: {{ trainingStartTimestamp | date: 'YYYY-MM-dd HH:mm:ss':'+0000' }} </span>
+                        <span style="margin-top: 0.4rem;">Updated At: {{ trainingDocData?.updatedAt | date: 'YYYY-MM-dd HH:mm:ss':'+0000' }} </span>
+                        <span style="margin-top: 0.4rem;">Worker: {{ trainingDocData?.workerName}}
+                            <br/>(ID: {{trainingDocData?.workerId}}) </span>
+                        <span style="margin-top: 0.4rem;">Client: {{ trainingDocData?.clientName}}
+                            <br/>(ID: {{trainingDocData?.clientId}})</span>
+                        <span style="margin-top: 0.4rem;">Training Key: {{ trainingDocData?.trainingKey}}
+                          </span>
+                    </mat-card>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <div class="container scrollbar-hidden">
     <mat-toolbar class="toolbar">
         <button
                 mat-icon-button
@@ -12,9 +290,6 @@
 
         <span class="spacer"></span>
 
-        <!--<button mat-icon-button matTooltip="Save" (click)="savePageState()">
-            <mat-icon>save</mat-icon>
-        </button>-->
         <button
                 mat-icon-button
                 matTooltip="Duplication"
@@ -44,8 +319,8 @@
     </mat-toolbar>
 
     <mat-grid-list cols="12" rows="3" rowHeight="fit" class="mat-primary main_grid" style="margin-bottom: -1rem;">
-        <!-- annotation list tile -->
-        <mat-grid-tile [colspan]="2" [rowspan]="3" style="padding: 2px !important;">
+        
+        <mat-grid-tile [colspan]="12" [rowspan]="3" style="padding: 2px !important;">
             <div class="annotation-container matcolorprimary">
                 <mat-grid-list cols="12" rowHeight="60px" class="annotation-controls-container matcolorprimary">
                     <mat-grid-tile [colspan]="4" [rowspan]="1" style="margin-left: 5%; margin-top: 0; margin-bottom: -1rem;">
@@ -122,8 +397,8 @@
             </div>
         </mat-grid-tile>
 
-        <!-- video tile -->
-        <mat-grid-tile [colspan]="8" [rowspan]="3">
+        
+        <mat-grid-tile [colspan]="12" [rowspan]="3">
             <div class="video-container" #youTubePlayerContainer
                  style="border: 1px solid lightgrey; height: 86%; width:92%; border-radius: 0.5rem; margin: 2px !important;">
                 <div class="video-center">
@@ -137,8 +412,8 @@
             </div>
         </mat-grid-tile>
 
-        <!-- annotation button tile -->
-        <mat-grid-tile [colspan]="2" [rowspan]="3">
+        
+        <mat-grid-tile [colspan]="12" [rowspan]="3">
 
             <div class="annotation_buttons_container matcolorprimary" *ngIf="annotationButtons">
                 <div style="float:left; margin-left: 15%;margin-top: 0.45rem; font-size: 0.9rem; font-weight: 400;">
@@ -290,7 +565,7 @@
             </div>
         </mat-grid-tile>
 
-        <!-- training info tile -->
+        
 
     </mat-grid-list>
-</div>
+</div> -->

@@ -1,3 +1,58 @@
+.main-video-wrapper{
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  header{
+    border-bottom: 1px solid #00ffa7;
+  }
+
+  main{
+    display: flex;
+    flex: 1 1 auto;
+
+    .left-section{
+      max-width: 270px;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: #1b2429;
+      flex: 0 0 auto;
+
+      .annotation-list-container{
+        max-height: 400px;
+        overflow: auto;
+      }
+    }
+    .video-section{
+      flex: 1 1 auto;
+      background-color: #243036;
+      border: 1px solid #00ffa7;
+      border-top: 0;
+    }
+
+    .right-section{
+      max-width: 270px;
+      width: 100%;
+      height: calc(100% - 300px);
+      overflow: auto;
+      background-color: #1b2429;
+      flex: 0 0 auto;
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
 .spacer {
   flex: 1 1 auto;
 }
@@ -10,6 +65,7 @@
 
 .toolbar {
   flex: 0 0 auto;
+  background: #1b2429;
 }
 
 .main_grid {
@@ -32,43 +88,43 @@
   flex: 0 0 auto;
 }
 
-.annotation-list-container {
-  flex: 1 1 auto;
-  overflow-y: auto;
-  border-top: 2px solid mintcream;
-  margin-left: 3.5%;
-  padding-left: 0.1rem;
-  margin-top: 0;
-  width: 82%;
-  margin-bottom: 3.5rem;
-  margin-right: -2rem;
+// .annotation-list-container {
+//   flex: 1 1 auto;
+//   overflow-y: auto;
+//   border-top: 2px solid mintcream;
+//   margin-left: 3.5%;
+//   padding-left: 0.1rem;
+//   margin-top: 0;
+//   width: 82%;
+//   margin-bottom: 3.5rem;
+//   margin-right: -2rem;
 
-  &::-webkit-scrollbar-corner {
-    border-radius: 5px;
-    width: 8px;
-  }
-}
+//   &::-webkit-scrollbar-corner {
+//     border-radius: 5px;
+//     width: 8px;
+//   }
+// }
 
 /* TODO(mdc-migration): The following rule targets internal classes of list that may no longer apply for the MDC version. */
 /* TODO(mdc-migration): The following rule targets internal classes of list that may no longer apply for the MDC version. */
-.mat-list-option-custom {
-  max-width: 16.8rem;
-  margin-left: -1rem;
-  overflow: hidden;
-  max-height: 2.2rem;
-}
+// .mat-list-option-custom {
+//   max-width: 16.8rem;
+//   margin-left: -1rem;
+//   overflow: hidden;
+//   max-height: 2.2rem;
+// }
 
 
 /* TRAINING INFO */
 
 .training_info_container {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  padding: 2px 20px 10px 10px;
-  margin-top: 0.2rem;
-  width: 81%;
+  // display: flex;
+  // flex-direction: column;
+  // justify-content: flex-start;
+  // align-items: center;
+  // padding: 2px 20px 10px 10px;
+  // margin-top: 0.2rem;
+  // width: 81%;
 }
 
 .training_info_card_form {
@@ -76,16 +132,22 @@
   flex-direction: column;
   justify-content: flex-end;
   padding: 0.25rem 0.25rem 0.05rem 0.25rem !important;
+  width: 90%;
+  margin: auto;
+  margin-top: 1rem;
 }
 
 .training_info_card_display {
-  margin-top: 0.2rem;
   display: flex;
-  width: 76%;
+  width: 90%;
   flex-direction: column;
   justify-content: flex-start;
-  padding: 0.5rem 0.3rem 0.5rem 0.3rem !important;
-  margin-left: 1.4rem;
+  padding: 0.5rem 0 0.5rem 0.7rem !important;
+  margin: auto;
+  font-size: 0.75rem;
+  line-height: 0.85rem;
+  border-radius: 0;
+  margin-top: 1rem;
 }
 
 .card {
@@ -108,23 +170,26 @@
 }
 
 .video-center {
-  position: absolute;
-  margin: auto;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  // position: absolute;
+  // margin: auto;
+  // top: 50%;
+  // left: 50%;
+  // transform: translate(-50%, -50%);
+  display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 /* ANNOTATION BUTTONS */
 .annotation_buttons_container {
-  min-width: 18rem;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  padding: 2px;
-  margin-left: 1%;
-  width: 82%;
+  // min-width: 18rem;
+  // height: 100%;
+  // display: flex;
+  // flex-direction: column;
+  // justify-content: flex-start;
+  // padding: 2px;
+  // margin-left: 1%;
+  // width: 82%;
 }
 
 .annotation_button {
@@ -157,10 +222,9 @@
   margin-top: 1.2rem;
 }
 
-.relative_time_toggle {
-  margin-right: 2em;
-  float: left;
-}
+// .relative_time_toggle {
+//   margin-bottom: 1rem;
+// }
 
 .grid-tile-content {
   width: 80%;
@@ -176,28 +240,28 @@
 
 @media only screen and (min-width: 1300px) and (max-width: 1599px) {
   .annotation-list-container {
-    flex: 1 1 auto;
-    overflow-y: auto;
-    border-top: 2px solid mintcream;
-    margin-left: 1rem;
-    padding-left: 0;
-    margin-top: 0;
-    width: 77%;
-    margin-bottom: 4.5rem;
+    // flex: 1 1 auto;
+    // overflow-y: auto;
+    // border-top: 2px solid mintcream;
+    // margin-left: 1rem;
+    // padding-left: 0;
+    // margin-top: 0;
+    // width: 77%;
+    // margin-bottom: 4.5rem;
 
-    &::-webkit-scrollbar-corner {
-      border-radius: 5px;
-      width: 8px;
-    }
+    // &::-webkit-scrollbar-corner {
+    //   border-radius: 5px;
+    //   width: 8px;
+    // }
     /* TODO(mdc-migration): The following rule targets internal classes of list that may no longer apply for the MDC version. */
     /* TODO(mdc-migration): The following rule targets internal classes of list that may no longer apply for the MDC version. */
-    .mat-list-option-custom {
-      max-width: 13rem;
-      margin-left: 0;
-      overflow: hidden;
-      max-height: 2rem;
-      font-size: 0.90rem;
-    }
+    // .mat-list-option-custom {
+    //   max-width: 13rem;
+    //   margin-left: 0;
+    //   overflow: hidden;
+    //   max-height: 2rem;
+    //   font-size: 0.90rem;
+    // }
 
     /*.mat-list-item-content {
       padding: 0 0 0 0.6rem !important;
@@ -205,14 +269,14 @@
   }
 
   .training_info_container {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    padding: 2px 20px 6px 22px;
-    margin-top: 0.2rem;
-    width: 75%;
-    font-size: 0.8rem;
+    // display: flex;
+    // flex-direction: column;
+    // justify-content: flex-start;
+    // align-items: center;
+    // padding: 2px 20px 6px 22px;
+    // margin-top: 0.2rem;
+    // width: 75%;
+    // font-size: 0.8rem;
   }
 
   .training_info_card_form {
@@ -222,18 +286,18 @@
     padding: 0.25rem 0.25rem 0.05rem 0.5rem !important;
   }
 
-  .training_info_card_display {
-    margin-top: 0.2rem;
-    display: flex;
-    width: 68%;
-    flex-direction: column;
-    justify-content: flex-start;
-    padding: 0.5rem 0 0.5rem 0.7rem !important;
-    margin-left: 1.4rem;
-    font-size: 0.75rem;
-    line-height: 0.85rem;
-    border-radius: 0;
-  }
+  // .training_info_card_display {
+  //   margin-top: 0.2rem;
+  //   display: flex;
+  //   width: 68%;
+  //   flex-direction: column;
+  //   justify-content: flex-start;
+  //   padding: 0.5rem 0 0.5rem 0.7rem !important;
+  //   margin-left: 1.4rem;
+  //   font-size: 0.75rem;
+  //   line-height: 0.85rem;
+  //   border-radius: 0;
+  // }
 
   .card {
     width: 100%;
@@ -247,43 +311,43 @@
 
 @media only screen and (min-width: 1200px) and (max-width: 1299px) {
   .annotation-list-container {
-    flex: 1 1 auto;
-    overflow-y: auto;
-    border-top: 2px solid mintcream;
-    margin-left: 2rem;
-    padding-left: 0;
-    margin-top: 0;
-    width: 67%;
-    margin-bottom: 4.8rem;
+    // flex: 1 1 auto;
+    // overflow-y: auto;
+    // border-top: 2px solid mintcream;
+    // margin-left: 2rem;
+    // padding-left: 0;
+    // margin-top: 0;
+    // width: 67%;
+    // margin-bottom: 4.8rem;
 
-    &::-webkit-scrollbar-corner {
-      border-radius: 5px;
-      width: 8px;
-    }
+    // &::-webkit-scrollbar-corner {
+    //   border-radius: 5px;
+    //   width: 8px;
+    // }
     /* TODO(mdc-migration): The following rule targets internal classes of list that may no longer apply for the MDC version. */
     /* TODO(mdc-migration): The following rule targets internal classes of list that may no longer apply for the MDC version. */
-    .mat-list-option-custom {
-      max-width: 12.5rem;
-      margin-left: 0;
-      overflow: hidden;
-      max-height: 2rem;
-      font-size: 0.87rem;
-    }
+    // .mat-list-option-custom {
+    //   max-width: 12.5rem;
+    //   margin-left: 0;
+    //   overflow: hidden;
+    //   max-height: 2rem;
+    //   font-size: 0.87rem;
+    // }
   }
 
   .training_info_container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 2px 20px 6px 22px;
-    margin-top: 0.2rem;
-    width: 69%;
-    font-size: 0.78rem;
+    // display: flex;
+    // flex-direction: column;
+    // justify-content: center;
+    // align-items: center;
+    // padding: 2px 20px 6px 22px;
+    // margin-top: 0.2rem;
+    // width: 69%;
+    // font-size: 0.78rem;
   }
 
   .training_info_container > input {
-    max-width: 70%;
+    // max-width: 70%;
   }
 
   .training_info_card_form {
@@ -305,19 +369,19 @@
     padding: 0 0 0.5rem;
   }
 
-  .training_info_card_display {
-    margin-top: 0.2rem;
-    display: flex;
-    width: 60%;
-    flex-direction: column;
-    justify-content: flex-start;
-    padding: 0.5rem 0 0.5rem 0.7rem !important;
-    margin-left: 2.4rem;
-    font-size: 0.65rem;
-    line-height: 0.75rem;
-    border-radius: 0;
-    overflow: auto;
-  }
+  // .training_info_card_display {
+  //   margin-top: 0.2rem;
+  //   display: flex;
+  //   width: 60%;
+  //   flex-direction: column;
+  //   justify-content: flex-start;
+  //   padding: 0.5rem 0 0.5rem 0.7rem !important;
+  //   margin-left: 2.4rem;
+  //   font-size: 0.65rem;
+  //   line-height: 0.75rem;
+  //   border-radius: 0;
+  //   overflow: auto;
+  // }
 
   /*.annotation_button{
     max-height: 1.8rem;
@@ -353,13 +417,13 @@
     }
     /* TODO(mdc-migration): The following rule targets internal classes of list that may no longer apply for the MDC version. */
     /* TODO(mdc-migration): The following rule targets internal classes of list that may no longer apply for the MDC version. */
-    .mat-list-option-custom {
-      max-width: 12.5rem;
-      margin-left: 0;
-      overflow: hidden;
-      max-height: 2.2rem;
-      font-size: 0.88rem;
-    }
+    // .mat-list-option-custom {
+    //   max-width: 12.5rem;
+    //   margin-left: 0;
+    //   overflow: hidden;
+    //   max-height: 2.2rem;
+    //   font-size: 0.88rem;
+    // }
   }
 
   .video-container {
